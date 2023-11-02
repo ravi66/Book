@@ -1,0 +1,76 @@
+﻿@using System.Globalization
+
+@if (ShowDialog)
+{
+    <div class="modal fade show d-block" id="transListModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable " role="document">
+            <div class="modal-content">
+                <div class="modal-header pt-1 pb-1">
+                    <h5 class="modal-title" id="confirmModalLabel">@DialogTitle</h5>
+                    <button type="button" class="btn btn-secondary oi oi-circle-x float-end" data-dismiss="modal" title="Close" @onclick="() => Close()" @ref="CloseButton" ></button>
+                </div>
+                <div class="modal-body mb-0 mt-0 pt-1 pb-1">
+                    @if (TypeId != 0 || SummaryTypeId != 0)
+                    {
+                    <div class="row row-cols-11 pb-sm-2 pt-sm-1">
+                        <div class="col-sm col-sm-6 ">
+                            <label for="StartDate">Start </label>
+                            <input type="date" id="StartDate" @bind=StartDate>
+                        </div>
+                        <div class="col-sm col-sm-5 ">
+                            <label for="EndDate" >End </label>
+                            <input type="date" id="EndDate" @bind=EndDate >
+                        </div>
+                        <div class="col-sm col-sm-1">
+                            <button type="submit" class="btn btn-primary btn-sm oi oi-magnifying-glass " title="Filter" @onclick="() => HandleFilter()"></button>
+                        </div>
+                    </div>
+                    }
+                    @if (Transactions.Count() == 0)
+                    {
+                    <div class="row pt-3">
+                        <div class="col-6 p-3"><i><b>No transactions found</b></i></div>
+                    </div>
+                    }
+                    else
+                    {
+                    <div class="row pt-1 pl-1">
+                        <div class="col" >
+                            <table class="table table-bordered table-hover table-sm">
+                                <thead>
+                                    <tr>
+                                        <th style="cursor: pointer;" @onclick="@(() => SortTable("Value"))">Value <span class="oi @(SetSortIcon("Value"))"></span></th>
+                                        <th style="cursor: pointer;" @onclick="@(() => SortTable("TransactionTypeName"))">Type <span class="oi @(SetSortIcon("TransactionTypeName"))"></span></th>
+                                        <th style="cursor: pointer;" @onclick="@(() => SortTable("TransactionDate"))">Dated <span class="oi @(SetSortIcon("TransactionDate"))"></span></th>
+                                        <th>Notes</th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var transaction in Transactions)
+                                    {
+                                    <tr>
+                                        <td><a href="javascript: void(0);" @onclick="@(e => EditTransaction(transaction.TransactionId))" class="@transaction.CssClass" >@transaction.Value.ToString("C2")</a></td>
+                                        <td>@transaction.TransactionTypeName</td>
+                                        <td>@transaction.TransactionDate.ToShortDateString()</td>
+                                        <td>@transaction.Notes</td>
+                                        <td style="text-align:center;" ><button class="btn btn-primary btn-sm oi oi-plus" title="Copy" @onclick="() => CopyTransaction(transaction.TransactionId)"></button></td>
+                                        <td style="text-align:center;" ><button class="btn btn-danger btn-sm oi oi-trash" title="Delete" @onclick="() => DeleteTransaction(transaction.TransactionId, transaction.TransactionTypeName, transaction.Value)"></button></td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<TransactionDialog @ref="TransactionDialog" CloseEventCallback="@TransactionDialog_OnDialogClose"></TransactionDialog>
+<ConfirmDialog @ref="ConfirmDelete" ConfirmationChanged="ConfirmDelete_Click"></ConfirmDialog>
+<TransCopyDialog @ref="CopyDialog" CloseEventCallback="@CopyDialog_OnDialogClose"></TransCopyDialog>
+<PromptDialog @ref="CopyCountPrompt"></PromptDialog>

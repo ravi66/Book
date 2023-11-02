@@ -1,0 +1,68 @@
+﻿@using System.Globalization
+
+@if (ShowDialog)
+{
+    <div class="modal fade show d-block" id="transactionModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    @if (SavedTransactionId == 0)
+                    {
+                        <h5 class="modal-title" id="titleLabel">Create Transaction</h5>
+                    }
+                    else
+                    {
+                        <h5 class="modal-title" id="titleLabel">Edit Transaction</h5>
+                    }
+                    <button type="button" class="btn btn-secondary oi oi-circle-x float-end" data-dismiss="modal" title="Close" @onclick="() => Close()" ></button>
+                </div>
+                <div class="modal-body">
+
+                    <EditForm Model=@Transaction OnValidSubmit="@HandleValidSubmit">
+
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="row">
+                            <label for="Value" class="col-3">Value: </label>
+                            <InputText id="Value" class="col-5" @bind-Value=@Transaction.ValueAsString @ref=inputTextForFocus onFocus="this.select();" ></InputText>
+                            <ValidationMessage For="@(() => Transaction.Value)" />
+                        </div>
+                        <div class="row">
+                            <label for="TransactionTypeId" class="col-3">Type: </label>
+                            <InputSelect id="TransactionTypeId" class="form-select-sm col-9" @bind-Value="@Transaction.TransactionTypeId">
+                                @foreach (var transactionType in TransactionTypeSL)
+                                {
+                                    <option value="@transactionType.TransactionTypeId.ToString()">@transactionType.Name</option>
+                                }
+                                @Transaction.TransactionTypeId
+                            </InputSelect>
+                            <ValidationMessage For="@(() => Transaction.TransactionTypeId)" />
+                        </div>
+                        <div class="row" >
+                            <label for="Dated" class="col-3">Dated: </label>
+                            <InputDate id="Dated" class="col-7" @bind-Value="@Transaction.TransactionDate" ></InputDate>
+                            <ValidationMessage For="@(() => Transaction.TransactionDate)" />
+                        </div>
+                        <div class="row">
+                            <label for="Name" class="col-3">Notes: </label>
+                            <InputTextArea id="Name" class="col-9" @bind-Value="@Transaction.Notes" ></InputTextArea>
+                            <ValidationMessage For="@(() => Transaction.Notes)" />
+                        </div>
+                        <div class="row">
+                            <label class="col-3 float-sm-start">Created:</label>
+                            <div class="col-9 float-sm-start">@Transaction.CreateDate.ToShortDateString()</div>
+                        </div>
+                        <div class="row float-end">
+                            <div class="col-2">
+                                <button type="submit" class="btn btn-primary oi oi-circle-check" title="Save" ></button>
+                            </div>
+                        </div>
+
+                    </EditForm>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}

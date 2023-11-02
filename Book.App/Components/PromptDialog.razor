@@ -1,0 +1,21 @@
+﻿@if (ShowPrompt)
+{
+    <div class="modal show d-block" id="promptModal" role="dialog" >
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable " role="document" >
+            <div class="modal-content">
+                <div class="modal-body pt-1 pb-2">
+                    <div class="row-cols-1 pt-2 pb-2 ">
+                        <div class="col text-center">
+                            @((MarkupString)PromptMessage)
+                        </div>
+                    </div>
+                    <div class="row-cols-1">
+                        <div class="col text-center">
+                            <button class="btn btn-primary oi oi-circle-check" data-dismiss="modal" title="Close" @onclick="() => Close()" @ref="OKButton" ></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,194 @@
+﻿@page "/"
+@using Book.Models;
+
+<div class="container pt-0">
+
+<PageTitle>@BookName</PageTitle>
+
+    @if (Summarys == null)
+    {
+        <div class="row">
+            <div class="col">Calculating Summary</div>
+        </div>
+    }
+    else
+    {
+        <div class="row pt-0 ">
+            <button class="btn btn-primary col col-2 oi oi-plus" title="Add Transaction" @onclick="AddTransaction" @ref="New" ></button>
+            <div class="col col-5">
+                <select class="form-select form-select-sm " id="year" value="@Year" @onchange="@YearChanged">
+                    @foreach (var year in YearSL)
+                    {
+                        <option value="@year.ToString()">@year.ToString()</option>
+                    }
+                    @Year
+                </select>
+            </div>
+        </div>
+        <div class="row pt-0 ">
+            <table class="table table-sm table-bordered table-hover ">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col"></th>
+                        @foreach (var summary in Summarys)
+                        {
+                            <th scope="col" class="text-sm-center">
+                                <button type="button" class="btn btn-primary " title="@summary.Name More Info" @onclick="@(e => TotalInfo(summary.InfoText))" >@summary.Name</button>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>Jan</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 1))" class="@summary.SummaryMonths[0].CssClass">@summary.SummaryMonths[0].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Feb</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 2))" class="@summary.SummaryMonths[1].CssClass">@summary.SummaryMonths[1].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Mar</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 3))" class="@summary.SummaryMonths[2].CssClass">@summary.SummaryMonths[2].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Apr</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 4))" class="@summary.SummaryMonths[3].CssClass">@summary.SummaryMonths[3].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>May</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 5))" class="@summary.SummaryMonths[4].CssClass">@summary.SummaryMonths[4].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Jun</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 6))" class="@summary.SummaryMonths[5].CssClass">@summary.SummaryMonths[5].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Jul</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 7))" class="@summary.SummaryMonths[6].CssClass">@summary.SummaryMonths[6].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Aug</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 8))" class="@summary.SummaryMonths[7].CssClass">@summary.SummaryMonths[7].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Sep</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 9))" class="@summary.SummaryMonths[8].CssClass">@summary.SummaryMonths[8].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Oct</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 10))" class="@summary.SummaryMonths[9].CssClass" title="@summary.Title" >@summary.SummaryMonths[9].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Nov</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 11))" class="@summary.SummaryMonths[10].CssClass" title="@summary.Title" >@summary.SummaryMonths[10].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Dec</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 12))" class="@summary.SummaryMonths[11].CssClass" title="@summary.Title" >@summary.SummaryMonths[11].Value.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Total</td>
+                        @foreach (var summary in Summarys)
+                        {
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="javascript: void(0);" @onclick="@(e => TransList(summary.Name, summary.Types, 0))" class="@summary.TotCssClass" title="@summary.Title" >@summary.Total.ToString("N2")</a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+}
+</div>
+
+<TransactionDialog @ref="TransactionDialog" CloseEventCallback="@TransactionDialog_OnDialogClose"></TransactionDialog>
+<TransListDialog @ref="TransListDialog" CloseEventCallback="@TransListDialog_OnDialogClose"></TransListDialog>
+<PromptDialog @ref="TotalInfoDialog"></PromptDialog>

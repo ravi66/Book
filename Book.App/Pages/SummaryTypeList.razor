@@ -1,0 +1,82 @@
+﻿@page "/summarytypelist"
+@using Book.Shared;
+
+<h3 class="row p-1">
+    <label class="col-6"><b>Summary Types</b></label>
+    <button class="btn btn-primary col-2 oi oi-plus" title="Add Summary" @onclick="(e => EditSummaryType(0))"></button>
+</h3>
+
+@if (SummaryTypes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-sm table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col" style="cursor: pointer;" @onclick="@(() => SortTable("Name"))">
+                    Name
+                    <span class="oi @(SetSortIcon("Name"))"></span>
+                </th>
+                <th scope="col" style="cursor: pointer;" @onclick="@(() => SortTable("Order"))">
+                    Order
+                    <span class="oi @(SetSortIcon("Order"))"></span>
+                </th>
+                <th scope="col" style="cursor: pointer;" @onclick="@(() => SortTable("CreateDate"))">
+                    Created
+                    <span class="oi @(SetSortIcon("CreateDate"))"></span>
+                </th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var summaryType in SummaryTypes)
+            {
+                <tr>
+                    <td><a href="javascript: void(0);" @onclick="@(e => EditSummaryType(summaryType.SummaryTypeId))">
+                            @summaryType.Name
+                        </a>
+                    </td>
+                    <td>@summaryType.Order</td>
+                    <td>@summaryType.CreateDate.ToShortDateString()</td>
+
+                    @if (@summaryType.TransactionTypeCount > 0)
+                    {
+                        <td>
+                            @if (Loading)
+                            {
+                                <button type="button" class="btn btn-info btn-sm" disabled>
+                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Loading...
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-info btn-sm oi oi-info" title="Transactions" @onclick="() => ListTransactions(summaryType.SummaryTypeId, summaryType.Name, summaryType.Types)"></button>
+                            }
+                        </td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+
+                    @if (@summaryType.TransactionTypeCount < 1 && @summaryType.SummaryTypeId != -1)
+                    {
+                        <td style="text-align:center;" ><button class="btn btn-danger btn-sm oi oi-trash" title="Delete" @onclick="() => DeleteSummaryType(summaryType.SummaryTypeId, summaryType.Name)"></button></td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<SummaryTypeDialog @ref="SummaryTypeDialog" CloseEventCallback="@SummaryTypeDialog_OnDialogClose"></SummaryTypeDialog>
+<ConfirmDialog @ref="ConfirmDelete" ConfirmationChanged="ConfirmDelete_Click"></ConfirmDialog>
+<TransListDialog @ref="TransListDialog" CloseEventCallback="@TransListDialog_OnDialogClose"></TransListDialog>

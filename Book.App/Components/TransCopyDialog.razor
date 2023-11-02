@@ -1,0 +1,59 @@
+﻿@using System.Globalization
+
+@if (ShowDialog)
+{
+    <div class="modal fade show d-block" id="TransCopyModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable " role="document">
+            <div class="modal-content">
+                <div class="modal-header pt-1 pb-1">
+                    <h5 class="modal-title" id="TransCopyLabel">@DialogTitle</h5>
+                    <button type="button" class="btn btn-secondary oi oi-circle-x float-end" data-dismiss="modal" title="Close" @onclick="() => Close()"></button>
+                </div>
+                <div class="modal-body pt-1 pb-1">
+
+                    <div class="row-cols-sm-1 pt-1 pb-1 p-1">
+                        <div class="col">
+                            <select class="form-select-sm" id="frequency" value="@SelectedFrequency" @onchange="@FrequencyChanged" @ref="FocusField" >
+                                @foreach (var frequency in FrequencySL)
+                                {
+                                    <option value="@frequency.FrequencyID.ToString()">@frequency.FrequencyName</option>
+                                }
+                                @SelectedFrequency
+                            </select>
+                            <button type="submit" class="btn btn-primary oi oi-circle-check" title="Save" @onclick="() => HandleSubmit()" ></button>
+                        </div>
+                    </div>
+
+                    <div class="row pt-1 pl-1">
+                        <div class="col">
+                            <table class="table table-bordered table-hover table-sm">
+                                <thead>
+                                    <tr>
+                                        <th style="cursor: pointer;" @onclick="@(() => SortTable("TransactionDate"))">
+                                            Dated
+                                            <span class="oi @(SetSortIcon("TransactionDate"))"></span>
+                                        </th>
+                                        <th>Value</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var transaction in NewTransactions)
+                                    {
+                                        <tr>
+                                            <td>@transaction.TransactionDate.ToShortDateString()</td>
+                                            <td>@transaction.Value.ToString("C2")</td>
+
+                                            <td style="text-align:center;"><button class="btn btn-danger btn-sm oi oi-trash" title="Delete" @onclick="() => DeleteTransaction(transaction.TransactionDate)"></button></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}

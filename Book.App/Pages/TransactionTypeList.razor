@@ -1,0 +1,71 @@
+﻿@page "/transactiontypelist"
+@using Book.Shared;
+@inject IJSRuntime JsRuntime
+
+<h3 class="row p-1">
+    <label class="col-7" ><b>Transaction Types</b></label>
+    <button class="btn btn-primary col-2 oi oi-plus" title="Add Transaction Type" @onclick="(e => EditTransactionType(0))"></button>
+</h3>
+
+@if (TransactionTypes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-sm table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col" style="cursor: pointer;" @onclick="@(() => SortTable("Name"))">
+                    Name
+                    <span class="oi @(SetSortIcon("Name"))"></span>
+                </th>
+                <th scope="col" style="cursor: pointer;" @onclick="@(() => SortTable("SummaryName"))">
+                    Summary
+                    <span class="oi @(SetSortIcon("SummaryName"))"></span>
+                </th>
+                <th scope="col" style="cursor: pointer;" @onclick="@(() => SortTable("CreateDate"))">
+                    Created
+                    <span class="oi @(SetSortIcon("CreateDate"))"></span>
+                </th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transactionType in TransactionTypes)
+            {
+                <tr>
+                    <td><a href="javascript: void(0);" @onclick="@(e => EditTransactionType(transactionType.TransactionTypeId))">
+                            @transactionType.Name
+                        </a>
+                    </td>
+                    <td>@transactionType.SummaryName</td>
+                    <td>@transactionType.CreateDate.ToShortDateString()</td>
+
+                    @if (@transactionType.TransactionCount > 0)
+                    {
+                        <td style="text-align:center;"><button class="btn btn-info btn-sm oi oi-info" title="Transactions" @onclick="() => ListTransactions(transactionType.TransactionTypeId, transactionType.Name)"></button></td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+
+                    @if (@transactionType.TransactionCount < 1 && @transactionType.TransactionTypeId != -1)
+                    {
+                        <td style="text-align:center;" ><button class="btn btn-danger btn-sm oi oi-trash" title="Delete" @onclick="() => DeleteTransactionType(transactionType.TransactionTypeId, transactionType.Name)"></button></td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<TransactionTypeDialog @ref="TransactionTypeDialog" CloseEventCallback="@TransactionTypeDialog_OnDialogClose"></TransactionTypeDialog>
+<ConfirmDialog @ref="ConfirmDelete" ConfirmationChanged="ConfirmDelete_Click"></ConfirmDialog>
+<TransListDialog @ref="TransListDialog" CloseEventCallback="@TransListDialog_OnDialogClose"></TransListDialog>
