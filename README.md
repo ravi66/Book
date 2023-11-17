@@ -11,5 +11,5 @@ Book is a project I'm mainly using as a learning experience in various technolog
  [SqliteWasmHelper](https://github.com/JeremyLikness/SqliteWasmHelper)
 - [MudBlazor](https://www.mudblazor.com/) components and UI styling
 
-It is a web application that has no back-end services - everything is accomplished ocally in 
+It is a web application that has no back-end services - everything is accomplished locally in 
 the browser.
