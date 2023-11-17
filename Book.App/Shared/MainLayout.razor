@@ -1,13 +1,25 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-    <main>
-        <article class="content px-4">
+<MudLayout>
+    <MudAppBar Elevation="0" Dense="true" Fixed="false" >
+        <MudMenu AnchorOrigin="Origin.BottomLeft" Label="@BookName" Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.KeyboardArrowDown">
+            <MudMenuItem Href="/" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Home">Summary</MudMenuItem>
+            <MudMenuItem Href="SummaryTypeList" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Summarize">Summary Types</MudMenuItem>
+            <MudMenuItem Href="TransactionTypeList" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Payments">Transaction Types</MudMenuItem>
+            <MudMenuItem Href="BookSettings" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Settings">Settings</MudMenuItem>
+            <MudMenuItem Href="Database" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Storage">Database</MudMenuItem>
+            <MudMenuItem Href="Credits" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Info">Credits</MudMenuItem>
+        </MudMenu>
+        <MudSpacer />
+        <MudIconButton Icon="@themeIcon" Color="Color.Inherit" OnClick="ToggleThemeMode" Class="mr-3" />
+    </MudAppBar>
+    <MudMainContent Class="pt-1 pb-2">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" >
             @Body
-        </article>
-    </main>
-</div>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>

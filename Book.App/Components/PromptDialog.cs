@@ -1,38 +1,27 @@
 ﻿using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace Book.Components
 {
     public partial class PromptDialog
     {
-        public bool ShowPrompt { get; set; }
+        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-        public string PromptMessage { get; set; } = "";
+        [Parameter] public string PromptMessage { get; set; }
 
-        private ElementReference OKButton;
+        void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+        public Boolean ShowPrompt;
 
         public void Show(string? promptMessage)
         {
-            ShowPrompt = true;
-
+            /*
             if (promptMessage != null)
                 PromptMessage = promptMessage;
 
+            ShowPrompt = true;
             StateHasChanged();
+            */
         }
-
-        public void Close()
-        {
-            ShowPrompt = false;
-            StateHasChanged();
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (ShowPrompt)
-            {
-                await OKButton.FocusAsync();
-            }
-        }
-
     }
 }

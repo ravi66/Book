@@ -2,112 +2,173 @@
 using Book.Components;
 using Microsoft.AspNetCore.Components;
 using SqliteWasmHelper;
+using MudBlazor;
+using Book.Services;
 
 namespace Book.Pages
 {
     public partial class TransactionTypeList
     {
-        public IEnumerable<TransactionType> TransactionTypes { get; set; }
+        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
 
-        [Inject]
-        public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
+        [Inject] public IDialogService DialogService { get; set; }
 
-        protected TransactionTypeDialog TransactionTypeDialog { get; set; }
+        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
 
-        protected TransListDialog TransListDialog { get; set; }
+        public List<TransactionType> TransactionTypes { get; set; }
 
-        protected ConfirmDialog ConfirmDelete { get; set; }
-        public int DeleteId { get; set; }
+        private List<SummaryType> SummaryTypes { get; set; }
+
+        private SummaryType _SelectedSummaryType { get; set; }
+
+
+        private TransactionType selectedTransactionType { get; set; }
+
+        private TransactionType transactionTypeBeforeEdit { get; set; }
+
+        private string BookName { get; set; } = "Book";
+
+        private MudTable<TransactionType> _table { get; set; }
+
+        private bool blockSwitch { get; set; } = false;
 
         protected async override Task OnInitializedAsync()
         {
+            BookName = await BookSettingSvc.GetBookName();
+
+            using var ctx = await Factory.CreateDbContextAsync();
+            SummaryTypes = (await ctx.GetAllSummaryTypes()).ToList();
+
+            await LoadTransactionTypes();
+        }
+
+        private async Task LoadTransactionTypes()
+        {
             using var ctx = await Factory.CreateDbContextAsync();
             TransactionTypes = (await ctx.GetAllTransactionTypes()).ToList();
-
-            isSortedAscending = true;
-            activeSortColumn = "Name";
         }
 
-        protected void EditTransactionType(int transactionTypeId)
+        protected async Task ListTransactions(int transactionTypeId, string transactionTypeName)
         {
-            TransactionTypeDialog.Show(transactionTypeId);
-        }
+            _table.SetEditingItem(null);
 
-        public async void TransactionTypeDialog_OnDialogClose()
-        {
-            await OnInitializedAsync();
+            var parameters = new DialogParameters<TransListDialog>();
+            parameters.Add(x => x.Mode, 3);
+            parameters.Add(x => x.Name, transactionTypeName);
+            parameters.Add(x => x.TransactionTypeId, transactionTypeId);
+
+            var dialog = DialogService.Show<TransListDialog>("Transaction List", parameters);
+
+            var result = await dialog.Result;
+
+            await LoadTransactionTypes();
             StateHasChanged();
         }
 
-        protected void ListTransactions(int transactionTypeId, string transactionTypeName)
+        async Task DeleteTransactionType(int transactionTypeId, string transactionTypeName)
         {
-            TransListDialog.ShowType(transactionTypeId, transactionTypeName);
-        }
+            _table.SetEditingItem(null);
 
-        public async void TransListDialog_OnDialogClose()
-        {
-            await OnInitializedAsync();
-            StateHasChanged();
-        }
+            var parameters = new DialogParameters<ConfirmDialog>();
+            parameters.Add(x => x.ConfirmationTitle, $"Delete {transactionTypeName} Transaction Type");
+            parameters.Add(x => x.ConfirmationMessage, "Are you sure you want to delete this Transaction Type?");
+            parameters.Add(x => x.CancelColorInt, 0);
+            parameters.Add(x => x.DoneColorInt, 1);
 
-        async Task DeleteTransactionType(int id, string name)
-        {
-            DeleteId = id;
-            ConfirmDelete.Show("Delete Transaction Type", $"Are you sure you want to delete Transaction Type: {name}");
-        }
+            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters);
+            var result = await dialog.Result;
 
-        protected async Task ConfirmDelete_Click(bool deleteConfirmed)
-        {
-            if (deleteConfirmed && DeleteId != 0)
+            if (!result.Canceled && transactionTypeId != 0)
             {
                 using var ctx = await Factory.CreateDbContextAsync();
-                await ctx.DeleteTransactionType(DeleteId);
-                await ctx.SaveChangesAsync();
 
-                await OnInitializedAsync();
+                await ctx.DeleteTransactionType(transactionTypeId);
+
+                await LoadTransactionTypes();
                 StateHasChanged();
             }
         }
 
-        private bool isSortedAscending;
-        private string activeSortColumn;
-        private void SortTable(string columnName)
+        private void BackupItem(object transactionType)
         {
-            if (columnName != activeSortColumn)
+            transactionTypeBeforeEdit = new()
             {
-                TransactionTypes = TransactionTypes.OrderBy(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                isSortedAscending = true;
-                activeSortColumn = columnName;
-            }
-            else
-            {
-                if (isSortedAscending)
-                {
-                    TransactionTypes = TransactionTypes.OrderByDescending(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                }
-                else
-                {
-                    TransactionTypes = TransactionTypes.OrderBy(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                }
+                TransactionTypeId = ((TransactionType)transactionType).TransactionTypeId,
+                SummaryTypeId = ((TransactionType)transactionType).SummaryTypeId,
+                SummaryType = ((TransactionType)transactionType).SummaryType,
+                SummaryName = ((TransactionType)transactionType).SummaryName,
+                Name = ((TransactionType)transactionType).Name,
+                CreateDate = ((TransactionType)transactionType).CreateDate,
+            };
 
-                isSortedAscending = !isSortedAscending;
-            }
+            _SelectedSummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == ((TransactionType)transactionType).SummaryTypeId);
         }
 
-        private string SetSortIcon(string columnName)
+        private void ResetItemToOriginalValues(object transactionType)
         {
-            if (activeSortColumn != columnName)
+            if (((TransactionType)transactionType).TransactionTypeId != 0)
             {
-                return string.Empty;
-            }
-            if (isSortedAscending)
-            {
-                return "oi-arrow-circle-top";
+                ((TransactionType)transactionType).TransactionTypeId = transactionTypeBeforeEdit.TransactionTypeId;
+                ((TransactionType)transactionType).SummaryTypeId = transactionTypeBeforeEdit.SummaryTypeId;
+                ((TransactionType)transactionType).SummaryType = transactionTypeBeforeEdit.SummaryType;
+                ((TransactionType)transactionType).SummaryName = transactionTypeBeforeEdit.SummaryName;
+                ((TransactionType)transactionType).Name = transactionTypeBeforeEdit.Name;
+                ((TransactionType)transactionType).CreateDate = transactionTypeBeforeEdit.CreateDate;
             }
             else
             {
-                return "oi-arrow-circle-bottom";
+                TransactionTypes.RemoveAt(0);
             }
+
+            blockSwitch = false;
+            StateHasChanged();
+        }
+
+        private async void ItemHasBeenCommitted(object transactionType)
+        {
+            ((TransactionType)transactionType).SummaryTypeId = _SelectedSummaryType.SummaryTypeId;
+            ((TransactionType)transactionType).SummaryName = _SelectedSummaryType.Name;
+
+            using var ctx = await Factory.CreateDbContextAsync();
+
+            if (((TransactionType)transactionType).TransactionTypeId == 0)
+            {
+                await ctx.AddTransactionType((TransactionType)transactionType);
+            }
+            else
+            {
+                await ctx.UpdateTransactionType((TransactionType)transactionType);
+            }
+
+            blockSwitch = false;
+        }
+
+        private async Task AddTransactionType()
+        {
+            if (_table.IsEditRowSwitchingBlocked) return;
+
+            TransactionType newTransactionType = new TransactionType();
+            newTransactionType.Name = String.Empty;
+            newTransactionType.CreateDate = DateTime.Today;
+
+            TransactionTypes.Insert(0, newTransactionType);
+            await Task.Delay(50);
+            _table.SetSelectedItem(newTransactionType);
+            _table.SetEditingItem(newTransactionType);
+            blockSwitch = true;
+        }
+
+        private async Task<IEnumerable<SummaryType>> SummarySearch(string searchValue)
+        {
+            await Task.Yield();
+
+            if (string.IsNullOrEmpty(searchValue))
+            {
+                return SummaryTypes;
+            }
+
+            return SummaryTypes
+                .Where(s => s.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
         }
 
     }

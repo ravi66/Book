@@ -1,46 +1,35 @@
 ﻿using Book.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using MudBlazor;
 using SqliteWasmHelper;
 
 namespace Book.Components
 {
     public partial class TransactionDialog
     {
+        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+        [Parameter] public int SavedTransactionId { get; set; }
+
+        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
+
         public Transaction Transaction { get; set; }
 
-        private bool FocusApplied { get; set; }
-        private InputText inputTextForFocus;
+        private List<TransactionType> TransactionTypes { get; set; }
 
-        [Inject]
-        public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
+        private TransactionType _SelectedTransactionType {  get; set; }
 
-        public bool ShowDialog { get; set; }
+        private DateTime? _SelectedDate {  get; set; }
 
-        [Parameter]
-        public EventCallback<bool> CloseEventCallback { get; set; }
+        void Close() => MudDialog.Cancel();
 
-        public int SavedTransactionId { get; set; }
-
-        public List<TransactionType> TransactionTypeSL { get; set; } = new List<TransactionType>();
-
-        public async Task Show(int transactionId)
+        protected override async Task OnInitializedAsync()
         {
-            SavedTransactionId = transactionId;
-
-            FocusApplied = false;
-
             using var ctx = await Factory.CreateDbContextAsync();
-            TransactionTypeSL = (await ctx.GetTransactionTypeSL()).ToList();
+            TransactionTypes = (await ctx.GetAllTransactionTypes()).ToList();
 
             await ResetDialogAsync();
-            ShowDialog = true;
-            StateHasChanged();
-        }
-
-        public void Close()
-        {
-            ShowDialog = false;
             StateHasChanged();
         }
 
@@ -48,7 +37,7 @@ namespace Book.Components
         {
             if (SavedTransactionId == 0)
             {
-                Transaction = new Transaction { Value = 0.00M, TransactionTypeId = -1, TransactionDate = DateTime.Now, CreateDate = DateTime.Now };
+                Transaction = new Transaction { Value = 0.00M, TransactionTypeId = -1, TransactionDate = DateTime.Today, CreateDate = DateTime.Now };
             }
             else
             {
@@ -56,10 +45,12 @@ namespace Book.Components
                 Transaction = await ctx.GetTransactionById(SavedTransactionId);
             }
 
+            _SelectedTransactionType = TransactionTypes.FirstOrDefault(t => t.TransactionTypeId == Transaction.TransactionTypeId);
+            _SelectedDate = Transaction.TransactionDate;
             Transaction.ValueAsString = Transaction.Value.ToString("F2");
         }
 
-        protected async Task HandleValidSubmit()
+        async void HandleValidSubmit()
         {
             decimal value;
 
@@ -68,8 +59,10 @@ namespace Book.Components
             else
                 Transaction.Value = 0;
 
-            if (Transaction.Value == 0)
-                Close();
+            if (Transaction.Value == 0) Close();
+
+            Transaction.TransactionTypeId = _SelectedTransactionType.TransactionTypeId;
+            if (_SelectedDate != null) Transaction.TransactionDate = (DateTime)_SelectedDate;
 
             using var ctx = await Factory.CreateDbContextAsync();
 
@@ -81,24 +74,21 @@ namespace Book.Components
             {
                 await ctx.UpdateTransaction(Transaction);
             }
-            
-            await ctx.SaveChangesAsync();
 
-            ShowDialog = false;
-            await CloseEventCallback.InvokeAsync(true);
-            StateHasChanged();
+            MudDialog.Close(DialogResult.Ok(true));
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        private async Task<IEnumerable<TransactionType>> TypeSearch(string searchValue)
         {
-            /*
-             * Only set focus to Value once
-            */
-            if (ShowDialog && inputTextForFocus.Element != null && !FocusApplied)
+            await Task.Yield();
+
+            if (string.IsNullOrEmpty(searchValue))
             {
-                FocusApplied = true;
-                await inputTextForFocus.Element.Value.FocusAsync();
+                return TransactionTypes;
             }
+
+            return TransactionTypes
+                .Where(t => t.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
         }
 
     }

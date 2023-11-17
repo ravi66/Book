@@ -1,6 +1,27 @@
 ﻿const cacheName = 'SqliteWasmHelper';
 const bookDbPath = '/data/cache/book.sqlite3';
 
+export async function deleteDatabase() {
+
+    window.sqlitedb = window.sqlitedb || {
+        init: false,
+        cache: await caches.open(cacheName)
+    };
+
+    const match = await window.sqlitedb.cache.match(bookDbPath);
+
+    if (match && match.ok) {
+
+        const deleteResp = await window.sqlitedb.cache.delete(bookDbPath);
+
+        if (deleteResp) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 export async function generateDownloadUrl() {
 
     window.sqlitedb = window.sqlitedb || {
@@ -44,3 +65,4 @@ export async function uploadDatabase(blob) {
 
     await window.sqlitedb.cache.put(bookDbPath, response);
 }
+

@@ -1,17 +1,21 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Microsoft.EntityFrameworkCore;
-using Book.Components;
-using SqliteWasmHelper;
-using Book.Models;
 using Microsoft.AspNetCore.Components.Forms;
+using Book.Components;
+using MudBlazor;
+using Book.Services;
 
 namespace Book.Pages
 {
     public partial class Database
     {
-        [Inject]
-        public IJSRuntime jsRuntime { get; set; }
+        [Inject] public IJSRuntime jsRuntime { get; set; }
+
+        [Inject] public NavigationManager navigationManager { get; set; }
+
+        [Inject] public IDialogService DialogService { get; set; }
+
+        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
 
         private IJSObjectReference? jsModule;
 
@@ -19,13 +23,14 @@ namespace Book.Pages
 
         public string BookDbFileName { get; set; }
 
-        [Inject]
-        public NavigationManager navigationManager { get; set; }
+        private string BookName { get; set; } = "Book";
 
         protected override async Task OnInitializedAsync()
         {
+            BookName = await BookSettingSvc.GetBookName();
+
             var dateStamp = DateTime.Now.ToString("yyyyMMddHHmm");
-            BookDbFileName = $"book-{dateStamp}.sqlite3";
+            BookDbFileName = $"BookDb-{dateStamp}.sqlite3";
 
             jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/database.js");
             BookDownloadUrl = await GetDownloadUrl();
@@ -41,6 +46,25 @@ namespace Book.Pages
             await e.File.OpenReadStream().ReadAsync(fileContent);
             await jsModule.InvokeVoidAsync("uploadDatabase", fileContent);
             navigationManager.NavigateTo("/", true);
+        }
+
+        private async void DeleteDatabase()
+        {
+            var parameters = new DialogParameters<ConfirmDialog>();
+            parameters.Add(x => x.ConfirmationTitle, "Delete Database");
+            parameters.Add(x => x.ConfirmationMessage, "<h2 style=\"color:Crimson\">WARNING:</h2><h5>Are you sure you want to delete all your saved changes?</h5><h5>If you have not copied your your changes they will be permanently lost</h5>");
+            parameters.Add(x => x.CancelColorInt, 0);
+            parameters.Add(x => x.DoneColorInt, 1);
+
+            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                var success = await jsModule.InvokeAsync<bool>("deleteDatabase");
+                if (success) navigationManager.NavigateTo("/", true);
+            }
+
         }
 
         async ValueTask IAsyncDisposable.DisposeAsync()

@@ -19,9 +19,10 @@ namespace Book.Models
         public ICollection<TransactionType>? TransactionTypes { get; set; }
 
         [NotMapped]
-        public int TransactionTypeCount { get; set; }
+        public List<int>? Types { get; set; }
 
         [NotMapped]
-        public List<int>? Types { get; set; }
+        public List<TransactionType>? TransactionTypeList { get; set; }
+
     }
 }

@@ -8,6 +8,7 @@ namespace Book.Models
         public int TransactionTypeId { get; set; }
 
         public int? SummaryTypeId { get; set; }
+
         public SummaryType? SummaryType { get; set; }
 
         [NotMapped]

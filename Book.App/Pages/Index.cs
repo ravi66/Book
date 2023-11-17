@@ -1,269 +1,270 @@
 ﻿using Book.Components;
 using Book.Models;
+using Book.Services;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using SqliteWasmHelper;
+using System.Globalization;
 
 namespace Book.Pages
 {
     public partial class Index
     {
+        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
+
+        [Inject] public IDialogService DialogService { get; set; }
+
+        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+
+        public int Year { get; set; }
+
         public IEnumerable<SummaryType> SummaryTypes { get; set; }
 
-		public IEnumerable<Summary> Summarys { get; set; }
+        public List<MonthlySummary> MonthlySummaries { get; set; } = new List<MonthlySummary>();
 
         private IEnumerable<Transaction> Transactions { get; set; }
 
-        private ElementReference New;
+        private string BookName { get; set; } = "Book";
 
-        private BookSetting BookNameSetting { get; set; }
-        private string BookName { get; set; }
+        public List<int> YearSL { get; set; } = new List<int>();
 
-        public int Year { get; set; } = 0;
+        public List<ColumnInfo> Columns { get; set; } = new List<ColumnInfo>();
 
-        public List<int> YearSL { get; set; }
-
-        public DateTime startDate { get; set; }
-        
-        public DateTime endDate { get; set; }
-
-        [Inject]
-        public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
-
-        [Parameter]
-        public EventCallback<bool> CloseEventCallback { get; set; }
-        
-        protected TransactionDialog TransactionDialog { get; set; }
-
-        protected TransListDialog TransListDialog { get; set; }
-
-        protected PromptDialog TotalInfoDialog { get; set; }
-        
         protected async override Task OnInitializedAsync()
         {
-            await EnsureDbSeeded();
-            await LoadSummary();
-		}
+            int startYear = await BookSettingSvc.GetStartYear();
+            int endYear = await BookSettingSvc.GetEndYear();
 
-        private async Task EnsureDbSeeded()
-        {
-            SummaryType? summaryTypeSeeded;
-            TransactionType? transactionTypeSeeded;
-            BookSetting? bookSettingSeeded;
+            for (int i = startYear; i <= endYear; i++) YearSL.Add(i);
+
+            if (Year == 0)
+            {
+                if (DateTime.Today.Year < startYear || DateTime.Today.Year > endYear)
+                {
+                    Year = startYear;
+                }
+                else
+                {
+                    Year = DateTime.Today.Year;
+                }
+            }
+
+            BookName = await BookSettingSvc.GetBookName();
 
             using var ctx = await Factory.CreateDbContextAsync();
 
-            summaryTypeSeeded = (await ctx.GetSummaryTypeById(-1));
+            SummaryTypes = (await ctx.LoadSummary()).Where(s => s.Types.Count > 0).ToList();
 
-            if (summaryTypeSeeded is null)
-            {
-                ctx.SummaryTypes.Add(new SummaryType { SummaryTypeId = -1, Name = "Unknown", Order = 9999, CreateDate = DateTime.Today });
-                await ctx.SaveChangesAsync();
-            }
-
-            transactionTypeSeeded = (await ctx.GetTransactionTypeById(-1));
-
-            if (transactionTypeSeeded is null)
-            {
-                ctx.TransactionTypes.Add(new TransactionType { TransactionTypeId = -1, Name = "Unknown", SummaryTypeId = -1, CreateDate = DateTime.Today });
-                await ctx.SaveChangesAsync();
-            }
-
-            bookSettingSeeded = (await ctx.GetBookSettingById(1));
-
-            if (bookSettingSeeded is null)
-            {
-                ctx.BookSetting.Add(new BookSetting { BookSettingId = 1, UserAmendable = 1,  SettingName = "Book Name", SettingValue = "Book" });
-                await ctx.SaveChangesAsync();
-            }
-
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (!firstRender)
-            {
-                if (!TotalInfoDialog.ShowPrompt) await New.FocusAsync();
-            }
-        }
-
-        protected void AddTransaction()
-        {
-            TransactionDialog.Show(0);
-        }
-
-        protected void TransList(string summaryName, List<int> types, int month)
-        {
-            TransListDialog.Show(summaryName, types, Year, month);
-        }
-
-        protected void TotalInfo(string infoText)
-        {
-            TotalInfoDialog.Show(infoText);
-        }
-
-        public async void YearChanged(ChangeEventArgs args)
-        {
-            Year = int.Parse(args.Value.ToString());
-            SummaryTypes = null;
             await LoadSummary();
-            StateHasChanged();
-        }
-
-        public async void TransactionDialog_OnDialogClose()
-        {
-            await LoadSummary();
-            StateHasChanged();
-        }
-
-        public async void TransListDialog_OnDialogClose()
-        {
-            await LoadSummary();
-            StateHasChanged();
         }
 
         private async Task LoadSummary()
         {
-            if (Year == 0)
-                Year = DateTime.Now.Year;
-            YearSL = new List<int>();
+            CreateMonthlySummaries();
 
-            for (int i = 2017; i <= DateTime.Now.Year + 5; i++)
+            await CreateSummaryDetails();
+
+            RemoveZeroTransactionsSummaryDetails();
+            CreateColumnInfo();
+        }
+
+        private void CreateMonthlySummaries()
+        {
+            MonthlySummaries = new List<MonthlySummary>();
+
+            for (int i = 1; i < 13; i++)
             {
-                YearSL.Add(i);
+                MonthlySummaries.Add(new MonthlySummary()
+                {
+                    MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i),
+                    MonthNo = i,
+                    SummaryDetails = new List<SummaryDetail>()
+                });
             }
 
+            // Add Total to MonthlySummary (row)
+            MonthlySummaries.Add(new MonthlySummary()
+            {
+                MonthName = "Total",
+                MonthNo = 0,
+                SummaryDetails = new List<SummaryDetail>()
+            });
+        }
+
+        private async Task CreateSummaryDetails()
+        {
             using var ctx = await Factory.CreateDbContextAsync();
 
-            BookNameSetting = (await ctx.GetBookSettingById(1));
-            BookName = BookNameSetting.SettingValue;
-
-            SummaryTypes = (await ctx.LoadSummary()).ToList();
-
-            Summarys = SummaryTypes
-                .Select(s => new Summary 
-                    {Name = s.Name,
-                     Types =  s.Types,
-                     Order = s.Order})
-                .Where (s => s.Types.Count > 0)
-                .ToList();
-
-            foreach (Summary summary in Summarys)
+            foreach (MonthlySummary monthlySummary in MonthlySummaries)
             {
-                Transactions = (await ctx.GetTransactionsByTypeYear(summary.Types, Year)).ToList();
-
-                summary.Count = Transactions.Count();
-
-                summary.SummaryMonths = new();
-
-                for (int monthNo = 1; monthNo < 13; monthNo++)
+                // Add Total SummaryDetail (column)
+                monthlySummary.SummaryDetails.Add(new SummaryDetail()
                 {
-                    startDate = new DateTime(Year, monthNo, 1);
-                    endDate = startDate.AddMonths(1);
+                    SummaryTypeId = 0,
+                    SummaryName = "Total",
+                    Types = new List<int>(),
+                });
 
-                    decimal monthTotal = 0;
-                    monthTotal = Transactions.Where(t => t.TransactionDate >= startDate && t.TransactionDate < endDate).Sum(t => t.Value) * -1;
-
-                    string monthCssClass = string.Empty;
-                    monthCssClass = (monthTotal >= 0) ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
-
-                    summary.SummaryMonths.Add(new SummaryMonth()
+                // Add user defined SummaryDetails
+                foreach (SummaryType summaryType in SummaryTypes)
+                {
+                    monthlySummary.SummaryDetails.Add(new SummaryDetail()
                     {
-                        Value = monthTotal,
-                        CssClass = monthCssClass
+                        SummaryTypeId = summaryType.SummaryTypeId,
+                        SummaryName = summaryType.Name,
+                        Types = summaryType.Types,
                     });
                 }
 
-                summary.Total = summary.SummaryMonths.Sum(s => s.Value);
-                summary.TotCssClass = (summary.Total >= 0) ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
-
-                if (DateTime.Now.Year != Year)
+                // Set SummaryDetail fields
+                foreach (SummaryDetail summaryDetail in monthlySummary.SummaryDetails)
                 {
-                    summary.Mat = GetCurTot(summary, 12) / 12;
-                    summary.PTot = 0;
+                    Transactions = await ctx.GetTransactionsByTypeMonth(summaryDetail.Types, Year, monthlySummary.MonthNo);
+
+                    summaryDetail.Total = Transactions.Sum(t => t.Value) * -1;
+                    summaryDetail.CssClass = summaryDetail.Total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
+
+                    summaryDetail.HasTransactions = Transactions.Count() > 0 ? true : false;
+                }
+            }
+        }
+
+        private void RemoveZeroTransactionsSummaryDetails()
+        {
+            List<int> summariesToBeRemoved = new List<int>();
+
+            foreach (SummaryDetail totalDetail in MonthlySummaries[12].SummaryDetails)  // Total Row
+            {
+                if (totalDetail.SummaryTypeId != 0 && !totalDetail.HasTransactions)  // Always keep the Total Column
+                {
+                    summariesToBeRemoved.Add(totalDetail.SummaryTypeId);
+                }
+            }
+
+            foreach (MonthlySummary monthlySummary in MonthlySummaries)
+            {
+                monthlySummary.SummaryDetails = monthlySummary.SummaryDetails
+                    .Select(s => new SummaryDetail
+                    {
+                        SummaryTypeId = s.SummaryTypeId,
+                        SummaryName = s.SummaryName,
+                        Types = s.Types,
+                        Total = s.Total,
+                        CssClass = s.CssClass
+                    })
+                    .Where(s => !summariesToBeRemoved.Contains(s.SummaryTypeId))
+                    .ToList();
+            }
+        }
+
+        private void CreateColumnInfo()
+        {
+            Columns = new List<ColumnInfo>();
+
+            foreach (SummaryDetail columnDetail in MonthlySummaries[12].SummaryDetails)
+            {
+                var columnInfo = new ColumnInfo();
+                columnInfo.Name = columnDetail.SummaryName;
+                columnInfo.MoreInfoToolTip = $"{columnDetail.SummaryName} More Info";
+
+                if (DateTime.Today.Year == Year)
+                {
+                    columnInfo.InfoText = SetInfoText(columnDetail.SummaryName, GetCurAvg(columnDetail.SummaryTypeId), GetCurAvg(columnDetail.SummaryTypeId) * 12);
                 }
                 else
                 {
-                    summary.Mat = GetCurTot(summary, DateTime.Now.Month) / DateTime.Now.Month;
-                    summary.PTot = summary.Mat * 12;
+                    columnInfo.InfoText = SetInfoText(columnDetail.SummaryName, (columnDetail.Total / 12), 0);
                 }
 
-                summary.InfoText = SetInfoText(summary.Name, summary.Mat, summary.PTot);
+                Columns.Add(columnInfo);
             }
-
-            Summarys = Summarys.Where(s => s.Count != 0).ToList();
-
-            AddTotalSummary();
-
-			Summarys = Summarys.OrderBy(s => s.Order).ToList();
         }
-        
-        private decimal GetCurTot(Summary summary, int monthNo)
+
+        public async void YearChanged(int year)
+        {
+            Year = year;
+            await LoadSummary();
+            StateHasChanged();
+        }
+
+        private async Task AddTransaction()
+        {
+            var parameters = new DialogParameters<TransactionDialog>();
+            parameters.Add(x => x.SavedTransactionId, 0);
+
+            var dialog = DialogService.Show<TransactionDialog>("Create Transaction", parameters); //, options);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                await LoadSummary();
+                StateHasChanged();
+            }
+        }
+
+        protected async void TransList(string summaryName, List<int> types, int month)
+        {
+            string typesString = (types != null && types.Count > 0) ? typesString = string.Join(",", types) : String.Empty;
+
+            var parameters = new DialogParameters<TransListDialog>();
+            parameters.Add(x => x.Mode, 1);
+            parameters.Add(x => x.Name, summaryName);
+            parameters.Add(x => x.TypesString, typesString);
+            parameters.Add(x => x.Year, Year);
+            parameters.Add(x => x.Month, month);
+
+            var dialog = DialogService.Show<TransListDialog>("Transaction List", parameters);
+            var result = await dialog.Result;
+
+            await LoadSummary();
+            StateHasChanged();
+        }
+
+        protected void TotalInfo(string infoText)
+        {
+            var parameters = new DialogParameters<PromptDialog>();
+            parameters.Add(x => x.PromptMessage, infoText);
+
+            var options = new DialogOptions() { NoHeader = true };
+
+            DialogService.Show<PromptDialog>("", parameters, options);
+        }
+
+        private decimal GetCurAvg(int summaryTypeId)
         {
             decimal total = 0;
 
-            for (int i = 0; i < monthNo; i++)
+            foreach (MonthlySummary monthlySummary in  MonthlySummaries)
             {
-                total += summary.SummaryMonths[i].Value;
-            }
+                if (monthlySummary.MonthNo > DateTime.Today.Month) break;
 
-            return total;
-        }
-
-        private void AddTotalSummary()
-        {
-            List<SummaryMonth> summaryMonths = new();
-
-            for (int monthNo = 1; monthNo < 13; monthNo++)
-            {
-                decimal monthTotal = 0;
-
-                foreach (Summary summary in Summarys)
+                foreach (SummaryDetail summaryDetail in monthlySummary.SummaryDetails)
                 {
-                    monthTotal += summary.SummaryMonths[monthNo - 1].Value;
+                    if (summaryDetail.SummaryTypeId == summaryTypeId)
+                    {
+                        total += summaryDetail.Total;
+                        break;
+                    }
                 }
-
-                string monthCssClass = string.Empty;
-                monthCssClass = (monthTotal >= 0) ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
-
-                summaryMonths.Add(new SummaryMonth()
-                {
-                    Value = monthTotal,
-                    CssClass = monthCssClass
-                });
-
             }
-                        
-            Summarys = Summarys.Append(new Summary
-            {
-                Name = "Total",
-                Order = -1,
-                SummaryMonths = summaryMonths,
-                Total = Summarys.Sum(s => s.Total),
-                TotCssClass = (Summarys.Sum(s => s.Total) >= 0) ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass,
-                Mat = Summarys.Sum(s => s.Mat),
-                PTot = Summarys.Sum(s => s.PTot),
-                InfoText = SetInfoText("Total", Summarys.Sum(s => s.Mat), Summarys.Sum(s => s.PTot))
-            });
 
+            return total / DateTime.Today.Month;
         }
 
         private string SetInfoText(string name, decimal curAvg, decimal projTotal)
         {
-            string infoText = "<h5>" + name + "</h5>";
-            string curAvgTextClass = "text-body";
-            string projTotalTextClass = "text-body";
-
-            if (curAvg < 0) curAvgTextClass = "text-danger";
-            if (projTotal < 0) projTotalTextClass = "text-danger";
+            string infoText = "<h2>" + name + "</h2>";
+            string curAvgTextClass = curAvg >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
+            string projTotalTextClass = projTotal >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
 
             if (DateTime.Now.Year == Year)
             {
-                infoText += "<div>Projected Year Total: <span class=\"" + projTotalTextClass + "\">" + projTotal.ToString("N2") + "</span></div>";
-                infoText += "<div>Current Monthly Average: <span class=\"" + curAvgTextClass + "\">" + curAvg.ToString("N2") + "</span></div>";
+                infoText += "<h3>Projected Year Total: <span class=\"" + projTotalTextClass + "\">" + projTotal.ToString("N2") + "</span></h3>";
+                infoText += "<h3>Current Monthly Average: <span class=\"" + curAvgTextClass + "\">" + curAvg.ToString("N2") + "</span></h3>";
             }
             else
             {
-                infoText += "<div>Monthly Average: <span class=\"" + curAvgTextClass + "\">" + curAvg.ToString("N2") + "</span></div>";
+                infoText += "<h3>Monthly Average: <span class=\"" + curAvgTextClass + "\">" + curAvg.ToString("N2") + "</span></h3>";
             }
 
             return infoText;

@@ -1,59 +1,53 @@
 ﻿@using System.Globalization
 
-@if (ShowDialog)
-{
-    <div class="modal fade show d-block" id="TransCopyModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable " role="document">
-            <div class="modal-content">
-                <div class="modal-header pt-1 pb-1">
-                    <h5 class="modal-title" id="TransCopyLabel">@DialogTitle</h5>
-                    <button type="button" class="btn btn-secondary oi oi-circle-x float-end" data-dismiss="modal" title="Close" @onclick="() => Close()"></button>
-                </div>
-                <div class="modal-body pt-1 pb-1">
+<MudDialog>
+    <DialogContent>
 
-                    <div class="row-cols-sm-1 pt-1 pb-1 p-1">
-                        <div class="col">
-                            <select class="form-select-sm" id="frequency" value="@SelectedFrequency" @onchange="@FrequencyChanged" @ref="FocusField" >
-                                @foreach (var frequency in FrequencySL)
-                                {
-                                    <option value="@frequency.FrequencyID.ToString()">@frequency.FrequencyName</option>
-                                }
-                                @SelectedFrequency
-                            </select>
-                            <button type="submit" class="btn btn-primary oi oi-circle-check" title="Save" @onclick="() => HandleSubmit()" ></button>
-                        </div>
-                    </div>
+        <MudStack Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Class="pt-0" Row="true">
+            
+            <MudCard Style="width: 50%;" Elevation="5">
+                <MudSelect  Style="width: 100%;"
+                            Variant="Variant.Outlined"
+                            T="Frequency"
+                            Value="SelectedFrequency"
+                            AnchorOrigin="Origin.BottomCenter"
+                            ValueChanged="@(FrequencyChanged)"
+                            Dense="true"
+                            Margin="Margin.Dense">
+                    @foreach (var frequency in Frequencies)
+                    {
+                        <MudSelectItem Value="frequency">@frequency.FrequencyName</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudCard>
 
-                    <div class="row pt-1 pl-1">
-                        <div class="col">
-                            <table class="table table-bordered table-hover table-sm">
-                                <thead>
-                                    <tr>
-                                        <th style="cursor: pointer;" @onclick="@(() => SortTable("TransactionDate"))">
-                                            Dated
-                                            <span class="oi @(SetSortIcon("TransactionDate"))"></span>
-                                        </th>
-                                        <th>Value</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var transaction in NewTransactions)
-                                    {
-                                        <tr>
-                                            <td>@transaction.TransactionDate.ToShortDateString()</td>
-                                            <td>@transaction.Value.ToString("C2")</td>
+            <MudIconButton  Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            Icon="@Icons.Material.Filled.Save"
+                            Size="Size.Large"
+                            OnClick="HandleSubmit" />
 
-                                            <td style="text-align:center;"><button class="btn btn-danger btn-sm oi oi-trash" title="Delete" @onclick="() => DeleteTransaction(transaction.TransactionDate)"></button></td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+            <MudIconButton  Variant="Variant.Filled" 
+                            Color="Color.Primary"
+                            Icon="@Icons.Material.Filled.Cancel"
+                            Size="Size.Large"
+                            OnClick="MudDialog.Cancel" />
 
-                </div>
-            </div>
-        </div>
-    </div>
-}
+            <MudSpacer />
+
+        </MudStack>
+
+        <MudTable Items="@NewTransactions"
+                  Hover="true">
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.TransactionDate)">Dated</MudTableSortLabel></MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Dated">@context.TransactionDate.ToShortDateString()</MudTd>
+                <MudTd><MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" aria-label="delete" OnClick="() => DeleteTransaction(context.TransactionDate)" /></MudTd>
+            </RowTemplate>
+        </MudTable>
+
+    </DialogContent>
+</MudDialog>

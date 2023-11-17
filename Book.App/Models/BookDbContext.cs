@@ -16,6 +16,23 @@ namespace Book.Models
 
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = -1, Name = "Unknown", Order = 9999, CreateDate = new DateTime(2017, 1, 1) });
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 1, Name = "Food", Order = 1, CreateDate = new DateTime(2017, 1, 1) });
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 2, Name = "Fun", Order = 2, CreateDate = new DateTime(2017, 1, 1) });
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 3, Name = "Life", Order = 3, CreateDate = new DateTime(2017, 1, 1) });
+
+
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { TransactionTypeId = -1, SummaryTypeId = -1, Name = "Unknown", CreateDate = new DateTime(2017, 1, 1) });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { TransactionTypeId = 1, SummaryTypeId = 1, Name = "Groceries", CreateDate = new DateTime(2017, 1, 1) });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { TransactionTypeId = 2, SummaryTypeId = 2, Name = "Cider", CreateDate = new DateTime(2017, 1, 1) });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { TransactionTypeId = 3, SummaryTypeId = 3, Name = "Rent", CreateDate = new DateTime(2017, 1, 1) });
+
+            base.OnModelCreating(modelBuilder);
+        }
+
         public DbSet<SummaryType> SummaryTypes { get; set; }
         public DbSet<TransactionType> TransactionTypes { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
@@ -25,7 +42,7 @@ namespace Book.Models
          * SummaryType Start
         */
 
-        public async Task<IEnumerable<SummaryType>> GetAllSummaryTypes()
+        public async Task<List<SummaryType>> GetAllSummaryTypes()
         {
             return SummaryTypes
                 .Select(s => new SummaryType
@@ -34,9 +51,8 @@ namespace Book.Models
                     Name = s.Name,
                     Order = s.Order,
                     CreateDate = s.CreateDate,
-                    TransactionTypeCount = s.TransactionTypes.Count(),
-                    Types = new List<int>(s.TransactionTypes
-                        .Select(t => t.TransactionTypeId).ToList())
+                    TransactionTypeList = new List<TransactionType>(s.TransactionTypes.OrderBy(t => t.Name).ToList()),
+                    Types = new List<int>(s.TransactionTypes.Select(t => t.TransactionTypeId).ToList())
                 })
                 .OrderBy(s => s.Order)
                 .ToList();
@@ -44,16 +60,7 @@ namespace Book.Models
 
         public async Task<SummaryType> GetSummaryTypeById(int summaryTypeId)
         {
-            return SummaryTypes
-                .Select(s => new SummaryType
-                {
-                    SummaryTypeId = s.SummaryTypeId,
-                    Name = s.Name,
-                    Order = s.Order,
-                    CreateDate = s.CreateDate,
-                    TransactionTypeCount = s.TransactionTypes.Count()
-                })
-                .FirstOrDefault(s => s.SummaryTypeId == summaryTypeId);
+            return SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == summaryTypeId);
         }
 
         public async Task<SummaryType> AddSummaryType(SummaryType summaryType)
@@ -65,8 +72,7 @@ namespace Book.Models
 
         public async Task<SummaryType> UpdateSummaryType(SummaryType summaryType)
         {
-            var foundSummaryType = SummaryTypes
-                .FirstOrDefault(s => s.SummaryTypeId == summaryType.SummaryTypeId);
+            var foundSummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == summaryType.SummaryTypeId);
 
             if (foundSummaryType != null)
             {
@@ -99,18 +105,18 @@ namespace Book.Models
                 .ToList();
         }
 
-        public async Task<IEnumerable<SummaryType>> LoadSummary()
+        public async Task<List<SummaryType>> LoadSummary()
         {
             return SummaryTypes
                 .Select(s => new SummaryType
                 {
+                    SummaryTypeId = s.SummaryTypeId,
                     Name = s.Name,
                     Order = s.Order,
-                    Types = new List<int>(s.TransactionTypes
-                        .Select(t => t.TransactionTypeId).ToList())
+                    Types = new List<int>(s.TransactionTypes.Select(t => t.TransactionTypeId).ToList())
                 })
-                .AsNoTracking()
                 .OrderBy(s => s.Order)
+                .AsNoTracking()
                 .ToList();
         }
 
@@ -126,6 +132,7 @@ namespace Book.Models
                 .Select(t => new TransactionType
                 {
                     TransactionTypeId = t.TransactionTypeId,
+                    SummaryTypeId = t.SummaryTypeId,
                     Name = t.Name,
                     SummaryName = t.SummaryType.Name,
                     CreateDate = t.CreateDate,
@@ -177,35 +184,11 @@ namespace Book.Models
             await SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<TransactionType>> GetTransactionTypeSL()
-        {
-            return TransactionTypes
-                .Select(t => new TransactionType { TransactionTypeId = t.TransactionTypeId, Name = t.Name })
-                .AsNoTracking()
-                .OrderBy(t => t.Name)
-                .ToList();
-        }
-
         /***********************************************************************************/
 
         /*
          * Transaction Start
         */ 
-
-        public async Task <IEnumerable<Transaction>> GetAllTransactions()
-        {
-            return Transactions
-                .Select(t => new Transaction
-                {
-                    TransactionId = t.TransactionId,
-                    Value = t.Value,
-                    TransactionTypeName = t.TransactionType.Name,
-                    TransactionDate = t.TransactionDate,
-                    Notes = t.Notes,
-                    CreateDate = t.CreateDate
-                })
-                .ToList();
-        }
 
         public async Task<Transaction> GetTransactionById(int transactionId)
         {
@@ -263,32 +246,6 @@ namespace Book.Models
             await SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Transaction>> GetTransactionsByTypeYear(List<int>? types, int year)
-        {
-            var query = Transactions
-                    .Select(t => new Transaction
-                    {
-                        TransactionId = t.TransactionId,
-                        TransactionTypeId = t.TransactionTypeId,
-                        Value = t.Value,
-                        TransactionDate = t.TransactionDate
-                    });
-
-            if (types != null)
-            {
-                query = query.Where(t => types.Contains((int)t.TransactionTypeId));
-            }
-
-            DateTime startDate = new DateTime(year, 1, 1);
-            DateTime endDate = new DateTime(year, 12, 31);
-
-            query = query.Where(t => t.TransactionDate >= startDate && t.TransactionDate <= endDate);
-
-            return query
-                .OrderByDescending(t => t.TransactionDate)
-                .ToList();
-        }
-
         public async Task<IEnumerable<Transaction>> GetTransactionsByTypeMonth(List<int>? types, int year, int month)
         {
             var query = Transactions
@@ -303,7 +260,7 @@ namespace Book.Models
                         Notes = t.Notes
                     });
 
-            if (types != null)
+            if (types.Count > 0)
             {
                 query = query.Where(t => types.Contains((int)t.TransactionTypeId));
             }
@@ -393,6 +350,7 @@ namespace Book.Models
                     SettingName = b.SettingName,
                     SettingValue = b.SettingValue
                 })
+                .Where(b => b.UserAmendable == true)
                 .OrderBy(b => b.SettingName)
                 .ToList();
         }
@@ -410,7 +368,7 @@ namespace Book.Models
                 .FirstOrDefault(b => b.BookSettingId == bookSettingId);
         }
 
-        public async Task<BookSetting> AddBookSettings(BookSetting bookSetting)
+        public async Task<BookSetting> AddBookSetting(BookSetting bookSetting)
         {
             var addedEntity = BookSetting.Add(bookSetting);
             await SaveChangesAsync();
@@ -443,6 +401,20 @@ namespace Book.Models
 
             BookSetting.Remove(foundBookSetting);
             await SaveChangesAsync();
+        }
+
+        public async Task UpdateBookSettings(IEnumerable<BookSetting> bookSettings)
+        {
+            if (bookSettings == null)
+                return;
+
+            foreach (var bookSetting in bookSettings)
+            {
+                var updatedEntity = await UpdateBookSetting(bookSetting);
+                await SaveChangesAsync();
+            }
+
+            return;
         }
 
         /***********************************************************************************/

@@ -8,7 +8,7 @@ namespace Book.Models
 {
     public static class Constants
     {
-        public const string PositiveValueCssClass = "text-body text-nowrap float-sm-end";
-        public const string NegativeValueCssClass = "text-danger text-nowrap float-sm-end";
+        public const string PositiveValueCssClass = "mud-primary-text ";
+        public const string NegativeValueCssClass = "mud-secondary-text ";
     }
 }

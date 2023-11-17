@@ -1,19 +1,11 @@
-﻿@if (ShowConfirmation)
-{
-    <div class="modal fade show d-block" id="confirmModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable " role="document">
-            <div class="modal-content">
-                <div class="modal-header pt-1 pb-1">
-                    <h5 class="modal-title" id="confirmModalLabel">@ConfirmationTitle</h5>
-                </div>
-                <div class="modal-body pt-1 pb-1">
-                    @((MarkupString)ConfirmationMessage)
-                </div>
-                <div class="modal-footer pt-1">
-                    <button type="button" class="btn btn-secondary oi oi-circle-x" data-dismiss="modal" title="No" @onclick="() => OnConfirmationChange(false)"></button>
-                    <button type="button" class="btn btn-danger oi oi-circle-check" title="Yes" @onclick="() => OnConfirmationChange(true)"></button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
+﻿<MudDialog>
+    <DialogContent>
+        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="1">
+            @((MarkupString)ConfirmationMessage)
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" OnClick="Close" Color="@CancelColor" Size="Size.Large" />
+        <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" OnClick="Done" Color="@DoneColor" Size="Size.Large" />
+    </DialogActions>
+</MudDialog>

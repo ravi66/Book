@@ -1,41 +1,38 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System.Threading.Tasks;
+using MudBlazor;
 
 namespace Book.Components
 {
     public partial class ConfirmDialog
     {
-        protected bool ShowConfirmation { get; set; }
+        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-        public string ConfirmationTitle { get; set; }
+        [Parameter] public string ConfirmationTitle { get; set; }
 
-        public string ConfirmationMessage { get; set; }
+        [Parameter] public string ConfirmationMessage { get; set; }
 
-        public void Show(string? confirmationTitle, string? confirmationMessage)
+        [Parameter] public int CancelColorInt { get; set; }
+
+        [Parameter] public int DoneColorInt { get; set; }
+
+        Color CancelColor { get; set; }
+
+        Color DoneColor { get; set; }
+
+        void Close() => MudDialog.Cancel();
+
+        void Done() => MudDialog.Close(DialogResult.Ok(true));
+
+        protected override async Task OnInitializedAsync()
         {
-            ShowConfirmation = true;
+            if (ConfirmationMessage == null || ConfirmationMessage == String.Empty) ConfirmationMessage = "Are you sure you want to?";
+            if (ConfirmationTitle != null && ConfirmationTitle != String.Empty) MudDialog.SetTitle(ConfirmationTitle);
 
-            if (confirmationTitle == null)
-                ConfirmationTitle = "Confirm";
-            else
-                ConfirmationTitle = confirmationTitle;
-
-            if (confirmationMessage == null)
-                ConfirmationMessage = "Are you sure you want to";
-            else
-                ConfirmationMessage = confirmationMessage; 
+            CancelColor = CancelColorInt == 0 ? Color.Primary : Color.Secondary;
+            DoneColor = DoneColorInt == 0 ? Color.Primary : Color.Secondary;
 
             StateHasChanged();
         }
 
-        [Parameter]
-        public EventCallback<bool> ConfirmationChanged { get; set; }
-
-        protected async Task OnConfirmationChange(bool value)
-        {
-            ShowConfirmation = false;
-            await ConfirmationChanged.InvokeAsync(value);
-        }
-        
     }
 }

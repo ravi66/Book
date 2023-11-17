@@ -7,7 +7,7 @@ namespace Book.Models
     {
         public int BookSettingId { get; set; }
 
-        public int UserAmendable { get; set; }
+        public bool UserAmendable { get; set; }
 
         [Required]
         [StringLength(50, ErrorMessage = "Setting Name is too long [50].")]

@@ -1,32 +1,28 @@
 ﻿using Book.Models;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using SqliteWasmHelper;
+using static MudBlazor.CategoryTypes;
 
 namespace Book.Components
 {
     public partial class TransCopyDialog
     {
+        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+        [Parameter] public int TransactionToCopyId { get; set; }
+
+        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
+
+        [Inject] public IDialogService DialogService { get; set; }
+
         public Transaction TransactionToCopy { get; set; }
-
-        public TransactionType TransactionType { get; set; }
-
-        private ElementReference FocusField;
 
         public IEnumerable<Transaction> NewTransactions { get; set; } = new List<Transaction>();
 
-        [Inject]
-        public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
+        public int CopyCount { get; set; } = 0;
 
-        [Parameter]
-        public EventCallback<bool> CloseEventCallback { get; set; }
-
-        public bool ShowDialog { get; set; }
-
-        public string DialogTitle { get; set; }
-
-        public int CopyCount { get; set; }
-
-        public List<Frequency> FrequencySL { get; set; } = new List<Frequency>() {
+        public List<Frequency> Frequencies { get; set; } = new List<Frequency>() {
                 new Frequency(){ FrequencyID = 3, FrequencyName = "Yearly"},
                 new Frequency(){ FrequencyID = 2, FrequencyName = "Quaterly"},
                 new Frequency(){ FrequencyID = 5, FrequencyName = "Bi-Monthly"},
@@ -34,21 +30,29 @@ namespace Book.Components
                 new Frequency(){ FrequencyID = 4, FrequencyName = "Weekly"}
             };
 
-        public int SelectedFrequency { get; set; } = 1;
+        public Frequency SelectedFrequency { get; set; }
 
         public DateTime NewDate { get; set; }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        void Close() => MudDialog.Cancel();
+
+        protected override async Task OnInitializedAsync()
         {
-            if (ShowDialog)
-            {
-                await FocusField.FocusAsync();
-            }
+            if (TransactionToCopyId == 0) MudDialog.Cancel();
+
+            using var ctx = await Factory.CreateDbContextAsync();
+            TransactionToCopy = await ctx.GetTransactionById(TransactionToCopyId);
+            if (TransactionToCopy.TransactionId == 0 || TransactionToCopy.TransactionTypeId == 0) MudDialog.Cancel();
+
+            SelectedFrequency = Frequencies.FirstOrDefault(f => f.FrequencyID == 1);
+
+            await LoadCopiedTransactions();
+            StateHasChanged();
         }
 
-        public async void FrequencyChanged(ChangeEventArgs args)
+        public async void FrequencyChanged(Frequency selectedFrequency)
         {
-            SelectedFrequency = int.Parse(args.Value.ToString());
+            SelectedFrequency = selectedFrequency;
             await LoadCopiedTransactions();
             StateHasChanged();
         }
@@ -63,7 +67,8 @@ namespace Book.Components
             while (NewDate <= TransactionToCopy.TransactionDate.AddYears(1))
             {
                 NewTransactions = NewTransactions.Append(
-                    new Transaction {
+                    new Transaction
+                    {
                         TransactionTypeId = TransactionToCopy.TransactionTypeId,
                         Value = TransactionToCopy.Value,
                         TransactionDate = NewDate
@@ -74,52 +79,33 @@ namespace Book.Components
             }
         }
 
-        public async Task Show(int pTransactionId)
-        {
-            CopyCount = 0;
-
-            if (pTransactionId == 0) Close();
-
-            using var ctx = await Factory.CreateDbContextAsync();
-            TransactionToCopy = await ctx.GetTransactionById(pTransactionId);
-            if (TransactionToCopy.TransactionId == 0 || TransactionToCopy.TransactionTypeId == 0) Close();
-
-            TransactionType = await ctx.GetTransactionTypeById(TransactionToCopy.TransactionTypeId ?? -1);
-
-            DialogTitle = "Copying " + TransactionToCopy.Value.ToString("C") + " " + TransactionType.Name + " transaction";
-
-            await LoadCopiedTransactions();
-            ShowDialog = true;
-            StateHasChanged();
-        }
-
         protected async Task HandleSubmit()
         {
             using var ctx = await Factory.CreateDbContextAsync();
             await ctx.AddTransactions(NewTransactions);
-            await ctx.SaveChangesAsync();
 
-            CopyCount = NewTransactions.Count();
-            Close();
-        }
+            var parameters = new DialogParameters<PromptDialog>();
+            string promptText = NewTransactions.Count() > 1 ? $"<h2>{NewTransactions.Count()} Transactions created</h2>" : $"<h2>{NewTransactions.Count()} Transaction created</h2>";
+            parameters.Add(x => x.PromptMessage, promptText);
 
-        public async void Close()
-        {
-            await CloseEventCallback.InvokeAsync(true);
-            ShowDialog = false;
-            StateHasChanged();
+            var options = new DialogOptions() { NoHeader = true };
+
+            var dialog = DialogService.Show<PromptDialog>("", parameters, options);
+            var result = await dialog.Result;
+
+            MudDialog.Cancel();
         }
 
         async Task DeleteTransaction(DateTime transDate)
         {
             NewTransactions = NewTransactions.Where(ct => ct.TransactionDate != transDate);
 
-            if (NewTransactions.Count() == 0) Close();
+            if (NewTransactions.Count() == 0) MudDialog.Cancel();
         }
 
         private void SetNewDate()
         {
-            switch (SelectedFrequency)
+            switch (SelectedFrequency.FrequencyID)
             {
                 case 1:
                     NewDate = NewDate.AddMonths(1);
@@ -142,49 +128,8 @@ namespace Book.Components
                     break;
 
                 default:
+                    NewDate = NewDate.AddMonths(1);
                     break;
-            }
-        }
-
-        private bool isSortedAscending;
-        private string activeSortColumn;
-
-        private void SortTable(string columnName)
-        {
-            if (columnName != activeSortColumn)
-            {
-                NewTransactions = NewTransactions.OrderBy(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                isSortedAscending = true;
-                activeSortColumn = columnName;
-            }
-            else
-            {
-                if (isSortedAscending)
-                {
-                    NewTransactions = NewTransactions.OrderByDescending(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                }
-                else
-                {
-                    NewTransactions = NewTransactions.OrderBy(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                }
-
-                isSortedAscending = !isSortedAscending;
-            }
-        }
-
-        private string SetSortIcon(string columnName)
-        {
-            if (activeSortColumn != columnName)
-            {
-                return string.Empty;
-            }
-            if (isSortedAscending)
-            {
-                return "oi-arrow-circle-top";
-            }
-            else
-            {
-                return "oi-arrow-circle-bottom";
             }
         }
 

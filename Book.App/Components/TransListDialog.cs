@@ -1,7 +1,8 @@
 ﻿using Book.Models;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+using MudBlazor;
 using SqliteWasmHelper;
+using static MudBlazor.CategoryTypes;
 
 namespace Book.Components
 {
@@ -9,277 +10,174 @@ namespace Book.Components
     {
         public IEnumerable<Transaction> Transactions { get; set; }
 
-        [Inject]
-        public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
+        [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-        [Inject]
-        public IJSRuntime jsRuntime { get; set; }
+        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
 
-        [Parameter]
-        public EventCallback<bool> CloseEventCallback { get; set; }
+        [Inject] public IDialogService DialogService { get; set; }
 
-        private ElementReference CloseButton;
+        [Parameter] public int Mode { get; set; }
 
-        public bool ShowDialog { get; set; }
+        [Parameter] public string Name { get; set; }
 
-        public string Name { get; set; } = string.Empty;
+        [Parameter] public string TypesString { get; set; }
 
-        public int TypeId { get; set; }
+        [Parameter] public int Year { get; set; }
 
-        public int SummaryTypeId { get; set; }
+        [Parameter] public int Month { get; set; }
 
-        public DateTime StartDate { get; set; } = new DateTime(2017, 01, 01);
-        public DateTime EndDate { get; set; } = new DateTime(DateTime.Now.Year + 5, 12, 31);
+        [Parameter] public int TransactionTypeId { get; set; }
 
-        protected TransactionDialog TransactionDialog { get; set; }
+        [Parameter] public int SummaryTypeId { get; set; }
 
-        protected PromptDialog CopyCountPrompt { get; set; }
-
-        protected ConfirmDialog ConfirmDelete { get; set; }
-
-        protected TransCopyDialog CopyDialog { get; set; }
-
-        public int DeleteId { get; set; }
-
+        private DateRange _dateRange = new DateRange(new DateTime(2017, 1, 1), new DateTime(DateTime.Today.Year + 5, 1 , 1));
+   
         public List<int> Types { get; set; }
-
-        public int Year { get; set; }
-
-        public int Month { get; set; }
 
         public string DialogTitle { get; set; }
 
         public string MonthName { get; set; }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            if (ShowDialog)
-            {
-                if (!CopyDialog.ShowDialog && !CopyCountPrompt.ShowPrompt) await CloseButton.FocusAsync();
-            }
-        }
+        private MudTable<Transaction> _table { get; set; }
 
-        protected void EditTransaction(int transactionId)
-        {
-            TransactionDialog.Show(transactionId);
-        }
+        void Close() => MudDialog.Cancel();
 
-        public async void TransactionDialog_OnDialogClose()
+        protected override async Task OnInitializedAsync()
         {
+            if (Mode < 1 || Mode > 3) Close();
+
+            MudDialog.Options.MaxWidth = MaxWidth.ExtraLarge;
+            MudDialog.Options.FullWidth = true;
+            MudDialog.Options.NoHeader = true;
+
+            MudDialog.SetOptions(MudDialog.Options);
+
+            if ((Mode == 1 || Mode == 2) && Name == "Total") Name = "";
+            if (Mode == 3) TypesString = String.Empty;
+            
+            Types = TypesString != String.Empty ? TypesString.Split(',').Select(int.Parse).ToList() : new List<int>();
+            
             await LoadTransactions();
-            ShowDialog = true;
-            StateHasChanged();
-        }
-
-        async Task CopyTransaction(int pId)
-        {
-            CopyDialog.Show(pId);
-            StateHasChanged();
-        }
-
-        public async void CopyDialog_OnDialogClose()
-        {
-            if (CopyDialog.CopyCount > 0)
-            {
-                if (CopyDialog.CopyCount == 1)
-                {
-                    CopyCountPrompt.Show("1 transaction created");
-                }
-                else
-                {
-                    CopyCountPrompt.Show($"{CopyDialog.CopyCount} transactions created");
-                }
-            }
-
-            await LoadTransactions();
-            ShowDialog = true;
-            StateHasChanged();
-        }
-
-        public async Task Show(string pSummaryName, List<int> pTypes, int pYear, int pMonth)
-        {
-            SummaryTypeId = 0;
-            TypeId = 0;
-            Name = pSummaryName;
-            Types = pTypes;
-            Year = pYear;
-            Month = pMonth;
-            isSortedAscending = false;
-            activeSortColumn = "TransactionDate";
-
-            if (Name == "Total") Name = "";
-
-            await LoadTransactions();
-            ShowDialog = true;
-            StateHasChanged();
-        }
-
-        public async Task ShowSummary(int pSummaryTypeId, string pSummaryName, List<int> pTypes)
-        {
-            SummaryTypeId = pSummaryTypeId;
-            TypeId = 0;
-            Name = pSummaryName;
-            Types = pTypes;
-            Year = 0;
-            Month = 0;
-            isSortedAscending = false;
-            activeSortColumn = "TransactionDate";
-
-            if (Name == "Total") Name = "";
-
-            await LoadTransactions();
-            ShowDialog = true;
-            StateHasChanged();
-        }
-
-        public async Task ShowType(int pTypeId, string pTypeName)
-        {
-            SummaryTypeId = 0;
-            TypeId = pTypeId;
-            Name = pTypeName;
-            Types = new List<int>();
-            Year = 0;
-            Month = 0;
-            isSortedAscending = false;
-            activeSortColumn = "TransactionDate";
-
-            await LoadTransactions();
-            ShowDialog = true;
             StateHasChanged();
         }
 
         protected async Task HandleFilter()
         {
             await LoadTransactions();
-            ShowDialog = true;
             StateHasChanged();
         }
 
-        public async Task Close()
-        {
-            ShowDialog = false;
-            await CloseEventCallback.InvokeAsync(true);
-            StateHasChanged();
-        }
-
-        private async Task ResetDialogAsync()
-        {
-            await LoadTransactions();
-        }
-
-        private async Task LoadTransactions()
+        public async Task LoadTransactions()
         {
             using var ctx = await Factory.CreateDbContextAsync();
 
-            if (TypeId != 0)
+            switch (Mode)
             {
-                Transactions = (await ctx.GetTransactionsByType(TypeId, StartDate, EndDate)).ToList();
-            }
-            else if (SummaryTypeId != 0)
-            {
-                Transactions = (await ctx.GetTransactionsBySummary(Types, StartDate, EndDate)).ToList();
-            }
-            else
-            {
-                Transactions = (await ctx.GetTransactionsByTypeMonth(Types, Year, Month)).ToList();
+                case 1:
+                    Transactions = (await ctx.GetTransactionsByTypeMonth(Types, Year, Month)).ToList();
+                    break;
+
+                case 2:
+                    Transactions = (await ctx.GetTransactionsBySummary(Types, _dateRange.Start.Value, _dateRange.End.Value)).ToList();
+                    break;
+
+                case 3:
+                    Transactions = (await ctx.GetTransactionsByType(TransactionTypeId, _dateRange.Start.Value, _dateRange.End.Value)).ToList();
+                    break;
+
+                default:
+                    Close();
+                    break;
             }
 
-            /*
-            ** Set Value text Colour
-            */
+            /* Set Value text Colour */
             foreach (Transaction t in Transactions)
             {
                 t.CssClass = (t.Value <= 0) ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
             }
 
-            /*
-            ** Set Dialogue Title
-            */
+            /* Set Dialogue Info */
             string transactionOrTransactions = (Transactions.Count() == 1) ? " transaction " : " transactions ";
 
-            if (TypeId != 0)
+            switch (Mode)
             {
-                DialogTitle = $"{Name} {transactionOrTransactions}";
-            }
-            else if (SummaryTypeId != 0)
-            {
-                DialogTitle = $"{Name} {transactionOrTransactions}";
-            }
-            else
-            {
-                if (Month > 0)
-                {
-                    MonthName = new DateTime(2020, Month, 1).ToString("MMMM");
-                    DialogTitle = $"{Name} {transactionOrTransactions} in {MonthName}, {Year}";
-                }
-                else
-                {
-                    DialogTitle = $"{Name} {transactionOrTransactions} in {Year}";
-                }
+                case 1:
+                    if (Month > 0)
+                    {
+                        MonthName = new DateTime(2020, Month, 1).ToString("MMMM");
+                        DialogTitle = $"{Name} {transactionOrTransactions} in {MonthName}, {Year}";
+                    }
+                    else
+                    {
+                        DialogTitle = $"{Name} {transactionOrTransactions} in {Year}";
+                    }
+                    break;
+
+                case 2:
+                    DialogTitle = $"{Name} {transactionOrTransactions}";
+                    break;
+
+                case 3:
+                    DialogTitle = $"{Name} {transactionOrTransactions}";
+                    break;
+
+                default:
+                    Close();
+                    break;
             }
 
             DialogTitle = $"{Transactions.Count()} {DialogTitle} [{Transactions.Sum(t => t.Value).ToString("C")}]";
         }
 
-        async Task DeleteTransaction(int id, string pName, decimal value)
+        protected async void EditTransaction(int transactionId)
         {
-            DeleteId = id;
-            ConfirmDelete.Show($"Delete {pName} Transaction", $"Are you sure you want to delete this transaction for {value.ToString("C")}?");
-        }
+            var parameters = new DialogParameters<TransactionDialog>();
+            parameters.Add(x => x.SavedTransactionId, transactionId);
 
-        protected async Task ConfirmDelete_Click(bool deleteConfirmed)
-        {
-            if (deleteConfirmed && DeleteId != 0)
+            var dialog = DialogService.Show<TransactionDialog>("Edit Transaction", parameters); //, options);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
             {
-                using var ctx = await Factory.CreateDbContextAsync();
-
-                await ctx.DeleteTransaction(DeleteId);
-                await ctx.SaveChangesAsync();
-
                 await LoadTransactions();
-                ShowDialog = true;
                 StateHasChanged();
             }
         }
 
-        private bool isSortedAscending = true;
-        private string activeSortColumn = string.Empty;
-        private void SortTable(string columnName)
+        async Task CopyTransaction(int transactionId, string typeName, decimal value)
         {
-            if (columnName != activeSortColumn)
-            {
-                Transactions = Transactions.OrderBy(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                isSortedAscending = true;
-                activeSortColumn = columnName;
-            }
-            else
-            {
-                if (isSortedAscending)
-                {
-                    Transactions = Transactions.OrderByDescending(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                }
-                else
-                {
-                    Transactions = Transactions.OrderBy(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                }
+            var parameters = new DialogParameters<TransCopyDialog>();
+            parameters.Add(x => x.TransactionToCopyId, transactionId);
 
-                isSortedAscending = !isSortedAscending;
+            var dialog = DialogService.Show<TransCopyDialog>($"Copying {value.ToString("C2")} {typeName} transaction", parameters); //, options);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                await LoadTransactions();
+                StateHasChanged();
             }
         }
 
-        private string SetSortIcon(string columnName)
+        async Task DeleteTransaction(int transactionId, string typeName, decimal value)
         {
-            if (activeSortColumn != columnName)
+            var parameters = new DialogParameters<ConfirmDialog>();
+            parameters.Add(x => x.ConfirmationTitle, $"Delete {typeName} Transaction");
+            parameters.Add(x => x.ConfirmationMessage, $"Are you sure you want to delete this transaction for {value.ToString("C2")}?");
+            parameters.Add(x => x.CancelColorInt, 0);
+            parameters.Add(x => x.DoneColorInt, 1);
+
+            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled && transactionId != 0)
             {
-                return string.Empty;
-            }
-            if (isSortedAscending)
-            {
-                return "oi-arrow-circle-top";
-            }
-            else
-            {
-                return "oi-arrow-circle-bottom";
+                using var ctx = await Factory.CreateDbContextAsync();
+
+                await ctx.DeleteTransaction(transactionId);
+
+                await LoadTransactions();
+                StateHasChanged();
             }
         }
 

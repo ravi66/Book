@@ -1,71 +1,125 @@
 ﻿@page "/transactiontypelist"
 @using Book.Shared;
-@inject IJSRuntime JsRuntime
+@using MudBlazor
 
-<h3 class="row p-1">
-    <label class="col-7" ><b>Transaction Types</b></label>
-    <button class="btn btn-primary col-2 oi oi-plus" title="Add Transaction Type" @onclick="(e => EditTransactionType(0))"></button>
-</h3>
+<PageTitle>@BookName - Transaction Types</PageTitle>
 
-@if (TransactionTypes == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table table-sm table-bordered table-hover align-middle">
-        <thead class="table-light">
-            <tr>
-                <th scope="col" style="cursor: pointer;" @onclick="@(() => SortTable("Name"))">
-                    Name
-                    <span class="oi @(SetSortIcon("Name"))"></span>
-                </th>
-                <th scope="col" style="cursor: pointer;" @onclick="@(() => SortTable("SummaryName"))">
-                    Summary
-                    <span class="oi @(SetSortIcon("SummaryName"))"></span>
-                </th>
-                <th scope="col" style="cursor: pointer;" @onclick="@(() => SortTable("CreateDate"))">
-                    Created
-                    <span class="oi @(SetSortIcon("CreateDate"))"></span>
-                </th>
-                <th scope="col"></th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var transactionType in TransactionTypes)
-            {
-                <tr>
-                    <td><a href="javascript: void(0);" @onclick="@(e => EditTransactionType(transactionType.TransactionTypeId))">
-                            @transactionType.Name
-                        </a>
-                    </td>
-                    <td>@transactionType.SummaryName</td>
-                    <td>@transactionType.CreateDate.ToShortDateString()</td>
+<MudContainer Class="pt-2 ps-1">
 
-                    @if (@transactionType.TransactionCount > 0)
+    <MudTable Elevation="5"
+              Items="@TransactionTypes"
+              @ref="_table"
+              Dense="true"
+              Hover="true"
+              CanCancelEdit="true"
+              CommitEditIcon="@Icons.Material.Filled.Save"
+              @bind-SelectedItem="selectedTransactionType"
+              SortLabel="Sort By"
+              RowEditPreview="BackupItem"
+              RowEditCancel="ResetItemToOriginalValues"
+              IsEditRowSwitchingBlocked="@blockSwitch"
+              EditTrigger="TableEditTrigger.EditButton"
+              EditButtonPosition="TableEditButtonPosition.Start"
+              ApplyButtonPosition="TableApplyButtonPosition.Start"
+              RowEditCommit="ItemHasBeenCommitted">
+        <ToolBarContent>
+            <MudText Typo="Typo.h4">
+                <MudIcon Icon="@Icons.Material.Filled.Payments" Color="Color.Primary" /> Transaction Types
+            </MudText>
+            <MudTooltip Color="Color.Primary" Text="Create Transaction Type">
+                <MudIconButton Size="Size.Large"
+                           Icon="@Icons.Material.Filled.AddBox"
+                           Color="Color.Primary"
+                           OnClick="AddTransactionType">
+                </MudIconButton>
+            </MudTooltip>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<TransactionType, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<TransactionType, object>(x=>x.SummaryName)">Summary</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<TransactionType, object>(x=>x.CreateDate)">Created</MudTableSortLabel></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Tools">
+                <MudTooltip Color="Color.Primary" Text="Transactions">
+                    <MudIconButton Icon="@Icons.Material.Filled.ReceiptLong"
+                                   Color="Color.Primary"
+                                   Size="Size.Small"
+                                   aria-label="list transactions"
+                                   OnClick="() => ListTransactions(context.TransactionTypeId, context.Name)" />
+                </MudTooltip>
+
+                @if (context.TransactionTypeId != -1 && context.TransactionCount == 0)
+                {
+                    <MudTooltip Color="Color.Primary" Text="Delete Transaction Type">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Secondary"
+                                       Size="Size.Small"
+                                       aria-label="delete transaction type"
+                                       OnClick="() => DeleteTransactionType(context.TransactionTypeId, context.Name)" />
+                    </MudTooltip>
+                }
+
+            </MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Summary">@context.SummaryName</MudTd>
+            <MudTd DataLabel="Created">@context.CreateDate.ToShortDateString()</MudTd>
+        </RowTemplate>
+        <RowEditingTemplate>
+            <MudTd DataLabel="Tools">
+
+                @if (context.TransactionTypeId != 0)
+                {
+                    <MudTooltip Color="Color.Primary" Text="Transactions">
+                        <MudIconButton Icon="@Icons.Material.Filled.ReceiptLong"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       aria-label="list transactions"
+                                       OnClick="()=> ListTransactions(context.TransactionTypeId, context.Name)" />
+                    </MudTooltip>
+
+                    @if (context.TransactionTypeId != -1 && context.TransactionCount == 0)
                     {
-                        <td style="text-align:center;"><button class="btn btn-info btn-sm oi oi-info" title="Transactions" @onclick="() => ListTransactions(transactionType.TransactionTypeId, transactionType.Name)"></button></td>
+                        <MudTooltip Color="Color.Primary" Text="Delete Transaction Type">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                           Color="Color.Secondary"
+                                           Size="Size.Small"
+                                           aria-label="delete transaction type"
+                                           OnClick="() => DeleteTransactionType(context.TransactionTypeId, context.Name)" />
+                        </MudTooltip>
                     }
-                    else
-                    {
-                        <td></td>
-                    }
-
-                    @if (@transactionType.TransactionCount < 1 && @transactionType.TransactionTypeId != -1)
-                    {
-                        <td style="text-align:center;" ><button class="btn btn-danger btn-sm oi oi-trash" title="Delete" @onclick="() => DeleteTransactionType(transactionType.TransactionTypeId, transactionType.Name)"></button></td>
-                    }
-                    else
-                    {
-                        <td></td>
-                    }
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-
-<TransactionTypeDialog @ref="TransactionTypeDialog" CloseEventCallback="@TransactionTypeDialog_OnDialogClose"></TransactionTypeDialog>
-<ConfirmDialog @ref="ConfirmDelete" ConfirmationChanged="ConfirmDelete_Click"></ConfirmDialog>
-<TransListDialog @ref="TransListDialog" CloseEventCallback="@TransListDialog_OnDialogClose"></TransListDialog>
+                }
+            </MudTd>
+            <MudTd DataLabel="Name">
+                <MudTextField @bind-Value="@context.Name"
+                              Label="Name"
+                              Required="true"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense" />
+             </MudTd>
+             <MudTd DataLabel="Summary">
+                 <MudAutocomplete T="SummaryType"
+                                  Required="true"
+                                  Label="Summary"
+                                  Style="width: 100%;"
+                                  Variant="Variant.Outlined"
+                                  Margin="Margin.Dense"
+                                  @bind-Value="_SelectedSummaryType"
+                                  Dense="true"
+                                  SearchFunc="@SummarySearch"
+                                  ToStringFunc="@(s => s == null ? null : $"{s.Name}")" />
+             </MudTd>
+             <MudTd DataLabel="Created">@context.CreateDate.ToShortDateString()</MudTd>
+         </RowEditingTemplate>
+         <EditButtonContent Context="button">
+             <MudTooltip Text="Edit Transaction Type" Color="Color.Primary">
+                 <MudIconButton Size="@Size.Medium"
+                                Icon="@Icons.Material.Filled.Edit"
+                                Class="pa-0"
+                                OnClick="@button.ButtonAction"
+                                Color="Color.Primary" />
+             </MudTooltip>
+         </EditButtonContent>
+     </MudTable>
+ </MudContainer>

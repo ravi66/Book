@@ -1,124 +1,150 @@
 ﻿using Book.Components;
 using Book.Models;
+using Book.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+using MudBlazor;
 using SqliteWasmHelper;
 
 namespace Book.Pages
 {
     public partial class SummaryTypeList
     {
-        public IEnumerable<SummaryType> SummaryTypes { get; set; }
+        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
 
-        [Inject]
-        public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
+        [Inject] public IDialogService DialogService { get; set; }
 
-        protected SummaryTypeDialog SummaryTypeDialog { get; set; }
+        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
 
-        protected TransListDialog TransListDialog { get; set; }
+        private string BookName { get; set; } = "Book";
 
-        protected ConfirmDialog ConfirmDelete { get; set; }
-        public int DeleteId { get; set; }
+        public List<SummaryType> SummaryTypes { get; set; }
 
-        public bool Loading = false;
+        private SummaryType selectedSummaryType { get; set; }
+
+        private SummaryType summaryTypeBeforeEdit { get; set; }
+
+        private MudTable<SummaryType> _table { get; set; }
+
+        private bool blockSwitch { get; set; } = false;
 
         protected async override Task OnInitializedAsync()
         {
-            using var ctx = await Factory.CreateDbContextAsync();
-            SummaryTypes = (await ctx.GetAllSummaryTypes()).ToList();
+            BookName = await BookSettingSvc.GetBookName();
 
-            isSortedAscending = true;
-            activeSortColumn = "Order";
+            await LoadSummaryTypes();
         }
 
-        protected void EditSummaryType(int summaryTypeId)
+        private async Task LoadSummaryTypes()
         {
-            SummaryTypeDialog.Show(summaryTypeId);
+            using var ctx = await Factory.CreateDbContextAsync();
+            SummaryTypes = await ctx.GetAllSummaryTypes();
         }
 
         protected async void ListTransactions(int summaryTypeId, string summaryName, List<int>? types)
         {
-            Loading = true;
-            StateHasChanged();
+            _table.SetEditingItem(null);
 
-            await TransListDialog.ShowSummary(summaryTypeId, summaryName, types);
+            string typesString = (types != null && types.Count > 0) ? typesString = string.Join(",", types) : String.Empty;
 
-            Loading = false;
-            StateHasChanged();
+            var parameters = new DialogParameters<TransListDialog>();
+            parameters.Add(x => x.Mode, 2);
+            parameters.Add(x => x.Name, summaryName);
+            parameters.Add(x => x.TypesString, typesString);
+            parameters.Add(x => x.SummaryTypeId, summaryTypeId);
+
+            DialogService.Show<TransListDialog>("Transaction List", parameters);
         }
-
-        public async void SummaryTypeDialog_OnDialogClose()
+        
+        async Task DeleteSummaryType(int summaryTypeId, string summaryName)
         {
-            await OnInitializedAsync();
-            StateHasChanged();
-        }
+            _table.SetEditingItem(null);
 
-        public async void TransListDialog_OnDialogClose()
-        {
-            await OnInitializedAsync();
-            StateHasChanged();
-        }
+            var parameters = new DialogParameters<ConfirmDialog>();
+            parameters.Add(x => x.ConfirmationTitle, $"Delete {summaryName} Summary Type");
+            parameters.Add(x => x.ConfirmationMessage, "Are you sure you want to delete this Summary Type?");
+            parameters.Add(x => x.CancelColorInt, 0);
+            parameters.Add(x => x.DoneColorInt, 1);
 
-        private bool isSortedAscending;
-        private string activeSortColumn;
-        private void SortTable(string columnName)
-        {
-            if (columnName != activeSortColumn)
-            {
-                SummaryTypes = SummaryTypes.OrderBy(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                isSortedAscending = true;
-                activeSortColumn = columnName;
-            }
-            else
-            {
-                if (isSortedAscending)
-                {
-                    SummaryTypes = SummaryTypes.OrderByDescending(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                }
-                else
-                {
-                    SummaryTypes = SummaryTypes.OrderBy(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
-                }
+            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters);
+            var result = await dialog.Result;
 
-                isSortedAscending = !isSortedAscending;
-            }
-        }
-
-        private string SetSortIcon(string columnName)
-        {
-            if (activeSortColumn != columnName)
-            {
-                return string.Empty;
-            }
-            if (isSortedAscending)
-            {
-                return "oi-arrow-circle-top";
-            }
-            else
-            {
-                return "oi-arrow-circle-bottom";
-            }
-        }
-
-        async Task DeleteSummaryType(int id, string name)
-        {
-            DeleteId = id;
-            ConfirmDelete.Show("Delete Summary", $"Are you sure you want to delete Summary: {name}");
-        }
-
-        protected async Task ConfirmDelete_Click(bool deleteConfirmed)
-        {
-            if (deleteConfirmed && DeleteId != 0)
+            if (!result.Canceled && summaryTypeId != 0)
             {
                 using var ctx = await Factory.CreateDbContextAsync();
-                await ctx.DeleteSummaryType(DeleteId);
-                await ctx.SaveChangesAsync();
 
-                await OnInitializedAsync();
+                await ctx.DeleteSummaryType(summaryTypeId);
+
+                await LoadSummaryTypes();
                 StateHasChanged();
             }
         }
 
-    }
+        private void BackupItem(object summaryType)
+        {
+            summaryTypeBeforeEdit = new()
+            {
+                SummaryTypeId = ((SummaryType)summaryType).SummaryTypeId,
+                Name = ((SummaryType)summaryType).Name,
+                Order = ((SummaryType)summaryType).Order,
+                Types = ((SummaryType)summaryType).Types,
+                TransactionTypeList = ((SummaryType)summaryType).TransactionTypeList,
+                CreateDate = ((SummaryType)summaryType).CreateDate
+            };
+        }
 
+        private void ResetItemToOriginalValues(object summaryType)
+        {
+            if (((SummaryType)summaryType).SummaryTypeId != 0)
+            {
+                ((SummaryType)summaryType).SummaryTypeId = summaryTypeBeforeEdit.SummaryTypeId;
+                ((SummaryType)summaryType).Name = summaryTypeBeforeEdit.Name;
+                ((SummaryType)summaryType).Order = summaryTypeBeforeEdit.Order;
+                ((SummaryType)summaryType).Types = summaryTypeBeforeEdit.Types;
+                ((SummaryType)summaryType).TransactionTypeList = summaryTypeBeforeEdit.TransactionTypeList;
+                ((SummaryType)summaryType).CreateDate = summaryTypeBeforeEdit.CreateDate;
+            }
+            else
+            {
+                SummaryTypes.RemoveAt(0);
+            }
+
+            blockSwitch = false;
+            StateHasChanged();
+        }
+
+        private async void ItemHasBeenCommitted(object summaryType)
+        {
+            using var ctx = await Factory.CreateDbContextAsync();
+
+            if (((SummaryType)summaryType).SummaryTypeId == 0)
+            {
+                await ctx.AddSummaryType((SummaryType)summaryType);
+            }
+            else
+            {
+                await ctx.UpdateSummaryType((SummaryType)summaryType);
+            }
+
+            blockSwitch = false;
+        }
+
+        private async Task AddSummaryType()
+        {
+            if (_table.IsEditRowSwitchingBlocked) return;
+
+            SummaryType newSummaryType = new SummaryType();
+            newSummaryType.Name = String.Empty;
+            newSummaryType.Order = SummaryTypes.Count + 1;
+            newSummaryType.CreateDate = DateTime.Today;
+            newSummaryType.Types = new List<int>();
+            newSummaryType.TransactionTypeList = new List<TransactionType>();
+
+            SummaryTypes.Insert(0, newSummaryType);
+            await Task.Delay(50);
+            _table.SetSelectedItem(newSummaryType);
+            _table.SetEditingItem(newSummaryType);
+            blockSwitch = true;
+        }
+
+    }
 }
