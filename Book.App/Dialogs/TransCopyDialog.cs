@@ -1,20 +1,25 @@
 ﻿using Book.Models;
+using Book.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SqliteWasmHelper;
 using static MudBlazor.CategoryTypes;
 
-namespace Book.Components
+namespace Book.Dialogs
 {
     public partial class TransCopyDialog
     {
         [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+        [Parameter] public string DialogTitle { get; set; }
 
         [Parameter] public int TransactionToCopyId { get; set; }
 
         [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
 
         [Inject] public IDialogService DialogService { get; set; }
+
+        [Inject] public MessageSvc MessageSvc { get; set; }
 
         public Transaction TransactionToCopy { get; set; }
 
@@ -27,7 +32,8 @@ namespace Book.Components
                 new Frequency(){ FrequencyID = 2, FrequencyName = "Quaterly"},
                 new Frequency(){ FrequencyID = 5, FrequencyName = "Bi-Monthly"},
                 new Frequency(){ FrequencyID = 1, FrequencyName = "Monthly"},
-                new Frequency(){ FrequencyID = 4, FrequencyName = "Weekly"}
+                new Frequency(){ FrequencyID = 4, FrequencyName = "Weekly"},
+                new Frequency(){ FrequencyID = 6, FrequencyName = "Daily"},
             };
 
         public Frequency SelectedFrequency { get; set; }
@@ -44,7 +50,10 @@ namespace Book.Components
             TransactionToCopy = await ctx.GetTransactionById(TransactionToCopyId);
             if (TransactionToCopy.TransactionId == 0 || TransactionToCopy.TransactionTypeId == 0) MudDialog.Cancel();
 
-            SelectedFrequency = Frequencies.FirstOrDefault(f => f.FrequencyID == 1);
+            SelectedFrequency = Frequencies.FirstOrDefault(f => f.FrequencyID == 3);
+
+            MudDialog.Options.NoHeader = true;
+            MudDialog.SetOptions(MudDialog.Options);
 
             await LoadCopiedTransactions();
             StateHasChanged();
@@ -71,7 +80,8 @@ namespace Book.Components
                     {
                         TransactionTypeId = TransactionToCopy.TransactionTypeId,
                         Value = TransactionToCopy.Value,
-                        TransactionDate = NewDate
+                        TransactionDate = NewDate,
+                        CreateDate = DateTime.Today,
                     }
                 );
 
@@ -84,8 +94,17 @@ namespace Book.Components
             using var ctx = await Factory.CreateDbContextAsync();
             await ctx.AddTransactions(NewTransactions);
 
+            List<int> years = new();
+            
+            foreach (Transaction transaction in NewTransactions)
+            {
+                if (years.IndexOf(transaction.TransactionDate.Year) == -1) years.Add(transaction.TransactionDate.Year);
+            }
+
+            MessageSvc.ChangeTransactions(years);
+
             var parameters = new DialogParameters<PromptDialog>();
-            string promptText = NewTransactions.Count() > 1 ? $"<h2>{NewTransactions.Count()} Transactions created</h2>" : $"<h2>{NewTransactions.Count()} Transaction created</h2>";
+            string promptText = NewTransactions.Count() > 1 ? $"<h2>{NewTransactions.Count()} Entries created</h2>" : $"<h2>{NewTransactions.Count()} Entry created</h2>";
             parameters.Add(x => x.PromptMessage, promptText);
 
             var options = new DialogOptions() { NoHeader = true };
@@ -127,11 +146,23 @@ namespace Book.Components
                     NewDate = NewDate.AddMonths(2);
                     break;
 
+                case 6:
+                    NewDate = NewDate.AddDays(1);
+                    break;
+
                 default:
                     NewDate = NewDate.AddMonths(1);
                     break;
             }
         }
+
+    }
+
+    public class Frequency
+    {
+        public int FrequencyID { get; set; }
+
+        public string FrequencyName { get; set; }
 
     }
 }

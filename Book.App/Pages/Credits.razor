@@ -6,17 +6,16 @@
 <MudText Typo="Typo.h4" GutterBottom="true">
     <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" /> Credits
 </MudText>
-<MudText Class="mb-6">The following are the principal resources used to build this application:</MudText>
 
-<MudStack Class="mb-8">
+<MudStack Class="mb-4">
 
-    <MudPaper Class="pa-3" Elevation="6">
+    <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
-            <MudItem xs="3" md="4" Class="d-flex justify-center align-center">
-                <MudImage Src="images/blazor_logo.png" Alt="Blazor Logo" Class="mx-3" Width="250" Height="250" Fluid="true" />
+            <MudItem xs="3" md="4" Class="d-flex justify-center align-center" >
+                <MudImage Src="images/blazor_logo.png" Alt="Blazor Logo" Class="mx-3" Width="150" Height="150" Fluid="true" />
             </MudItem>
-            <MudItem xs="9" md="8">
-                <MudText Typo="Typo.h5">Blazor WebAssembly (Wasm)</MudText>
+            <MudItem xs="9" md="8" >
+                <MudText Typo="Typo.h5" >Blazor WebAssembly (Wasm)</MudText>
                 <MudText>
                     <MudLink Href="https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor" Target="_blank">https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor</MudLink>
                 </MudText>
@@ -30,28 +29,10 @@
         </MudGrid>
     </MudPaper>
 
-    <MudPaper Class="pa-3" Elevation="6">
+    <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
             <MudItem xs="3" md="4" Class="d-flex justify-center align-center">
-                <MudImage Src="images/sqlite_logo.gif" Alt="Sqlite Logo" Class="rounded-lg mx-3" Fluid="true" Width="250" Height="250" />
-            </MudItem>
-            <MudItem xs="9" md="8">
-                <MudText Typo="Typo.h5">SqliteWasmHelper</MudText>
-                <MudText>
-                    <MudLink Href="https://github.com/JeremyLikness/SqliteWasmHelper" Target="_blank">https://github.com/JeremyLikness/SqliteWasmHelper</MudLink>
-                </MudText>
-                <MudDivider Class="mb-3" />
-                <MudText>
-                    SqliteWasmHelper allows for using an SQLite database that persits in the Browser's cache Compatible with EF Core.
-                </MudText>
-            </MudItem>
-        </MudGrid>
-    </MudPaper>
-
-     <MudPaper Class="pa-3" Elevation="6">
-        <MudGrid>
-            <MudItem xs="3" md="4" Class="d-flex justify-center align-center">
-                <MudImage Src="images/efcore_logo.png" Alt="EF Core Logo" Class="rounded-lg mx-3" Width="250" Height="250" Fluid="true" />
+                <MudImage Src="images/efcore_logo.png" Alt="EF Core Logo" Class="rounded-lg mx-3" Width="250" Fluid="true" Height="100" />
             </MudItem>
             <MudItem xs="9" md="8">
                 <MudText Typo="Typo.h5">Entity Framework Core</MudText>
@@ -60,15 +41,13 @@
                 </MudText>
                 <MudDivider Class="mb-3" />
                 <MudText>
-                    Entity Framework (EF) Core is a lightweight, extensible, open source and cross-platform 
-                    object-database mapper for .NET. It supports LINQ queries, change tracking, updates, 
-                    and schema migrations.
+                    Entity Framework (EF) Core is an object-database mapper for .NET.
                 </MudText>
             </MudItem>
         </MudGrid>
     </MudPaper>
 
-    <MudPaper Class="pa-3" Elevation="6">
+    <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
             <MudItem xs="3" md="4" Class="d-flex justify-center align-center">
                 <MudImage Src="images/mudblazor.png" Alt="MudBlazor Logo" Class="mx-3" Fluid="true" Width="250" Height="250" />
@@ -80,28 +59,44 @@
                 </MudText>
                 <MudDivider Class="mb-3" />
                 <MudText>
-                    MudBlazor is a UI component library written from the ground up for Blazor. Apart from the library
-                    itself, MudBlazor also provides templates, a learning platform, theme manager, demo and
-                    example projects as well as an online code editor integrated with documentation and issue tracking.
+                    MudBlazor is a UI component library written from the ground up for Blazor.
                 </MudText>
             </MudItem>
         </MudGrid>
     </MudPaper>
 
-    <MudPaper Class="pa-3" Elevation="6">
+    <MudPaper Class="pa-2" Elevation="5">
+        <MudGrid>
+            <MudItem xs="3" md="4" Class="d-flex justify-center align-center" >
+                <MudImage Src="images/sqlite_logo.gif" Alt="Sqlite Logo" Class="rounded-lg mx-3" Width="250" Height="150" Fluid="true" />
+            </MudItem>
+            <MudItem xs="9" md="8">
+                <MudText Typo="Typo.h5">SqliteWasmHelper</MudText>
+                <MudText>
+                    <MudLink Href="https://github.com/JeremyLikness/SqliteWasmHelper" Target="_blank">https://github.com/JeremyLikness/SqliteWasmHelper</MudLink>
+                </MudText>
+                <MudDivider Class="mb-3" />
+                <MudText>
+                    SqliteWasmHelper enables using a EFCore compatible SQLite database that persits in the Browser's cache
+                </MudText>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
             <MudItem xs="3" md="4" Class="d-flex justify-center align-center ">
-                <MudImage Src="images/Trackor.png" Alt="Trackor Logo" Class="mx-1" Width="250" Height="250" Fluid="true" />
+                <MudImage Src="images/Trackor.png" Alt="Trackor Logo" Class="mx-3" Width="150" Height="150" Fluid="true" />
             </MudItem>
-            <MudItem xs="9" md="8" >
+            <MudItem xs="9" md="8">
                 <MudText Typo="Typo.h5">Trackor</MudText>
                 <MudText>
                     <MudLink Href="https://github.com/eric-king/trackor/" Target="_blank">https://github.com/eric-king/trackor/</MudLink>
                 </MudText>
                 <MudDivider Class="mb-3" />
                 <MudText>
-                    Trackor is an example Blazor Wasm application written by Eric King that demonstrates the use of all the above packages.
-                    This application was shamelessly used as both an inspiration and direct code source.
+                    Trackor is a Blazor WASM application that uses all the above packages. I shamelessly
+                    used it as both an inspiration and direct code source.
                 </MudText>
             </MudItem>
         </MudGrid>

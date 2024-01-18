@@ -24,5 +24,8 @@ namespace Book.Models
         [NotMapped]
         public List<TransactionType>? TransactionTypeList { get; set; }
 
+        [NotMapped]
+        public bool ShowTransactionTypes { get; set; }
+
     }
 }

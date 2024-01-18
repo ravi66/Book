@@ -28,8 +28,6 @@ namespace Book.Pages
 
         private bool blockSwitch { get; set; } = false;
 
-        private bool DisableSave { get; set; } = true;
-
         protected async override Task OnInitializedAsync()
         {
             BookName = await BookSettingSvc.GetBookName();
@@ -61,12 +59,6 @@ namespace Book.Pages
         }
 
         private async void ItemHasBeenCommitted(object bookSetting)
-        {
-            DisableSave = false;
-            StateHasChanged();
-        }
-
-        private async Task Save()
         {
             using var ctx = await Factory.CreateDbContextAsync();
 

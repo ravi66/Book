@@ -1,10 +1,11 @@
 ﻿using Book.Models;
+using Book.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using SqliteWasmHelper;
 using static MudBlazor.CategoryTypes;
 
-namespace Book.Components
+namespace Book.Dialogs
 {
     public partial class TransListDialog
     {
@@ -15,6 +16,10 @@ namespace Book.Components
         [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
 
         [Inject] public IDialogService DialogService { get; set; }
+
+        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+
+        [Inject] public MessageSvc MessageSvc { get; set; }
 
         [Parameter] public int Mode { get; set; }
 
@@ -30,7 +35,7 @@ namespace Book.Components
 
         [Parameter] public int SummaryTypeId { get; set; }
 
-        private DateRange _dateRange = new DateRange(new DateTime(2017, 1, 1), new DateTime(DateTime.Today.Year + 5, 1 , 1));
+        private DateRange _dateRange { get; set; } 
    
         public List<int> Types { get; set; }
 
@@ -54,17 +59,22 @@ namespace Book.Components
 
             if ((Mode == 1 || Mode == 2) && Name == "Total") Name = "";
             if (Mode == 3) TypesString = String.Empty;
-            
+
+            if (Mode > 1)
+            {
+                _dateRange = new DateRange(new DateTime(await BookSettingSvc.GetStartYear(), 1, 1), new DateTime(await BookSettingSvc.GetEndYear(), 12, 31));
+            }
+
             Types = TypesString != String.Empty ? TypesString.Split(',').Select(int.Parse).ToList() : new List<int>();
-            
+
+            MessageSvc.TransactionsChanged += () => TransactionsChanged(MessageSvc.TransactionYears);
+
             await LoadTransactions();
-            StateHasChanged();
         }
 
         protected async Task HandleFilter()
         {
             await LoadTransactions();
-            StateHasChanged();
         }
 
         public async Task LoadTransactions()
@@ -84,10 +94,6 @@ namespace Book.Components
                 case 3:
                     Transactions = (await ctx.GetTransactionsByType(TransactionTypeId, _dateRange.Start.Value, _dateRange.End.Value)).ToList();
                     break;
-
-                default:
-                    Close();
-                    break;
             }
 
             /* Set Value text Colour */
@@ -96,8 +102,8 @@ namespace Book.Components
                 t.CssClass = (t.Value <= 0) ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
             }
 
-            /* Set Dialogue Info */
-            string transactionOrTransactions = (Transactions.Count() == 1) ? " transaction " : " transactions ";
+            /* Set Dialogue Title */
+            string entryOrEntries = (Transactions.Count() == 1) ? " entry " : " entries ";
 
             switch (Mode)
             {
@@ -105,80 +111,80 @@ namespace Book.Components
                     if (Month > 0)
                     {
                         MonthName = new DateTime(2020, Month, 1).ToString("MMMM");
-                        DialogTitle = $"{Name} {transactionOrTransactions} in {MonthName}, {Year}";
+                        DialogTitle = $"{Name} {entryOrEntries} in {MonthName}, {Year}";
                     }
                     else
                     {
-                        DialogTitle = $"{Name} {transactionOrTransactions} in {Year}";
+                        DialogTitle = $"{Name} {entryOrEntries} in {Year}";
                     }
                     break;
 
                 case 2:
-                    DialogTitle = $"{Name} {transactionOrTransactions}";
+                    DialogTitle = $"{Name} {entryOrEntries}";
                     break;
 
                 case 3:
-                    DialogTitle = $"{Name} {transactionOrTransactions}";
-                    break;
-
-                default:
-                    Close();
+                    DialogTitle = $"{Name} {entryOrEntries}";
                     break;
             }
 
-            DialogTitle = $"{Transactions.Count()} {DialogTitle} [{Transactions.Sum(t => t.Value).ToString("C")}]";
+            DialogTitle = $"{Transactions.Count()} {DialogTitle} [{Transactions.Sum(t => t.Value):C}]";
+            MudDialog.StateHasChanged();
         }
 
         protected async void EditTransaction(int transactionId)
         {
-            var parameters = new DialogParameters<TransactionDialog>();
-            parameters.Add(x => x.SavedTransactionId, transactionId);
-
-            var dialog = DialogService.Show<TransactionDialog>("Edit Transaction", parameters); //, options);
-            var result = await dialog.Result;
-
-            if (!result.Canceled)
+            var parameters = new DialogParameters<TransactionDialog>
             {
-                await LoadTransactions();
-                StateHasChanged();
-            }
+                { x => x.SavedTransactionId, transactionId }
+            };
+
+            DialogService.Show<TransactionDialog>("Edit Entry", parameters); //, options);
         }
 
         async Task CopyTransaction(int transactionId, string typeName, decimal value)
         {
-            var parameters = new DialogParameters<TransCopyDialog>();
-            parameters.Add(x => x.TransactionToCopyId, transactionId);
-
-            var dialog = DialogService.Show<TransCopyDialog>($"Copying {value.ToString("C2")} {typeName} transaction", parameters); //, options);
-            var result = await dialog.Result;
-
-            if (!result.Canceled)
+            var parameters = new DialogParameters<TransCopyDialog>
             {
-                await LoadTransactions();
-                StateHasChanged();
-            }
+                { c => c.DialogTitle, $"Copying {value:C2} {typeName} entry" },
+                { c => c.TransactionToCopyId, transactionId }
+            };
+
+            DialogService.Show<TransCopyDialog>("Copy", parameters);
         }
 
-        async Task DeleteTransaction(int transactionId, string typeName, decimal value)
+        async Task DeleteTransaction(Transaction transaction)
         {
-            var parameters = new DialogParameters<ConfirmDialog>();
-            parameters.Add(x => x.ConfirmationTitle, $"Delete {typeName} Transaction");
-            parameters.Add(x => x.ConfirmationMessage, $"Are you sure you want to delete this transaction for {value.ToString("C2")}?");
-            parameters.Add(x => x.CancelColorInt, 0);
-            parameters.Add(x => x.DoneColorInt, 1);
+            var parameters = new DialogParameters<ConfirmDialog>
+            {
+                { x => x.ConfirmationTitle, $"Delete {transaction.TransactionTypeName} Entry" },
+                { x => x.ConfirmationMessage, $"Are you sure you want to delete this entry for {transaction.Value:C2}?" },
+                { x => x.CancelColorInt, 0 },
+                { x => x.DoneColorInt, 1 }
+            };
 
             var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters);
             var result = await dialog.Result;
 
-            if (!result.Canceled && transactionId != 0)
+            if (!result.Canceled && transaction.TransactionId != 0)
             {
                 using var ctx = await Factory.CreateDbContextAsync();
 
-                await ctx.DeleteTransaction(transactionId);
+                await ctx.DeleteTransaction(transaction.TransactionId);
 
-                await LoadTransactions();
-                StateHasChanged();
+                MessageSvc.ChangeTransactions(new List<int> { transaction.TransactionDate.Year });
             }
+        }
+
+        private void TransactionsChanged(List<int> transactionYears)
+        {
+            LoadTransactions();
+            StateHasChanged();
+        }
+
+        public void Dispose()
+        {
+            MessageSvc.TransactionsChanged -= () => TransactionsChanged(MessageSvc.TransactionYears);
         }
 
     }

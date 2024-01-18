@@ -1,0 +1,25 @@
+﻿@using System.Globalization
+@using System.ComponentModel.DataAnnotations
+@using Book.Models
+
+<MudDialog>
+    <DialogContent>
+        <MudForm Model="@Transaction" @bind-IsValid="@validationOk">
+            <MudStack>
+                <MudTextField Variant="Variant.Outlined" Label="Value" Margin="Margin.Dense" @bind-Value=Transaction.ValueAsString For="@(() => Transaction.ValueAsString)" AutoFocus="true" onFocus="this.select()" />
+                <MudStack Row="true">
+                    <MudAutocomplete T="TransactionType" Label="Type" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="_SelectedTransactionType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
+                    <MudTextField Label="Summary" ReadOnly="true" Value="@_SelectedTransactionType.SummaryName" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                </MudStack>
+                <MudDatePicker Variant="Variant.Outlined" Label="Dated" Required="true" RequiredError="Transactions must be Dated" @bind-Date="_SelectedDate" PickerVariant="PickerVariant.Dialog" DisableToolbar="true" Margin="Margin.Dense" Editable="true" />
+                <MudTextField Variant="Variant.Outlined" @bind-Value="Transaction.Notes" Label="Notes" Lines="3" />
+                <MudText>Created: @Transaction.CreateDate.ToShortDateString()</MudText>
+            </MudStack>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" aria-label="save" OnClick="Save" />
+        <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Secondary" aria-label="delete" OnClick="DeleteTransaction" />
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
+    </DialogActions>
+</MudDialog>

@@ -1,93 +1,58 @@
 ﻿@page "/"
+@implements IDisposable
 
-<PageTitle>@BookName - Summary</PageTitle>
+<PageTitle>@BookName - Summary @Year</PageTitle>
 
-<MudContainer Class="pt-0 ps-1" >
-    <MudHidden Breakpoint="Breakpoint.SmAndDown" Invert="true" >
-        <MudStack Justify="Justify.Center" Row="true" AlignItems="AlignItems.Center" Class="pb-2" >
-            <MudTooltip Text="Create Transaction" Color="Color.Primary">
-                <MudIconButton Color="Color.Primary"
-                               Icon="@Icons.Material.Filled.ReceiptLong"
-                               OnClick="AddTransaction"
-                               Variant="Variant.Filled" />
-            </MudTooltip>
-            <MudTooltip Text="Change Year" Color="Color.Primary" >
-                <MudSelect Variant="Variant.Outlined"
-                       Margin="Margin.Dense"
-                       T="int"
-                       AnchorOrigin="Origin.BottomCenter"
-                       Value="@(Year)"
-                       ValueChanged="@(YearChanged)"
-                       Dense="true"
-                       MaxHeight="500" >
-                    @foreach (var year in YearSL)
-                    {
-                        <MudSelectItem Value="@year" />
-                    }
-                </MudSelect>
-            </MudTooltip>
-        </MudStack>
-        <MudStack Justify="Justify.Center" Row="true" Class="pb-2" >
-            @foreach (var columnInfo in Columns)
+<MudHidden Breakpoint="Breakpoint.Xs" Invert="true" >
+    <MudGrid Class="pa-2" Justify="Justify.Center" Spacing="1" >
+        <MudMenu Dense="true" AnchorOrigin="Origin.BottomLeft" Label="@Year.ToString()" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small ">
+            @foreach (int year in Years)
             {
-                <MudTooltip Text="@columnInfo.MoreInfoToolTip" Color="Color.Primary">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(e => TotalInfo(columnInfo.InfoText))" Size="Size.Small">@columnInfo.Name</MudButton>
-                </MudTooltip>
+                <MudMenuItem OnClick="() => YearChanged(year)" OnTouch="() => YearChanged(year)">@year</MudMenuItem>
             }
-        </MudStack>
-    </MudHidden>
+        </MudMenu>
+        @foreach (var columnInfo in Columns)
+        {
+            <MudItem >
+                <MudButton Variant="Variant.Outlined" OnClick="@(e => TotalInfo(columnInfo.InfoText))" Size="Size.Small">@columnInfo.Name</MudButton>
+            </MudItem>
+        }
+    </MudGrid>
+</MudHidden>
 
-    <MudTable   Dense="true"
-                Hover="true"
-                Elevation="5"
-                Breakpoint="Breakpoint.Sm"
-                Items="@MonthlySummaries" >
-        <HeaderContent>
-            <MudTh>
-                <MudTooltip Text="Create Transaction" Color="Color.Primary">
-                    <MudIconButton Size="Size.Medium"
-                                   Color="Color.Primary"
-                                   Icon="@Icons.Material.Filled.ReceiptLong"
-                                   OnClick="AddTransaction"
-                                   Variant="Variant.Filled" />
-                </MudTooltip>
+<MudTable Dense="true" Hover="true" Elevation="5" Breakpoint="Breakpoint.Xs" Items="@MonthlySummaries" Class="pa-1" >
+    <ColGroup>
+        <col style="width: 10%;" />
+        @foreach (var columnInfo in Columns)
+        {
+            <col />
+        }
+    </ColGroup>
+    <HeaderContent>
+        <MudTh>
+            <MudMenu Dense="true" AnchorOrigin="Origin.BottomLeft" Label="@Year.ToString()" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small ">
+                @foreach (int year in Years)
+                {
+                    <MudMenuItem OnClick="() => YearChanged(year)" OnTouch="() => YearChanged(year)">@year</MudMenuItem>
+                }
+            </MudMenu>
+        </MudTh>
+        @foreach (var columnInfo in Columns)
+        {
+            <MudTh Style="text-align:center" >
+                <MudButton Variant="Variant.Outlined" OnClick="@(e => TotalInfo(columnInfo.InfoText))" Size="Size.Small">
+                    @columnInfo.Name
+                </MudButton>
             </MudTh>
-            @foreach (var columnInfo in Columns)
-            {
-                <MudTh Style="text-align:center" >
-                    <MudTooltip Text="@columnInfo.MoreInfoToolTip" Color="Color.Primary">
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(e => TotalInfo(columnInfo.InfoText))" Size="Size.Small">@columnInfo.Name</MudButton>
-                    </MudTooltip>
-                </MudTh>
-            }
-            <MudTh Style="text-align:center; " >
-                <MudTooltip Text="Change Year" Color="Color.Primary">
-                    <MudSelect Variant="Variant.Outlined"
-                            Margin="Margin.Dense"
-                            T="int"
-                            AnchorOrigin="Origin.BottomCenter"
-                            Value="@(Year)"
-                            ValueChanged="@(YearChanged)"
-                            Dense="true"
-                            MaxHeight="500" >
-                        @foreach (var year in YearSL)
-                        {
-                            <MudSelectItem Value="@year" />
-                        }
-                    </MudSelect>
-                </MudTooltip>
-            </MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Month"><MudText>@context.MonthName</MudText></MudTd>
-            @foreach (var summary in context.SummaryDetails)
-            {
-                <MudTd Style="text-align:center" DataLabel="@summary.SummaryName">
-                    <MudLink Href="javascript: void(0);" OnClick="(e => TransList(summary.SummaryName, summary.Types, context.MonthNo))" Class="@summary.CssClass">@summary.Total.ToString("N2")</MudLink>
-                </MudTd>
-            }
-        </RowTemplate>
-    </MudTable>
-    
-</MudContainer>
-
+        }
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Month"><MudText>@context.MonthName</MudText></MudTd>
+        @foreach (var summary in context.SummaryDetails)
+        {
+            <MudTd Style="text-align:center" DataLabel="@summary.SummaryName">
+                <MudLink OnClick="(e => TransList(summary.SummaryName, summary.Types, context.MonthNo))" Class="@summary.CssClass">@summary.Total.ToString("N2")</MudLink>
+            </MudTd>
+        }
+    </RowTemplate>
+</MudTable>

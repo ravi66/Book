@@ -10,40 +10,39 @@
 
 <MudAlert Severity="Severity.Error" Class="mb-6" Elevation="6">
     <MudText Typo="Typo.h5">
-    Any changes you make are saved in an SQLite database stored in your browser's cache.
-    If that cache is cleared for any reason all changes will be lost. It is recommended to
-    periodically copy your changes so they can never be lost
+        Any changes you make are saved in an SQLite database. It is highly recommended
+        to periodically back this up. Last backup: @LastBackupDate.
     </MudText>
 </MudAlert>
 
 <MudGrid>
     <MudItem xs="12" md="6" lg="4">
-        <MudCard Elevation="6">
+        <MudCard Elevation="5">
             <MudCardContent Style="min-height: 100px;">
-                <MudText Typo="Typo.h5">Copy</MudText>
-                <MudText Typo="Typo.body2">Copy your saved changes</MudText>
+                <MudText Typo="Typo.h5">Back up</MudText>
+                <MudText Typo="Typo.body2">Copy the database to a file</MudText>
             </MudCardContent>
             <MudCardActions>
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Filled.CloudDownload" Href="@BookDownloadUrl" Target="_blank" download="@BookDbFileName">Copy</MudButton>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CloudDownload" Href="@BookDownloadUrl" Target="_blank" download="@BookDbFileName" OnClick="SetLastBackupDate">Backup</MudButton>
             </MudCardActions>
         </MudCard>
     </MudItem>
     <MudItem xs="12" md="6" lg="4">
-        <MudCard Elevation="6">
+        <MudCard Elevation="5">
             <MudCardContent Style="min-height: 100px;">
                 <MudText Typo="Typo.h5">Replace</MudText>
-                <MudText Typo="Typo.body2">Replace your saved changes with previously copied</MudText>
+                <MudText Typo="Typo.body2">Replace the database with a previous backup</MudText>
             </MudCardContent>
             <MudCardActions>
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" HtmlTag="label" for="inputFile" StartIcon="@Icons.Filled.CloudUpload">Replace</MudButton>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" HtmlTag="label" for="inputFile" StartIcon="@Icons.Material.Filled.CloudUpload">Replace</MudButton>
             </MudCardActions>
         </MudCard>
     </MudItem>
     <MudItem xs="12" md="6" lg="4">
-        <MudCard Elevation="6">
+        <MudCard Elevation="5">
             <MudCardContent Style="min-height: 100px;">
                 <MudText Typo="Typo.h5">Delete</MudText>
-                <MudText Typo="Typo.body2">Delete your saved changes</MudText>
+                <MudText Typo="Typo.body2">Delete the current database and use an empty one</MudText>
             </MudCardContent>
             <MudCardActions>
                 <MudButton Color="Color.Error" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" OnClick="DeleteDatabase">Delete</MudButton>

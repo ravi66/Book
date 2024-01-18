@@ -1,11 +1,10 @@
 ## Book
 
-### An application for recording transactions written in Blazor WebAssembly
+### An application for recording transactions written in c# and deployed using Blazor WebAssembly
 
 #### What Book is:
 Book is a project I'm mainly using as a learning experience in various technologies new to me:
 - [Blazor WebAssembly](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor)
-- PWA ([Progressive Web Application](https://en.wikipedia.org/wiki/Progressive_web_application))
 - [EF Core](https://docs.microsoft.com/en-us/ef/core/) backed by a SQLite
  database, _in the browser cache_, with the help of
  [SqliteWasmHelper](https://github.com/JeremyLikness/SqliteWasmHelper)

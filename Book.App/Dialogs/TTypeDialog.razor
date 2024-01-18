@@ -1,0 +1,48 @@
+﻿@using System.Globalization
+@using System.ComponentModel.DataAnnotations
+@using Book.Models
+
+<MudDialog>
+    <DialogContent>
+        <MudForm Model="@TransactionType"  @bind-IsValid="@validationOk">
+            <MudStack>
+                <MudCard Elevation="5" Style="width:100%">
+                    <MudTextField
+                        Variant="Variant.Outlined" 
+                        Label="Name" 
+                        Margin="Margin.Dense"
+                        @bind-Value=TransactionType.Name
+                        For="@(() => TransactionType.Name)"
+                        AutoFocus="true"
+                        onFocus="this.select()" />
+                </MudCard>
+                <MudCard Elevation="5">
+                    <MudAutocomplete T="SummaryType"
+                                     Label="Summary"
+                                     Style="width: 100%;"
+                                     Variant="Variant.Outlined"
+                                     Margin="Margin.Dense"
+                                     Dense="true"
+                                     SearchFunc="@TypeSearch"
+                                     SelectOnClick="true"
+                                     SelectValueOnTab="true"
+                                     @bind-Value="_SelectedSummaryType"
+                                     ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
+                </MudCard>
+                <MudCard Elevation="5">
+                    <MudText>
+                        Created: @TransactionType.CreateDate.ToShortDateString()
+                    </MudText>
+                </MudCard>
+            </MudStack>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" aria-label="save" OnClick="() => Save()" />
+        @if (TransactionType.TransactionCount < 1)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Secondary" aria-label="delete" OnClick="() => DeleteTType()" />
+        }
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
+    </DialogActions>
+</MudDialog>

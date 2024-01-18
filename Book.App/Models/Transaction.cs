@@ -7,9 +7,9 @@ namespace Book.Models
     {
         public int TransactionId { get; set; }
 
-        public int? TransactionTypeId { get; set; }
-        
         public TransactionType? TransactionType { get; set; }
+
+        public int? TransactionTypeId { get; set; }
 
         [NotMapped]
         [Display(Name = "Type")]

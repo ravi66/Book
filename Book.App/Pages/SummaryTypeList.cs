@@ -1,4 +1,4 @@
-﻿using Book.Components;
+﻿using Book.Dialogs;
 using Book.Models;
 using Book.Services;
 using Microsoft.AspNetCore.Components;
@@ -23,9 +23,9 @@ namespace Book.Pages
 
         private SummaryType summaryTypeBeforeEdit { get; set; }
 
-        private MudTable<SummaryType> _table { get; set; }
+        private MudTable<SummaryType> _Summaries { get; set; }
 
-        private bool blockSwitch { get; set; } = false;
+        private bool sBlockSwitch { get; set; } = false;
 
         protected async override Task OnInitializedAsync()
         {
@@ -40,9 +40,9 @@ namespace Book.Pages
             SummaryTypes = await ctx.GetAllSummaryTypes();
         }
 
-        protected async void ListTransactions(int summaryTypeId, string summaryName, List<int>? types)
+        protected async void ListTransactionsSummary(int summaryTypeId, string summaryName, List<int>? types)
         {
-            _table.SetEditingItem(null);
+            _Summaries.SetEditingItem(null);
 
             string typesString = (types != null && types.Count > 0) ? typesString = string.Join(",", types) : String.Empty;
 
@@ -54,10 +54,10 @@ namespace Book.Pages
 
             DialogService.Show<TransListDialog>("Transaction List", parameters);
         }
-        
+
         async Task DeleteSummaryType(int summaryTypeId, string summaryName)
         {
-            _table.SetEditingItem(null);
+            _Summaries.SetEditingItem(null);
 
             var parameters = new DialogParameters<ConfirmDialog>();
             parameters.Add(x => x.ConfirmationTitle, $"Delete {summaryName} Summary Type");
@@ -75,11 +75,10 @@ namespace Book.Pages
                 await ctx.DeleteSummaryType(summaryTypeId);
 
                 await LoadSummaryTypes();
-                StateHasChanged();
             }
         }
 
-        private void BackupItem(object summaryType)
+        private void BackupSummary(object summaryType)
         {
             summaryTypeBeforeEdit = new()
             {
@@ -92,7 +91,7 @@ namespace Book.Pages
             };
         }
 
-        private void ResetItemToOriginalValues(object summaryType)
+        private void ResetSummary(object summaryType)
         {
             if (((SummaryType)summaryType).SummaryTypeId != 0)
             {
@@ -106,13 +105,13 @@ namespace Book.Pages
             else
             {
                 SummaryTypes.RemoveAt(0);
+                StateHasChanged();
             }
 
-            blockSwitch = false;
-            StateHasChanged();
+            sBlockSwitch = false;
         }
 
-        private async void ItemHasBeenCommitted(object summaryType)
+        private async void SummaryCommitted(object summaryType)
         {
             using var ctx = await Factory.CreateDbContextAsync();
 
@@ -125,12 +124,12 @@ namespace Book.Pages
                 await ctx.UpdateSummaryType((SummaryType)summaryType);
             }
 
-            blockSwitch = false;
+            sBlockSwitch = false;
         }
 
         private async Task AddSummaryType()
         {
-            if (_table.IsEditRowSwitchingBlocked) return;
+            if (_Summaries.IsEditRowSwitchingBlocked) return;
 
             SummaryType newSummaryType = new SummaryType();
             newSummaryType.Name = String.Empty;
@@ -141,10 +140,53 @@ namespace Book.Pages
 
             SummaryTypes.Insert(0, newSummaryType);
             await Task.Delay(50);
-            _table.SetSelectedItem(newSummaryType);
-            _table.SetEditingItem(newSummaryType);
-            blockSwitch = true;
+            _Summaries.SetSelectedItem(newSummaryType);
+            _Summaries.SetEditingItem(newSummaryType);
+            sBlockSwitch = true;
         }
 
+        private void ShowTransactionTypeBtnPress(int summaryTypeId)
+        {
+            SummaryType tmpSummaryType = SummaryTypes.First(s => s.SummaryTypeId == summaryTypeId);
+            tmpSummaryType.ShowTransactionTypes = !tmpSummaryType.ShowTransactionTypes;
+        }
+
+        private async Task AddTransactionType(int summaryTypeId)
+        {
+            var parameters = new DialogParameters<TTypeDialog>();
+            parameters.Add(x => x.NewSummaryTypeId, summaryTypeId);
+
+            var dialog = DialogService.Show<TTypeDialog>("Create Entry Type", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                await LoadSummaryTypes();
+            }
+        }
+
+        protected async Task ListTransactionsTType(int transactionTypeId, string transactionTypeName)
+        {
+            var parameters = new DialogParameters<TransListDialog>();
+            parameters.Add(x => x.Mode, 3);
+            parameters.Add(x => x.Name, transactionTypeName);
+            parameters.Add(x => x.TransactionTypeId, transactionTypeId);
+
+            DialogService.Show<TransListDialog>("Entries List", parameters);
+        }
+
+        protected async Task EditTType(int transactionTypeId)
+        {
+            var parameters = new DialogParameters<TTypeDialog>();
+            parameters.Add(x => x.SavedTransactionTypeId, transactionTypeId);
+
+            var dialog = DialogService.Show<TTypeDialog>("Edit Entry Type", parameters);
+            var result = await dialog.Result;
+
+            if (!result.Canceled)
+            {
+                await LoadSummaryTypes();
+            }
+        }
     }
 }

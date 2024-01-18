@@ -1,65 +1,47 @@
 ﻿@page "/booksettings"
-@using Book.Shared;
-@using MudBlazor
 
 <PageTitle>@BookName - Settings</PageTitle>
 
-<MudContainer Class="pt-2 ps-1" >
-
-    <MudTable   Elevation="5"
-                Items="@BookSettings"
-                @ref="_table"
-                Dense="true"
-                Hover="true"
-                CanCancelEdit="true"
-                CommitEditIcon="@Icons.Material.Filled.Save"
-                @bind-SelectedItem="selectedBookSetting"
-                SortLabel="Sort By"
-                RowEditPreview="BackupItem"
-                RowEditCancel="ResetItemToOriginalValues"
-                IsEditRowSwitchingBlocked="@blockSwitch"
-                EditTrigger="TableEditTrigger.EditButton"
-                EditButtonPosition="TableEditButtonPosition.Start"
-                ApplyButtonPosition="TableApplyButtonPosition.Start"
-                RowEditCommit="ItemHasBeenCommitted">
-        <ToolBarContent>
-            <MudText Typo="Typo.h4" >
-                <MudIcon Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" /> Settings
-            </MudText>
-            <MudTooltip Text="Save changes" Color="Color.Primary">
-                <MudIconButton Size="Size.Large" 
-                    ButtonType="ButtonType.Submit"
-                    Icon="@Icons.Material.Filled.Save" 
-                    Color="Color.Primary" 
-                    OnClick="Save" 
-                    Disabled="@DisableSave"/>
-            </MudTooltip>
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh><MudTableSortLabel SortBy="new Func<BookSetting, object>(x=>x.SettingName)">Name</MudTableSortLabel></MudTh>
-            <MudTh><MudTableSortLabel SortBy="new Func<BookSetting, object>(x=>x.SettingValue)">Value</MudTableSortLabel></MudTh>
-        </HeaderContent>
-        <RowTemplate >
-            <MudTd DataLabel="Setting Name">@context.SettingName</MudTd>
+<MudTable Elevation="5"
+          Items="@BookSettings"
+          @ref="_table"
+          Dense="true"
+          Hover="true"
+          CanCancelEdit="true"
+          CommitEditIcon="@Icons.Material.Filled.Save"
+          @bind-SelectedItem="selectedBookSetting"
+          SortLabel="Sort By"
+          RowEditPreview="BackupItem"
+          RowEditCancel="ResetItemToOriginalValues"
+          IsEditRowSwitchingBlocked="@blockSwitch"
+          EditTrigger="TableEditTrigger.EditButton"
+          EditButtonPosition="TableEditButtonPosition.Start"
+          ApplyButtonPosition="TableApplyButtonPosition.Start"
+          RowEditCommit="ItemHasBeenCommitted">
+    <ToolBarContent>
+        <MudText Typo="Typo.h4">
+            <MudIcon Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" /> Settings
+        </MudText>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortBy="new Func<BookSetting, object>(x=>x.SettingName)">Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<BookSetting, object>(x=>x.SettingValue)">Value</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Setting Name">@context.SettingName</MudTd>
             <MudTd DataLabel="Setting Value">@context.SettingValue</MudTd>
         </RowTemplate>
         <RowEditingTemplate>
             <MudTd DataLabel="Setting Name">@context.SettingName</MudTd>
             <MudTd DataLabel="Setting Value">
-                <MudTextField   @bind-Value="@context.SettingValue"
-                                Required
-                                Variant="Variant.Outlined"
-                                Margin="Margin.Dense" />
-             </MudTd>
+                <MudTextField @bind-Value="@context.SettingValue" Required Variant="Variant.Outlined" Margin="Margin.Dense" />
+            </MudTd>
         </RowEditingTemplate>
-         <EditButtonContent Context="button">
-            <MudTooltip Text="Edit Setting" Color="Color.Primary">
-                <MudIconButton Size="@Size.Medium"
-                            Icon="@Icons.Material.Filled.Edit"
-                            Class="pa-0"
-                            OnClick="@button.ButtonAction"
-                            Color="Color.Primary" />
-            </MudTooltip>
-         </EditButtonContent>
-     </MudTable>
-</MudContainer>
+     <EditButtonContent Context="button">
+         <MudIconButton Size="@Size.Small"
+                        Icon="@Icons.Material.Filled.Edit"
+                        Class="pa-0"
+                        OnClick="@button.ButtonAction"
+                        Color="Color.Primary" />
+     </EditButtonContent>
+ </MudTable>

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace Book.Components
+namespace Book.Dialogs
 {
     public partial class ConfirmDialog
     {

@@ -1,0 +1,13 @@
+﻿@page "/refresh"
+@page "/refresh/{page}"
+@inject NavigationManager NavigationManager
+
+@code {
+    [Parameter] public string Page { get; set; }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.NavigateTo($"{Page}");
+    }
+
+}

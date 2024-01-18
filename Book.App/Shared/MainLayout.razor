@@ -5,20 +5,29 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="0" Dense="true" Fixed="false" >
-        <MudMenu AnchorOrigin="Origin.BottomLeft" Label="@BookName" Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.KeyboardArrowDown">
-            <MudMenuItem Href="/" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Home">Summary</MudMenuItem>
-            <MudMenuItem Href="SummaryTypeList" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Summarize">Summary Types</MudMenuItem>
-            <MudMenuItem Href="TransactionTypeList" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Payments">Transaction Types</MudMenuItem>
-            <MudMenuItem Href="BookSettings" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Settings">Settings</MudMenuItem>
-            <MudMenuItem Href="Database" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Storage">Database</MudMenuItem>
-            <MudMenuItem Href="Credits" IconColor="Color.Primary" Icon="@Icons.Material.Filled.Info">Credits</MudMenuItem>
-        </MudMenu>
+    <MudAppBar Elevation="0" Dense="true">
+        <MudIconButton OnClick="@ToggleDrawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
         <MudSpacer />
-        <MudIconButton Icon="@themeIcon" Color="Color.Inherit" OnClick="ToggleThemeMode" Class="mr-3" />
+        <MudButton OnClick="AddTransaction" StartIcon="@Icons.Material.Filled.AddCircleOutline" Color="Color.Inherit" Variant="Variant.Outlined" >New Entry</MudButton>
+        <MudSpacer />
+        <MudIconButton OnClick="ToggleThemeMode" Icon="@themeIcon" Color="Color.Inherit" />
     </MudAppBar>
-    <MudMainContent Class="pt-1 pb-2">
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge" >
+    <MudDrawer @bind-Open="@drawerOpen" Variant="DrawerVariant.Responsive" Elevation="0">
+        <MudDrawerHeader Dense="true" >
+            <MudText Typo="Typo.h6" >@BookName</MudText>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home" Match="NavLinkMatch.All" >Summary</MudNavLink>
+            <MudNavGroup Title="Setup" Icon="@Icons.Material.Filled.Build" >
+                <MudNavLink Href="SummaryTypeList" Icon="@Icons.Material.Filled.Summarize" >Types</MudNavLink>
+                <MudNavLink Href="BookSettings" Icon="@Icons.Material.Filled.Settings" >Settings</MudNavLink>
+                <MudNavLink Href="Database" Icon="@Icons.Material.Filled.Storage" >Database</MudNavLink>
+            </MudNavGroup>
+            <MudNavLink Href="Credits" Icon="@Icons.Material.Filled.Info">Credits</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-1" >
             @Body
         </MudContainer>
     </MudMainContent>

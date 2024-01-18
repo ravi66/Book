@@ -1,11 +1,18 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Book.Services;
+using Book.Dialogs;
 
 namespace Book.Shared
 {
     public partial class MainLayout
     {
+        [Inject] public NavigationManager navigationManager { get; set; }
+
+        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+
+        [Inject] public IDialogService DialogService { get; set; }
+
         private bool _isDarkMode = true;
 
         private string themeIcon = Icons.Material.Filled.LightMode;
@@ -14,9 +21,20 @@ namespace Book.Shared
 
         private MudThemeProvider _mudThemeProvider;
 
-        [Inject] public NavigationManager navigationManager { get; set; }
+        private bool drawerOpen = false;
 
-        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+        void ToggleDrawer()
+        {
+            drawerOpen = !drawerOpen;
+        }
+
+        protected async override Task OnInitializedAsync()
+        {
+            BookName = await BookSettingSvc.GetBookName();
+            _isDarkMode = await BookSettingSvc.GetDarkMode();
+
+            themeIcon = _isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
+        }
 
         private async void ToggleThemeMode()
         {
@@ -34,12 +52,12 @@ namespace Book.Shared
             await BookSettingSvc.SetDarkMode(_isDarkMode);
         }
 
-        protected async override Task OnInitializedAsync()
+        private async Task AddTransaction()
         {
-            BookName = await BookSettingSvc.GetBookName();
-            _isDarkMode = await BookSettingSvc.GetDarkMode();
+            var parameters = new DialogParameters<TransactionDialog>();
+            parameters.Add(x => x.SavedTransactionId, 0);
 
-            themeIcon = _isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
+            DialogService.Show<TransactionDialog>("New Entry", parameters);
         }
 
     }

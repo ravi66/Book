@@ -1,0 +1,63 @@
+﻿@using System.Globalization
+@implements IDisposable
+
+<MudDialog>
+
+    <DialogContent  >
+
+        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row="true" >
+            <MudText Typo="Typo.h5">@DialogTitle</MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
+        </MudStack>
+
+        @if (Mode > 1)
+        {
+            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row="true" Style="pa-0">
+                <MudPaper Elevation="2" >
+                    <MudDateRangePicker Variant="Variant.Outlined"
+                                        Label="Filter"
+                                        Editable="true"
+                                        @bind-DateRange="_dateRange"
+                                        AutoClose="true"
+                                        Margin="Margin.Dense" />
+                </MudPaper>
+                <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" OnClick="HandleFilter" Color="Color.Primary" Size="Size.Medium" aria-label="filter" />
+            </MudStack>
+        }
+
+        <MudTable   Items="@Transactions"
+                    T="Transaction"
+                    Hover="true"
+                    @ref="_table"
+                    Virtualize="true"
+                    Dense="true" >
+            <HeaderContent>
+                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.TransactionTypeName)"><MudText>Type</MudText></MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.Value)"><MudText>Value</MudText></MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.TransactionDate)"><MudText>Dated</MudText></MudTableSortLabel></MudTh>
+                <MudTh><MudText>Tools</MudText></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.Notes)"><MudText>Notes</MudText></MudTableSortLabel></MudTh>
+            </HeaderContent>
+            <NoRecordsContent>
+                <MudText>No Entries found</MudText>
+            </NoRecordsContent>
+            <RowTemplate>
+                <MudTd DataLabel="Type"><MudText>@context.TransactionTypeName</MudText></MudTd>
+                <MudTd DataLabel="Value" Class="@context.CssClass"><MudText>@context.Value.ToString("C2")</MudText></MudTd>
+                <MudTd DataLabel="Dated"><MudText>@context.TransactionDate.ToShortDateString()</MudText></MudTd>
+                <MudTd DataLabel="Tools">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" aria-label="edit entry" OnClick="()=> EditTransaction(context.TransactionId)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" Size="Size.Small" aria-label="copy entry" OnClick="()=> CopyTransaction(context.TransactionId, context.TransactionTypeName, context.Value)" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" Size="Size.Small" aria-label="delete entry" OnClick="() => DeleteTransaction(context)" /> @*.TransactionId, context.TransactionTypeName, context.Value, context.TransactionDate.Year)" /> *@
+                </MudTd>
+                <MudTd DataLabel="Notes"><MudText>@context.Notes</MudText></MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 8, 30, int.MaxValue }"
+                               HorizontalAlignment="HorizontalAlignment.Center" />
+            </PagerContent>
+        </MudTable>
+
+    </DialogContent>
+    
+</MudDialog>
