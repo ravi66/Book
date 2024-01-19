@@ -5,8 +5,9 @@
 
     <DialogContent  >
 
-        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row="true" >
+        <MudStack Row="true" >
             <MudText Typo="Typo.h5">@DialogTitle</MudText>
+            <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
         </MudStack>
 
@@ -14,23 +15,13 @@
         {
             <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row="true" Style="pa-0">
                 <MudPaper Elevation="2" >
-                    <MudDateRangePicker Variant="Variant.Outlined"
-                                        Label="Filter"
-                                        Editable="true"
-                                        @bind-DateRange="_dateRange"
-                                        AutoClose="true"
-                                        Margin="Margin.Dense" />
+                    <MudDateRangePicker Variant="Variant.Outlined" Label="Filter" Editable="true" @bind-DateRange="_dateRange" AutoClose="true" Margin="Margin.Dense" />
                 </MudPaper>
                 <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" OnClick="HandleFilter" Color="Color.Primary" Size="Size.Medium" aria-label="filter" />
             </MudStack>
         }
 
-        <MudTable   Items="@Transactions"
-                    T="Transaction"
-                    Hover="true"
-                    @ref="_table"
-                    Virtualize="true"
-                    Dense="true" >
+        <MudTable Items="@Transactions" T="Transaction" Hover="true" @ref="_table" Virtualize="true" Dense="true" >
             <HeaderContent>
                 <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.TransactionTypeName)"><MudText>Type</MudText></MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.Value)"><MudText>Value</MudText></MudTableSortLabel></MudTh>
