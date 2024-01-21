@@ -9,9 +9,9 @@ namespace Book.Pages
 {
     public partial class Database
     {
-        [Inject] public IJSRuntime jsRuntime { get; set; }
+        [Inject] public IJSRuntime JsRuntime { get; set; }
 
-        [Inject] public NavigationManager navigationManager { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; }
 
         [Inject] public IDialogService DialogService { get; set; }
 
@@ -33,7 +33,7 @@ namespace Book.Pages
             LastBackupDate = await BookSettingSvc.GetLastBackupDate();
             BookDbFileName = $"{await BookSettingSvc.GetDbPrefix()}-{DateTime.Now:yyyyMMddhhmm}.sqlite3";
 
-            jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/database.js");
+            jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/database.js");
             BookDownloadUrl = await GetDownloadUrl();
         }
 
@@ -46,32 +46,35 @@ namespace Book.Pages
             var fileContent = new byte[e.File.Size];
             await e.File.OpenReadStream().ReadAsync(fileContent);
             await jsModule.InvokeVoidAsync("uploadDatabase", fileContent);
-            navigationManager.NavigateTo("/", true);
+            NavigationManager.NavigateTo("/", true);
         }
 
         private async void DeleteDatabase()
         {
-            var parameters = new DialogParameters<ConfirmDialog>();
-            parameters.Add(x => x.ConfirmationTitle, "Delete Database");
-            parameters.Add(x => x.ConfirmationMessage, "<h2 style=\"color:Crimson\">WARNING:</h2><h5>Are you sure you want to delete all your saved changes?</h5><h5>If you have not copied your your changes they will be permanently lost</h5>");
-            parameters.Add(x => x.CancelColorInt, 0);
-            parameters.Add(x => x.DoneColorInt, 1);
+            var parameters = new DialogParameters<ConfirmDialog>
+            {
+                { x => x.ConfirmationMessage, "<h2 style=\"color:Crimson\">*** WARNING ***</h2><h3>Are you sure you want to delete all your saved changes?</h3><h4>If you have not backed up your your changes they will be permanently lost</h4>" },
+                { x => x.CancelColorInt, 0 },
+                { x => x.DoneColorInt, 1 }
+            };
 
-            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters);
+            var options = new DialogOptions() { NoHeader = true };
+
+            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters, options);
             var result = await dialog.Result;
 
             if (!result.Canceled)
             {
                 var success = await jsModule.InvokeAsync<bool>("deleteDatabase");
-                if (success) navigationManager.NavigateTo("/", true);
-                navigationManager.NavigateTo("refresh/Database");
+                if (success) NavigationManager.NavigateTo("/", true);
+                NavigationManager.NavigateTo("refresh/Database");
             }
         }
 
         private async void SetLastBackupDate()
         {
             await BookSettingSvc.SetLastBackupDate(DateTime.Now);
-            navigationManager.NavigateTo("refresh/Database");
+            NavigationManager.NavigateTo("refresh/Database");
         }
 
         async ValueTask IAsyncDisposable.DisposeAsync()
