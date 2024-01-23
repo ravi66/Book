@@ -10,6 +10,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\.nojekyll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\.nojekyll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\.nojekyll" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.13">
@@ -20,6 +32,12 @@
     <PackageReference Include="MudBlazor" Version="6.11.0" />
     <PackageReference Include="SqliteWasmHelper" Version="1.2.0-beta-gf8e1db1f31" />
     <PackageReference Include="System.Net.Http.Json" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Dialogs\TransListDialog.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 
 </Project>

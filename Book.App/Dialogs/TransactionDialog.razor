@@ -18,6 +18,10 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
+        @if (SavedTransactionId != 0)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Variant="Variant.Filled" Color="Color.Primary" aria-label="copy entry" OnClick="CopyTransaction" />
+        }
         <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" aria-label="save" OnClick="Save" />
         <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Secondary" aria-label="delete" OnClick="DeleteTransaction" />
         <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />

@@ -5,7 +5,7 @@
 
     <DialogContent  >
 
-        <MudStack Row="true" >
+        <MudStack Row="true" AlignItems="AlignItems.Center" >
             <MudText Typo="Typo.h5">@DialogTitle</MudText>
             <MudSpacer />
             <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
@@ -13,21 +13,18 @@
 
         @if (Mode > 1)
         {
-            <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Row="true" Style="pa-0">
-                <MudPaper Elevation="2" >
-                    <MudDateRangePicker Variant="Variant.Outlined" Label="Filter" Editable="true" @bind-DateRange="_dateRange" AutoClose="true" Margin="Margin.Dense" />
-                </MudPaper>
-                <MudIconButton Icon="@Icons.Material.Filled.Search" Variant="Variant.Filled" OnClick="HandleFilter" Color="Color.Primary" Size="Size.Medium" aria-label="filter" />
-            </MudStack>
+            <MudPaper Elevation="5" Class="mt-2 mb-2" MaxWidth="300px">
+                <MudDateRangePicker Variant="Variant.Outlined" Label="Filter" Editable="true" DateRange="DateFilter" DateRangeChanged="HandleFilter" AutoClose="true" Margin="Margin.Dense" DisableUnderLine="true" DisableToolbar="true" />
+            </MudPaper>
         }
 
-        <MudTable Items="@Transactions" T="Transaction" Hover="true" @ref="_table" Virtualize="true" Dense="true" >
+        <MudTable Items="@Transactions" T="Transaction" Hover="true" Dense="true" AllowUnsorted="false" SortLabel="Sort By" >
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.TransactionTypeName)"><MudText>Type</MudText></MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.Value)"><MudText>Value</MudText></MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.TransactionDate)"><MudText>Dated</MudText></MudTableSortLabel></MudTh>
-                <MudTh><MudText>Tools</MudText></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.Notes)"><MudText>Notes</MudText></MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.TransactionTypeName)">Type</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.Value)">Value</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<Transaction, object>(x=>x.TransactionDate)">Dated</MudTableSortLabel></MudTh>
+                <MudTh>Tools</MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.Notes)">Notes</MudTableSortLabel></MudTh>
             </HeaderContent>
             <NoRecordsContent>
                 <MudText>No Entries found</MudText>
@@ -44,8 +41,7 @@
                 <MudTd DataLabel="Notes"><MudText>@context.Notes</MudText></MudTd>
             </RowTemplate>
             <PagerContent>
-                <MudTablePager PageSizeOptions="new int[] { 8, 30, int.MaxValue }"
-                               HorizontalAlignment="HorizontalAlignment.Center" />
+                <MudTablePager PageSizeOptions="new int[] { 8, 30, int.MaxValue }" HorizontalAlignment="HorizontalAlignment.Center" />
             </PagerContent>
         </MudTable>
 

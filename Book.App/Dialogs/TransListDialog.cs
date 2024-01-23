@@ -35,15 +35,13 @@ namespace Book.Dialogs
 
         [Parameter] public int SummaryTypeId { get; set; }
 
-        private DateRange _dateRange { get; set; } 
+        private DateRange? DateFilter { get; set; } 
    
         public List<int> Types { get; set; }
 
         public string DialogTitle { get; set; }
 
         public string MonthName { get; set; }
-
-        private MudTable<Transaction> _table { get; set; }
 
         void Close() => MudDialog.Cancel();
 
@@ -62,7 +60,7 @@ namespace Book.Dialogs
 
             if (Mode > 1)
             {
-                _dateRange = new DateRange(new DateTime(await BookSettingSvc.GetStartYear(), 1, 1), new DateTime(await BookSettingSvc.GetEndYear(), 12, 31));
+                DateFilter = new DateRange(new DateTime(await BookSettingSvc.GetStartYear(), 1, 1), new DateTime(await BookSettingSvc.GetEndYear(), 12, 31));
             }
 
             Types = TypesString != String.Empty ? TypesString.Split(',').Select(int.Parse).ToList() : new List<int>();
@@ -72,8 +70,9 @@ namespace Book.Dialogs
             await LoadTransactions();
         }
 
-        protected async Task HandleFilter()
+        protected async Task HandleFilter(DateRange dateRange)
         {
+            DateFilter = dateRange;
             await LoadTransactions();
         }
 
@@ -88,11 +87,11 @@ namespace Book.Dialogs
                     break;
 
                 case 2:
-                    Transactions = (await ctx.GetTransactionsBySummary(Types, _dateRange.Start.Value, _dateRange.End.Value)).ToList();
+                    Transactions = (await ctx.GetTransactionsBySummary(Types, DateFilter.Start.Value, DateFilter.End.Value)).ToList();
                     break;
 
                 case 3:
-                    Transactions = (await ctx.GetTransactionsByType(TransactionTypeId, _dateRange.Start.Value, _dateRange.End.Value)).ToList();
+                    Transactions = (await ctx.GetTransactionsByType(TransactionTypeId, DateFilter.Start.Value, DateFilter.End.Value)).ToList();
                     break;
             }
 
@@ -146,7 +145,7 @@ namespace Book.Dialogs
         {
             var parameters = new DialogParameters<TransCopyDialog>
             {
-                { c => c.DialogTitle, $"Copying {value:C2} {typeName} entry" },
+                { c => c.DialogTitle, $"Copy {value:C2} {typeName} entry" },
                 { c => c.TransactionToCopyId, transactionId }
             };
 

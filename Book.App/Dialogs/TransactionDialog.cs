@@ -136,5 +136,16 @@ namespace Book.Dialogs
                 .Where(t => t.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
         }
 
+        async Task CopyTransaction()
+        {
+            var parameters = new DialogParameters<TransCopyDialog>
+            {
+                { c => c.DialogTitle, $"Copy {Transaction.Value:C2} {_SelectedTransactionType.Name} entry" },
+                { c => c.TransactionToCopyId, Transaction.TransactionId }
+            };
+
+            DialogService.Show<TransCopyDialog>("Copy", parameters);
+        }
+
     }
 }

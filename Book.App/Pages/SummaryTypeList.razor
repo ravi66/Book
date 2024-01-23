@@ -2,32 +2,12 @@
 
 <PageTitle>@BookName - Types</PageTitle>
 
-<MudTable Elevation="5"
-          Items="@SummaryTypes"
-          @ref="_Summaries"
-          Dense="true"
-          Hover="true"
-          CanCancelEdit="true"
-          CommitEditIcon="@Icons.Material.Filled.Save"
-          @bind-SelectedItem="selectedSummaryType"
-          SortLabel="Sort By"
-          EditTrigger="TableEditTrigger.EditButton"
-          EditButtonPosition="TableEditButtonPosition.Start"
-          RowEditPreview="BackupSummary"
-          RowEditCancel="ResetSummary"
-          IsEditRowSwitchingBlocked="@sBlockSwitch"
-          ApplyButtonPosition="TableApplyButtonPosition.Start"
-          RowEditCommit="SummaryCommitted"
-          Class="pa-2">
+<MudTable Elevation="5" Items="@SummaryTypes" @ref="_Summaries" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="selectedSummaryType" SortLabel="Sort By" EditTrigger="TableEditTrigger.EditButton" EditButtonPosition="TableEditButtonPosition.Start" RowEditPreview="BackupSummary" RowEditCancel="ResetSummary" IsEditRowSwitchingBlocked="@sBlockSwitch" ApplyButtonPosition="TableApplyButtonPosition.Start" RowEditCommit="SummaryCommitted" Class="pa-2" AllowUnsorted="false" >
     <ToolBarContent>
         <MudText Typo="Typo.h4">
             <MudIcon Icon="@Icons.Material.Filled.Summarize" Color="Color.Primary" /> Summaries
         </MudText>
-        <MudIconButton Size="Size.Large"
-                       Icon="@Icons.Material.Filled.AddBox"
-                       Color="Color.Primary"
-                       OnClick="AddSummaryType">
-        </MudIconButton>
+        <MudIconButton Size="Size.Large" Icon="@Icons.Material.Filled.AddBox" Color="Color.Primary" OnClick="AddSummaryType" />
     </ToolBarContent>
     <ColGroup>
         <col style="width: 5%;" />
@@ -40,7 +20,7 @@
     <HeaderContent>
         <MudTh></MudTh>
         <MudTh><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.Order)">Order</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<SummaryType, object>(x=>x.Order)">Order</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.CreateDate)">Created</MudTableSortLabel></MudTh>
         <MudTh></MudTh>
         <MudTh></MudTh>
@@ -49,11 +29,7 @@
         <MudTd>
             @if (context.Types.Count == 0 && context.SummaryTypeId != -1)
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                       Size="Size.Small"
-                       Color="Color.Secondary"
-                       aria-label="delete summary type"
-                       OnClick="() => DeleteSummaryType(context.SummaryTypeId, context.Name)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Secondary" aria-label="delete summary type" OnClick="() => DeleteSummaryType(context.SummaryTypeId, context.Name)" />
             }
         </MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
@@ -62,22 +38,13 @@
         <MudTd>
             @if (context.SummaryTypeId != 0)
             {
-                <MudButton Variant="Variant.Outlined"
-                           Size="Size.Small"
-                           OnClick="@(() => ShowTransactionTypeBtnPress(context.SummaryTypeId))">
-                    @((context.ShowTransactionTypes == true) ? "Hide" : "Show") Entry Types
-                </MudButton>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowTransactionTypeBtnPress(context.SummaryTypeId))" >@((context.ShowTransactionTypes == true) ? "Hide" : "Show") Entry Types</MudButton>
             }
         </MudTd>
         <MudTd>
             @if (context.SummaryTypeId != 0)
             {
-                <MudButton Variant="Variant.Outlined"
-                    aria-label="list entries"
-                    Size="Size.Small"
-                    OnClick="()=> ListTransactionsSummary(context.SummaryTypeId, context.Name, context.Types)">
-                        Entries
-                </MudButton>
+                <MudButton Variant="Variant.Outlined" aria-label="list entries" Size="Size.Small" OnClick="()=> ListTransactionsSummary(context.SummaryTypeId, context.Name, context.Types)" >Entries</MudButton>
             }
             </MudTd>
     </RowTemplate>
@@ -86,17 +53,10 @@
         {
             <MudTr>
                 <td colspan="7" class="pa-5">
-                    <MudTable Items="@context.TransactionTypeList"
-                              Context="TypeContext"
-                              Hover="true"
-                              Elevation="5">
+                    <MudTable Items="@context.TransactionTypeList" Context="TypeContext" Hover="true" Elevation="5" >
                         <ToolBarContent>
                             <MudText Typo="Typo.h5">Entry Types for <strong>@context.Name</strong></MudText>
-                            <MudIconButton Size="Size.Medium"
-                                           Icon="@Icons.Material.Filled.AddBox"
-                                           Color="Color.Primary"
-                                           OnClick="() => AddTransactionType(context.SummaryTypeId)">
-                            </MudIconButton>
+                            <MudIconButton Size="Size.Medium" Icon="@Icons.Material.Filled.AddBox" Color="Color.Primary" OnClick="() => AddTransactionType(context.SummaryTypeId)" />
                         </ToolBarContent>
                         <HeaderContent>
                             <MudTh />
@@ -114,12 +74,7 @@
                             <MudTd DataLabel="Name">@TypeContext.Name</MudTd>
                             <MudTd DataLabel="Date Created">@TypeContext.CreateDate.ToShortDateString()</MudTd>
                             <MudTd>
-                                    <MudButton Variant="Variant.Outlined"
-                                               aria-label="list entries"
-                                               Size="Size.Small"
-                                               OnClick="()=> ListTransactionsTType(TypeContext.TransactionTypeId, TypeContext.Name)">
-                                        Entries
-                                    </MudButton>
+                                <MudButton Variant="Variant.Outlined" aria-label="list entries" Size="Size.Small" OnClick="()=> ListTransactionsTType(TypeContext.TransactionTypeId, TypeContext.Name)" >Entries</MudButton>
                             </MudTd>
                         </RowTemplate>
                     </MudTable>
@@ -131,54 +86,30 @@
         <MudTd>
             @if (context.Types.Count == 0 && context.SummaryTypeId != -1 && context.SummaryTypeId != 0)
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                               Size="Size.Small"
-                               Color="Color.Secondary"
-                               aria-label="delete summary type"
-                               OnClick="() => DeleteSummaryType(context.SummaryTypeId, context.Name)" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Secondary" aria-label="delete summary type" OnClick="() => DeleteSummaryType(context.SummaryTypeId, context.Name)" />
             }
         </MudTd>
         <MudTd DataLabel="Name">
-            <MudTextField @bind-Value="@context.Name"
-                           Required="true"
-                           Variant="Variant.Outlined"
-                           Margin="Margin.Dense" />
+            <MudTextField @bind-Value="@context.Name" Required="true" Variant="Variant.Outlined" Margin="Margin.Dense" />
         </MudTd>
         <MudTd DataLabel="Order">
-            <MudNumericField @bind-Value="@context.Order"
-                              Required="true"
-                              Variant="Variant.Outlined"
-                              Margin="Margin.Dense"
-                              Min="1" />
+            <MudNumericField @bind-Value="@context.Order" Required="true" Variant="Variant.Outlined" Margin="Margin.Dense" Min="1" />
         </MudTd>
         <MudTd DataLabel="Created">@context.CreateDate.ToShortDateString()</MudTd>
         <MudTd>
             @if (context.SummaryTypeId != 0)
             {
-                <MudButton Variant="Variant.Outlined"
-                       Size="Size.Small"
-                       OnClick="@(() => ShowTransactionTypeBtnPress(context.SummaryTypeId))">
-                    @((context.ShowTransactionTypes == true) ? "Hide" : "Show") Entry Types
-                </MudButton>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowTransactionTypeBtnPress(context.SummaryTypeId))" >@((context.ShowTransactionTypes == true) ? "Hide" : "Show") Entry Types</MudButton>
             }
         </MudTd>
         <MudTd>
             @if (context.SummaryTypeId != 0)
             {
-                <MudButton Variant="Variant.Outlined"
-                           aria-label="list entries"
-                           Size="Size.Small"
-                           OnClick="()=> ListTransactionsSummary(context.SummaryTypeId, context.Name, context.Types)">
-                    Entries
-                </MudButton>
+                <MudButton Variant="Variant.Outlined" aria-label="list entries" Size="Size.Small" OnClick="()=> ListTransactionsSummary(context.SummaryTypeId, context.Name, context.Types)" >Entries</MudButton>
             }
         </MudTd>
     </RowEditingTemplate>
     <EditButtonContent Context="button">
-        <MudIconButton Size="@Size.Small"
-                       Icon="@Icons.Material.Filled.Edit"
-                       Class="pa-0"
-                       OnClick="@button.ButtonAction"
-                       Color="Color.Primary" />
+        <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Filled.Edit" Class="pa-0" OnClick="@button.ButtonAction" Color="Color.Primary" />
     </EditButtonContent>
 </MudTable>
