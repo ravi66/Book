@@ -4,7 +4,7 @@
 <PageTitle>@BookName - Info</PageTitle>
 
 <MudText Typo="Typo.h4" GutterBottom="true">
-    <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" /> Info
+    <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" /> Book @Version
 </MudText>
 
 <MudStack Class="mb-4">
@@ -119,6 +119,8 @@
     [Inject] public BookSettingSvc BookSettingSvc { get; set; }
 
     private string BookName { get; set; } = "Book";
+
+    private string Version { get; set; } = Constants.BookVersion;
 
     protected async override Task OnInitializedAsync()
     {

@@ -13,6 +13,8 @@ namespace Book.Shared
 
         [Inject] public IDialogService DialogService { get; set; }
 
+        [Inject] public BookDbMigratorSvc Migrator { get; set; }
+
         private bool _isDarkMode = true;
 
         private string themeIcon = Icons.Material.Filled.LightMode;
@@ -30,6 +32,9 @@ namespace Book.Shared
 
         protected async override Task OnInitializedAsync()
         {
+            // Migrate DB
+            _ = await Migrator.EnsureDbCreated();
+
             BookName = await BookSettingSvc.GetBookName();
             _isDarkMode = await BookSettingSvc.GetDarkMode();
 

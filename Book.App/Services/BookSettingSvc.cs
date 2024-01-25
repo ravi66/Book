@@ -74,6 +74,11 @@ namespace Book.Services
             return await GetSettingValue(6, "[DATABASE] Backup Prefix", true, "Book");
         }
 
+        public async Task<string> GetDbVersion()
+        {
+            return await GetSettingValue(7, "[ALL] Database Version", false, "1.0");
+        }
+
         // Sets
 
         public async Task SetDarkMode(bool isDarkMode)
@@ -88,7 +93,13 @@ namespace Book.Services
             return;
         }
 
-        //
+        public async Task SetDbVersion(string version)
+        {
+            // Always set in BookDbMigratorSvc
+            return;
+        }
+
+        // Privates
 
         private async Task<string> GetSettingValue (int settingId, string settingName, bool userAmendable, string defaultValue)
         {

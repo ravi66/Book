@@ -6,6 +6,7 @@ namespace Book.Services
     {
         public static IServiceCollection AddBookServices(this IServiceCollection services)
         {
+            services.AddSingleton<BookDbMigratorSvc>();
             services.AddSingleton<BookSettingSvc>();
             services.AddSingleton<MessageSvc>();
 
