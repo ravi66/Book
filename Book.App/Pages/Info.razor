@@ -1,13 +1,23 @@
-﻿@page "/credits"
+﻿@page "/info"
 @using Book.Services;
 
-<PageTitle>@BookName - Credits</PageTitle>
+<PageTitle>@BookName - Info</PageTitle>
 
 <MudText Typo="Typo.h4" GutterBottom="true">
-    <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" /> Credits
+    <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" /> Info
 </MudText>
 
 <MudStack Class="mb-4">
+
+    <MudPaper Class="pa-4" Elevation="5">
+        <MudText Typo="Typo.h5" >
+            Book enables the recording of Entries via the New Entry button (top middle) while the
+            Summary page shows monthly balances. An Entry has a Type, these Types are collated into 
+            Summaries that are used as columns on the Summary page. You can add Summaries by pressing
+            the menu button (top left) and then Setup->Types. This page also lets you create and
+            edit Entry Types.
+        </MudText>
+    </MudPaper>
 
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
