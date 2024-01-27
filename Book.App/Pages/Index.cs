@@ -3,21 +3,21 @@ using Book.Models;
 using Book.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using SqliteWasmHelper;
-using System;
 using System.Globalization;
 
 namespace Book.Pages
 {
     public partial class Index
     {
-        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
-
         [Inject] public IDialogService DialogService { get; set; }
 
         [Inject] public BookSettingSvc BookSettingSvc { get; set; }
 
         [Inject] public MessageSvc MessageSvc { get; set; }
+
+        [Inject] public TransactionRepository Repo { get; set; }
+
+        [Inject] public SummaryTypeRepository SummaryRepo { get; set; }
 
         public IEnumerable<SummaryType> SummaryTypes { get; set; }
 
@@ -41,9 +41,7 @@ namespace Book.Pages
 
             Years = Enumerable.Range(await BookSettingSvc.GetStartYear(), await BookSettingSvc.GetEndYear() - await BookSettingSvc.GetStartYear() + 1).ToArray();
 
-            using var ctx = await Factory.CreateDbContextAsync();
-
-            SummaryTypes = (await ctx.LoadSummary()).Where(s => s.Types.Count > 0).ToList();
+            SummaryTypes = (await SummaryRepo.LoadSummary()).Where(s => s.Types.Count > 0).ToList();
 
             await LoadSummary();
         }
@@ -53,9 +51,7 @@ namespace Book.Pages
             CreateMonthlySummaries();
 
             // Get all Transactions for year
-            using var ctx = await Factory.CreateDbContextAsync();
-
-            Transactions = await ctx.GetTransactionsByTypeMonth(new List<int>(), Year, 0);
+            Transactions = await Repo.GetTransactionsByTypeMonth(new List<int>(), Year, 0);
 
             CreateSummaryDetails();
             RemoveZeroTransactionsSummaryDetails();

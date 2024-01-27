@@ -3,17 +3,16 @@ using Book.Models;
 using Book.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using SqliteWasmHelper;
 
 namespace Book.Pages
 {
     public partial class SummaryTypeList
     {
-        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
-
         [Inject] public IDialogService DialogService { get; set; }
 
         [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+
+        [Inject] public SummaryTypeRepository Repo { get; set; }
 
         private string BookName { get; set; } = "Book";
 
@@ -36,8 +35,7 @@ namespace Book.Pages
 
         private async Task LoadSummaryTypes()
         {
-            using var ctx = await Factory.CreateDbContextAsync();
-            SummaryTypes = await ctx.GetAllSummaryTypes();
+            SummaryTypes = await Repo.GetAllSummaryTypes();
         }
 
         protected async void ListTransactionsSummary(int summaryTypeId, string summaryName, List<int>? types)
@@ -70,10 +68,7 @@ namespace Book.Pages
 
             if (!result.Canceled && summaryTypeId != 0)
             {
-                using var ctx = await Factory.CreateDbContextAsync();
-
-                await ctx.DeleteSummaryType(summaryTypeId);
-
+                await Repo.DeleteSummaryType(summaryTypeId);
                 await LoadSummaryTypes();
             }
         }
@@ -113,15 +108,13 @@ namespace Book.Pages
 
         private async void SummaryCommitted(object summaryType)
         {
-            using var ctx = await Factory.CreateDbContextAsync();
-
             if (((SummaryType)summaryType).SummaryTypeId == 0)
             {
-                await ctx.AddSummaryType((SummaryType)summaryType);
+                await Repo.AddSummaryType((SummaryType)summaryType);
             }
             else
             {
-                await ctx.UpdateSummaryType((SummaryType)summaryType);
+                await Repo.UpdateSummaryType((SummaryType)summaryType);
             }
 
             sBlockSwitch = false;

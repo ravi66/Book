@@ -17,6 +17,10 @@
             <MudTd DataLabel="Setting Value">@context.SettingValue</MudTd>
         </RowTemplate>
         <RowEditingTemplate>
+            <style>
+                .mud-table-cell:first-of-type .mud-tooltip-root:nth-of-type(1) .mud-svg-icon { fill: slateblue; }
+                .mud-table-cell:first-of-type .mud-tooltip-root:nth-of-type(2) .mud-svg-icon { fill: slateblue; }
+            </style>
             <MudTd DataLabel="Setting Name">@context.SettingName</MudTd>
             <MudTd DataLabel="Setting Value">
                 <MudTextField @bind-Value="@context.SettingValue" Required Variant="Variant.Outlined" Margin="Margin.Dense" />

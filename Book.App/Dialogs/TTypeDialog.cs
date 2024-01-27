@@ -1,9 +1,7 @@
 ﻿using Book.Models;
 using Book.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
-using SqliteWasmHelper;
 
 namespace Book.Dialogs
 {
@@ -15,11 +13,13 @@ namespace Book.Dialogs
 
         [Parameter] public int NewSummaryTypeId { get; set; }
 
-        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
-
         [Inject] public MessageSvc MessageSvc { get; set; }
 
         [Inject] public IDialogService DialogService { get; set; }
+
+        [Inject] public SummaryTypeRepository SummaryRepo { get; set; }
+
+        [Inject] public TransactionTypeRepository TTypeRepo { get; set; }
 
         public TransactionType TransactionType { get; set; }
 
@@ -33,8 +33,7 @@ namespace Book.Dialogs
 
         protected override async Task OnInitializedAsync()
         {
-            using var ctx = await Factory.CreateDbContextAsync();
-            SummaryTypes = (await ctx.GetAllSummaryTypes()).ToList();
+            SummaryTypes = (await SummaryRepo.GetAllSummaryTypes()).ToList();
 
             if (SavedTransactionTypeId == 0)
             {
@@ -47,7 +46,7 @@ namespace Book.Dialogs
             }
             else
             {
-                TransactionType = await ctx.GetTransactionTypeById(SavedTransactionTypeId);
+                TransactionType = await TTypeRepo.GetTransactionTypeById(SavedTransactionTypeId);
             }
 
             _SelectedSummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == TransactionType.SummaryTypeId);
@@ -59,15 +58,13 @@ namespace Book.Dialogs
 
             TransactionType.SummaryTypeId = _SelectedSummaryType.SummaryTypeId;
 
-            using var ctx = await Factory.CreateDbContextAsync();
-
             if (SavedTransactionTypeId == 0)
             {
-                await ctx.AddTransactionType(TransactionType);
+                await TTypeRepo.AddTransactionType(TransactionType);
             }
             else
             {
-                await ctx.UpdateTransactionType(TransactionType);
+                await TTypeRepo.UpdateTransactionType(TransactionType);
             }
 
             MudDialog.Close(DialogResult.Ok(true));
@@ -101,10 +98,7 @@ namespace Book.Dialogs
             {
                 if (TransactionType.TransactionTypeId != 0)
                 {
-                    using var ctx = await Factory.CreateDbContextAsync();
-
-                    await ctx.DeleteTransactionType(TransactionType.TransactionTypeId);
-
+                    await TTypeRepo.DeleteTransactionType(TransactionType.TransactionTypeId);
                     MudDialog.Close(DialogResult.Ok(true));
                 }
                 else

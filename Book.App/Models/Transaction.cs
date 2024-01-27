@@ -24,11 +24,8 @@ namespace Book.Models
         [DataType(DataType.Currency)]
         [Column(TypeName = "money")]
         [Display(Name = "Value")]
+        [RegularExpression("(.*[1-9].*)|(.*[.].*[1-9].*)", ErrorMessage = "Value can not be zero")]
         public decimal Value { get; set; }
-
-        [NotMapped]
-        [RegularExpression(@"^-?\d*\.?\d*", ErrorMessage = "Invalid Value")]
-        public string? ValueAsString { get; set; }
 
         [Display(Name = "Created")]
         public DateTime CreateDate { get; set; }

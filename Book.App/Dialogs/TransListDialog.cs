@@ -2,8 +2,6 @@
 using Book.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using SqliteWasmHelper;
-using static MudBlazor.CategoryTypes;
 
 namespace Book.Dialogs
 {
@@ -12,14 +10,6 @@ namespace Book.Dialogs
         public IEnumerable<Transaction> Transactions { get; set; }
 
         [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-
-        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
-
-        [Inject] public IDialogService DialogService { get; set; }
-
-        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
-
-        [Inject] public MessageSvc MessageSvc { get; set; }
 
         [Parameter] public int Mode { get; set; }
 
@@ -34,6 +24,14 @@ namespace Book.Dialogs
         [Parameter] public int TransactionTypeId { get; set; }
 
         [Parameter] public int SummaryTypeId { get; set; }
+
+        [Inject] public TransactionRepository Repo { get; set; }
+
+        [Inject] public IDialogService DialogService { get; set; }
+
+        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+
+        [Inject] public MessageSvc MessageSvc { get; set; }
 
         private DateRange? DateFilter { get; set; } 
    
@@ -78,20 +76,18 @@ namespace Book.Dialogs
 
         public async Task LoadTransactions()
         {
-            using var ctx = await Factory.CreateDbContextAsync();
-
             switch (Mode)
             {
                 case 1:
-                    Transactions = (await ctx.GetTransactionsByTypeMonth(Types, Year, Month)).ToList();
+                    Transactions = (await Repo.GetTransactionsByTypeMonth(Types, Year, Month)).ToList();
                     break;
 
                 case 2:
-                    Transactions = (await ctx.GetTransactionsBySummary(Types, DateFilter.Start.Value, DateFilter.End.Value)).ToList();
+                    Transactions = (await Repo.GetTransactionsBySummary(Types, DateFilter.Start.Value, DateFilter.End.Value)).ToList();
                     break;
 
                 case 3:
-                    Transactions = (await ctx.GetTransactionsByType(TransactionTypeId, DateFilter.Start.Value, DateFilter.End.Value)).ToList();
+                    Transactions = (await Repo.GetTransactionsByType(TransactionTypeId, DateFilter.Start.Value, DateFilter.End.Value)).ToList();
                     break;
             }
 
@@ -167,9 +163,7 @@ namespace Book.Dialogs
 
             if (!result.Canceled && transaction.TransactionId != 0)
             {
-                using var ctx = await Factory.CreateDbContextAsync();
-
-                await ctx.DeleteTransaction(transaction.TransactionId);
+                await Repo.DeleteTransaction(transaction.TransactionId);
 
                 MessageSvc.ChangeTransactions(new List<int> { transaction.TransactionDate.Year });
             }

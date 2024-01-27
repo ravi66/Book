@@ -1,9 +1,7 @@
 ﻿using Book.Models;
 using Book.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
-using SqliteWasmHelper;
 
 namespace Book.Dialogs
 {
@@ -13,11 +11,13 @@ namespace Book.Dialogs
 
         [Parameter] public int SavedTransactionId { get; set; }
 
-        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
-
         [Inject] public MessageSvc MessageSvc { get; set; }
 
         [Inject] public IDialogService DialogService { get; set; }
+
+        [Inject] public TransactionTypeRepository TTypeRepo { get; set; }
+
+        [Inject] public TransactionRepository Repo { get; set; }
 
         public Transaction Transaction { get; set; }
 
@@ -35,8 +35,7 @@ namespace Book.Dialogs
 
         protected override async Task OnInitializedAsync()
         {
-            using var ctx = await Factory.CreateDbContextAsync();
-            TransactionTypes = (await ctx.GetAllTransactionTypes()).ToList();
+            TransactionTypes = (await TTypeRepo.GetAllTransactionTypes()).ToList();
 
             if (SavedTransactionId == 0)
             {
@@ -51,39 +50,22 @@ namespace Book.Dialogs
             }
             else
             {
-                Transaction = await ctx.GetTransactionById(SavedTransactionId);
+                Transaction = await Repo.GetTransactionById(SavedTransactionId);
                 OriginalYear = Transaction.TransactionDate.Year;
             }
 
             _SelectedTransactionType = TransactionTypes.FirstOrDefault(t => t.TransactionTypeId == Transaction.TransactionTypeId);
             _SelectedDate = Transaction.TransactionDate;
-            Transaction.ValueAsString = Transaction.Value.ToString("F2");
         }
 
         async void Save()
         {
             if (!validationOk) return;
 
-            if (Decimal.TryParse(Transaction.ValueAsString, out decimal value))
-                Transaction.Value = value;
-            else
-                Transaction.Value = 0;
-
-            if (Transaction.Value == 0) Close();
-
             Transaction.TransactionTypeId = _SelectedTransactionType.TransactionTypeId;
             Transaction.TransactionDate = (DateTime)(_SelectedDate is null ? DateTime.Today : _SelectedDate);
 
-            using var ctx = await Factory.CreateDbContextAsync();
-
-            if (SavedTransactionId == 0)
-            {
-                await ctx.AddTransaction(Transaction);
-            }
-            else
-            {
-                await ctx.UpdateTransaction(Transaction);
-            }
+            _ = SavedTransactionId == 0 ? await Repo.AddTransaction(Transaction) : await Repo.UpdateTransaction(Transaction);
 
             List<int> years = new List<int> { Transaction.TransactionDate.Year };
             if (OriginalYear != 0 && OriginalYear != Transaction.TransactionDate.Year) years.Add(OriginalYear);
@@ -107,9 +89,7 @@ namespace Book.Dialogs
             {
                 if (Transaction.TransactionId != 0)
                 {
-                    using var ctx = await Factory.CreateDbContextAsync();
-
-                    await ctx.DeleteTransaction(Transaction.TransactionId);
+                    await Repo.DeleteTransaction(Transaction.TransactionId);
 
                     MessageSvc.ChangeTransactions(new List<int> { Transaction.TransactionDate.Year });
 

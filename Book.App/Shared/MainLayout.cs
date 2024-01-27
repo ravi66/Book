@@ -7,17 +7,15 @@ namespace Book.Shared
 {
     public partial class MainLayout
     {
-        [Inject] public NavigationManager navigationManager { get; set; }
-
         [Inject] public BookSettingSvc BookSettingSvc { get; set; }
 
         [Inject] public IDialogService DialogService { get; set; }
 
-        [Inject] public BookDbMigratorSvc Migrator { get; set; }
+        [Inject] public BookDbMigratorSvc DbMigrator { get; set; }
 
         private bool _isDarkMode = true;
-
         private string themeIcon = Icons.Material.Filled.LightMode;
+        private string themeIconText = "Light Mode";
 
         private string BookName = "Book";
 
@@ -25,34 +23,26 @@ namespace Book.Shared
 
         private bool drawerOpen = false;
 
-        void ToggleDrawer()
-        {
-            drawerOpen = !drawerOpen;
-        }
-
         protected async override Task OnInitializedAsync()
         {
-            // Migrate DB
-            _ = await Migrator.EnsureDbCreated();
+            await DbMigrator.EnsureDbCreated();
 
             BookName = await BookSettingSvc.GetBookName();
             _isDarkMode = await BookSettingSvc.GetDarkMode();
 
-            themeIcon = _isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
+            SetTheme();
+        }
+
+        void ToggleDrawer()
+        {
+            drawerOpen = !drawerOpen;
         }
 
         private async void ToggleThemeMode()
         {
             _isDarkMode = !_isDarkMode;
 
-            if (_isDarkMode)
-            {
-                themeIcon = Icons.Material.Filled.LightMode;
-            }
-            else
-            {
-                themeIcon = Icons.Material.Filled.DarkMode;
-            }
+            SetTheme();
 
             await BookSettingSvc.SetDarkMode(_isDarkMode);
         }
@@ -65,5 +55,10 @@ namespace Book.Shared
             DialogService.Show<TransactionDialog>("New Entry", parameters);
         }
 
+        private void SetTheme()
+        {
+            themeIcon = _isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
+            themeIconText = _isDarkMode ? "Light Mode" : "Dark Mode";
+        }
     }
 }

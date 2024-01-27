@@ -2,8 +2,6 @@
 using Book.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using SqliteWasmHelper;
-using static MudBlazor.CategoryTypes;
 
 namespace Book.Dialogs
 {
@@ -15,17 +13,15 @@ namespace Book.Dialogs
 
         [Parameter] public int TransactionToCopyId { get; set; }
 
-        [Inject] public ISqliteWasmDbContextFactory<BookDbContext> Factory { get; set; }
-
         [Inject] public IDialogService DialogService { get; set; }
 
         [Inject] public MessageSvc MessageSvc { get; set; }
 
+        [Inject] public TransactionRepository Repo { get; set; }
+
         public Transaction TransactionToCopy { get; set; }
 
         public IEnumerable<Transaction> NewTransactions { get; set; } = new List<Transaction>();
-
-        public int CopyCount { get; set; } = 0;
 
         public List<Frequency> Frequencies { get; set; } = new List<Frequency>() {
                 new Frequency(){ FrequencyID = 3, FrequencyName = "Yearly"},
@@ -46,8 +42,7 @@ namespace Book.Dialogs
         {
             if (TransactionToCopyId == 0) MudDialog.Cancel();
 
-            using var ctx = await Factory.CreateDbContextAsync();
-            TransactionToCopy = await ctx.GetTransactionById(TransactionToCopyId);
+            TransactionToCopy = await Repo.GetTransactionById(TransactionToCopyId);
             if (TransactionToCopy.TransactionId == 0 || TransactionToCopy.TransactionTypeId == 0) MudDialog.Cancel();
 
             SelectedFrequency = Frequencies.FirstOrDefault(f => f.FrequencyID == 3);
@@ -91,8 +86,7 @@ namespace Book.Dialogs
 
         protected async Task HandleSubmit()
         {
-            using var ctx = await Factory.CreateDbContextAsync();
-            await ctx.AddTransactions(NewTransactions);
+            await Repo.AddTransactions(NewTransactions);
 
             List<int> years = new();
             

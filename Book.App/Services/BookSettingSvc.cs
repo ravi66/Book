@@ -1,5 +1,4 @@
 ﻿using Book.Models;
-using SqliteWasmHelper;
 
 namespace Book.Services
 {
@@ -7,12 +6,11 @@ namespace Book.Services
     {
         private BookSetting? BookSetting { get; set; }
 
-        private BookDbContext _dbContext;
-        private readonly ISqliteWasmDbContextFactory<BookDbContext> _dbContextFactory;
+        private BookSettingRepository _repo;
 
-        public BookSettingSvc(ISqliteWasmDbContextFactory<BookDbContext> dbContextFactory)
+        public BookSettingSvc(BookSettingRepository repo)
         {
-            _dbContextFactory = dbContextFactory;
+            _repo = repo;
         }
 
         // Gets
@@ -103,9 +101,7 @@ namespace Book.Services
 
         private async Task<string> GetSettingValue (int settingId, string settingName, bool userAmendable, string defaultValue)
         {
-            _dbContext = await _dbContextFactory.CreateDbContextAsync();
-
-            BookSetting = await _dbContext.GetBookSettingById(settingId);
+            BookSetting = await _repo.GetBookSettingById(settingId);
 
             if (BookSetting == null)
             {
@@ -115,7 +111,7 @@ namespace Book.Services
                 BookSetting.UserAmendable = userAmendable;
                 BookSetting.SettingValue = defaultValue;
 
-                BookSetting = await _dbContext.AddBookSetting(BookSetting);
+                BookSetting = await _repo.AddBookSetting(BookSetting);
             }
 
             return BookSetting.SettingValue;
@@ -123,9 +119,7 @@ namespace Book.Services
 
         private async Task SetSettingValue(int settingId, string settingName, bool userAmendable, string newValue)
         {
-            _dbContext = await _dbContextFactory.CreateDbContextAsync();
-
-            BookSetting = await _dbContext.GetBookSettingById(settingId);
+            BookSetting = await _repo.GetBookSettingById(settingId);
 
             if (BookSetting == null)
             {
@@ -135,13 +129,13 @@ namespace Book.Services
                 BookSetting.UserAmendable = userAmendable;
                 BookSetting.SettingValue = newValue;
 
-                BookSetting = await _dbContext.AddBookSetting(BookSetting);
+                BookSetting = await _repo.AddBookSetting(BookSetting);
             }
             else
             {
                 BookSetting.SettingValue = newValue;
 
-                BookSetting = await _dbContext.UpdateBookSetting(BookSetting);
+                BookSetting = await _repo.UpdateBookSetting(BookSetting);
             }
 
             return;

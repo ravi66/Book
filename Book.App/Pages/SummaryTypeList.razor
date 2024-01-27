@@ -7,7 +7,7 @@
         <MudText Typo="Typo.h4">
             <MudIcon Icon="@Icons.Material.Filled.Summarize" Color="Color.Primary" /> Summaries
         </MudText>
-        <MudIconButton Size="Size.Large" Icon="@Icons.Material.Filled.AddBox" Color="Color.Primary" OnClick="AddSummaryType" />
+        <MudIconButton Icon="@Icons.Material.Filled.AddCircle" Color="Color.Primary" OnClick="AddSummaryType" aria-label="create summary"/>
     </ToolBarContent>
     <ColGroup>
         <col style="width: 5%;" />
@@ -56,7 +56,7 @@
                     <MudTable Items="@context.TransactionTypeList" Context="TypeContext" Hover="true" Elevation="5" >
                         <ToolBarContent>
                             <MudText Typo="Typo.h5">Entry Types for <strong>@context.Name</strong></MudText>
-                            <MudIconButton Size="Size.Medium" Icon="@Icons.Material.Filled.AddBox" Color="Color.Primary" OnClick="() => AddTransactionType(context.SummaryTypeId)" />
+                            <MudIconButton Icon="@Icons.Material.Filled.AddCircle" Color="Color.Primary" OnClick="() => AddTransactionType(context.SummaryTypeId)" aria-label="create entry type" />
                         </ToolBarContent>
                         <HeaderContent>
                             <MudTh />
@@ -83,6 +83,10 @@
         }
     </ChildRowContent>
     <RowEditingTemplate>
+        <style>
+            .mud-table-cell:first-of-type .mud-tooltip-root:nth-of-type(1) .mud-svg-icon { fill: slateblue; }
+            .mud-table-cell:first-of-type .mud-tooltip-root:nth-of-type(2) .mud-svg-icon { fill: slateblue; }
+        </style>
         <MudTd>
             @if (context.Types.Count == 0 && context.SummaryTypeId != -1 && context.SummaryTypeId != 0)
             {

@@ -1,4 +1,7 @@
-﻿<MudDialog>
+﻿@using Microsoft.AspNetCore.Components;
+@using MudBlazor;
+
+<MudDialog>
     <DialogContent>
         <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="1" >
             @((MarkupString)PromptMessage)
@@ -6,3 +9,12 @@
         </MudStack>
     </DialogContent>
 </MudDialog>
+
+@code
+{
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string PromptMessage { get; set; }
+
+    void Close() => MudDialog.Close(DialogResult.Ok(true));
+}
