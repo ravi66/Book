@@ -5,19 +5,23 @@
 <MudDialog>
     <DialogContent>
         <MudForm Model="@TransactionType"  @bind-IsValid="@validationOk">
-            <MudStack>
-                <MudCard Elevation="5" Style="width:100%">
-                    <MudTextField Variant="Variant.Outlined" Label="Name" Margin="Margin.Dense" @bind-Value=TransactionType.Name For="@(() => TransactionType.Name)" AutoFocus="true" onFocus="this.select()" />
-                </MudCard>
-                <MudCard Elevation="5">
-                    <MudAutocomplete T="SummaryType" Label="Summary" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="_SelectedSummaryType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
-                </MudCard>
-                <MudCard Elevation="5">
-                    <MudText>
-                        Created: @TransactionType.CreateDate.ToShortDateString()
-                    </MudText>
-                </MudCard>
-            </MudStack>
+            <MudGrid Spacing="1" Justify="Justify.FlexStart" >
+                <MudItem xs="12" sm="6">
+                    <MudPaper Elevation="5">
+                        <MudTextField Variant="Variant.Outlined" Label="Name" Margin="Margin.Dense" @bind-Value=TransactionType.Name For="@(() => TransactionType.Name)" AutoFocus="true" onFocus="this.select()" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudPaper Elevation="5">
+                        <MudAutocomplete T="SummaryType" Label="Summary" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="_SelectedSummaryType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem>
+                    <MudPaper Elevation="5">
+                        <MudText>Created: @TransactionType.CreateDate.ToShortDateString()</MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
         </MudForm>
     </DialogContent>
     <DialogActions>

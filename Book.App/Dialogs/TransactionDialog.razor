@@ -2,21 +2,41 @@
 @using System.ComponentModel.DataAnnotations
 @using Book.Models
 
-<MudDialog ContentStyle="width: 375px" >
+<MudDialog >
     <DialogContent >
         <MudForm Model="@Transaction" @bind-IsValid="@validationOk">
-            <MudStack>
-                <MudStack Row="true" >
-                    <MudNumericField Variant="Variant.Outlined" Label="Value" Margin="Margin.Dense" HideSpinButtons="true" Format="F2" @bind-Value=Transaction.Value For="@(() => Transaction.Value)" AutoFocus="true" onFocus="this.select()" />
-                    <MudDatePicker Variant="Variant.Outlined" Label="Dated" Required="true" RequiredError="Transactions must be Dated" @bind-Date="_SelectedDate" PickerVariant="PickerVariant.Dialog" DisableToolbar="true" Margin="Margin.Dense" Editable="true" />
-                </MudStack>
-                <MudStack Row="true" >
-                    <MudAutocomplete T="TransactionType" Label="Type" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="_SelectedTransactionType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
-                    <MudTextField Label="Summary" ReadOnly="true" Value="@_SelectedTransactionType.SummaryName" Variant="Variant.Outlined" Margin="Margin.Dense"/>
-                </MudStack>
-                <MudTextField Variant="Variant.Outlined" @bind-Value="Transaction.Notes" Label="Notes" Lines="3" />
-                <MudText>Created: @Transaction.CreateDate.ToShortDateString()</MudText>
-            </MudStack>
+            <MudGrid Spacing="1" Justify="Justify.FlexStart" >
+                <MudItem xs="12" sm="6" >
+                    <MudPaper Elevation="5" Class="mb-2" >
+                        <MudNumericField Variant="Variant.Outlined" Label="Value" Margin="Margin.Dense" HideSpinButtons="true" Format="F2" @bind-Value=Transaction.Value For="@(() => Transaction.Value)" AutoFocus="true" onFocus="this.select()" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" >
+                    <MudPaper Elevation="5" Class="mb-2" >
+                        <MudDatePicker Variant="Variant.Outlined" Label="Dated" Required="true" RequiredError="Transactions must be Dated" @bind-Date="_SelectedDate" PickerVariant="PickerVariant.Dialog" DisableToolbar="true" Margin="Margin.Dense" Editable="true" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" >
+                    <MudPaper Elevation="5" Class="mb-2" >
+                        <MudAutocomplete T="TransactionType" Label="Type" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="_SelectedTransactionType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6" >
+                    <MudPaper Elevation="5" Class="mb-2" >
+                        <MudTextField Label="Summary" ReadOnly="true" Value="@_SelectedTransactionType.SummaryName" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" >
+                    <MudPaper Elevation="5" Class="mb-2" >
+                        <MudTextField Variant="Variant.Outlined" @bind-Value="Transaction.Notes" Label="Notes" Lines="3" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem>
+                    <MudPaper Elevation="5" Class="mb-2" >
+                        <MudText>Created: @Transaction.CreateDate.ToShortDateString()</MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
         </MudForm>
     </DialogContent>
     <DialogActions>
