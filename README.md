@@ -13,4 +13,4 @@ Book is a project used as a learning experience in various technologies new to m
 It is a browser application that has no back-end services - everything is accomplished 
 locally in the browser.
 
-Please visit (https://www.mudblazor.com/) to access this application.
+Please visit (https://ravi66.github.io/) to access this application.
