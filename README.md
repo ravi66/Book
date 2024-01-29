@@ -1,6 +1,6 @@
 ## Book
 
-### An application for recording transactions written in c# and deployed using Blazor WebAssembly
+### A Blazor Wasm application for recording transactions and viewing balances
 
 #### What Book is:
 Book is a project used as a learning experience in various technologies new to me:
@@ -10,5 +10,5 @@ Book is a project used as a learning experience in various technologies new to m
  [SqliteWasmHelper](https://github.com/JeremyLikness/SqliteWasmHelper)
 - [MudBlazor](https://www.mudblazor.com/) components and UI styling
 
-It is a browser application that has no back-end services - everything is accomplished locally in 
-the browser.
+It is a browser application that has no back-end services - everything is accomplished 
+locally in the browser.
