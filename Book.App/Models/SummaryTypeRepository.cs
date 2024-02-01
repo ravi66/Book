@@ -23,17 +23,50 @@ namespace Book.Models
                     Name = s.Name,
                     Order = s.Order,
                     CreateDate = s.CreateDate,
-                    TransactionTypeList = new List<TransactionType>(s.TransactionTypes.OrderBy(t => t.Name).ToList()),
+                    TransactionTypeList = new List<TransactionType>(s.TransactionTypes
+                        .Select(t => new TransactionType
+                        {
+                            TransactionTypeId = t.TransactionTypeId,
+                            SummaryTypeId = t.SummaryTypeId,
+                            Name = t.Name,
+                            CreateDate = t.CreateDate,
+                            TransactionCount = t.Transactions.Count(),
+                        })
+                        .OrderBy(t => t.Name).ToList()),
                     Types = new List<int>(s.TransactionTypes.Select(t => t.TransactionTypeId).ToList())
                 })
                 .OrderBy(s => s.Order)
                 .ToList();
         }
 
-        public async Task<SummaryType> GetSummaryTypeById(int summaryTypeId)
+        public async Task<List<SummaryType>> GetAutoCompleteList()
         {
             using var dbContext = await _db.CreateDbContextAsync();
-            return dbContext.SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == summaryTypeId);
+
+            return dbContext.SummaryTypes
+                .Select(s => new SummaryType
+                {
+                    SummaryTypeId = s.SummaryTypeId,
+                    Name = s.Name,
+                    Order = s.Order,
+                })
+                .OrderBy(s => s.Order)
+                .ToList();
+        }
+
+        public async Task<SummaryType?> GetSummaryTypeById(int summaryTypeId)
+        {
+            using var dbContext = await _db.CreateDbContextAsync();
+            return dbContext.SummaryTypes
+                .Select(s => new SummaryType
+                {
+                    SummaryTypeId = s.SummaryTypeId,
+                    Name = s.Name,
+                    Order = s.Order,
+                    CreateDate = s.CreateDate,
+                    Types = new List<int>(s.TransactionTypes.Select(t => t.TransactionTypeId).ToList())
+                })
+                .FirstOrDefault(s => s.SummaryTypeId == summaryTypeId);
         }
 
         public async Task<SummaryType> AddSummaryType(SummaryType summaryType)

@@ -2,7 +2,7 @@
 
 <PageTitle>@BookName - Settings</PageTitle>
 
-<MudTable Elevation="5" Items="@BookSettings" @ref="_table" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="selectedBookSetting" SortLabel="Sort By" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" IsEditRowSwitchingBlocked="@blockSwitch" EditTrigger="TableEditTrigger.EditButton" EditButtonPosition="TableEditButtonPosition.Start" ApplyButtonPosition="TableApplyButtonPosition.Start" RowEditCommit="ItemHasBeenCommitted" AllowUnsorted="false" >
+<MudTable Elevation="5" Items="@BookSettings" @ref="_table" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="selectedBookSetting" SortLabel="Sort By" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" IsEditRowSwitchingBlocked="@blockSwitch" EditTrigger="TableEditTrigger.EditButton" EditButtonPosition="TableEditButtonPosition.Start" ApplyButtonPosition="TableApplyButtonPosition.Start" RowEditCommit="ItemHasBeenCommitted" AllowUnsorted="false" CancelEditTooltip="Cancel" CommitEditTooltip="Save Setting" >
     <ToolBarContent>
         <MudText Typo="Typo.h4">
             <MudIcon Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" /> Settings
@@ -27,6 +27,8 @@
             </MudTd>
         </RowEditingTemplate>
      <EditButtonContent Context="button">
-         <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Filled.Edit" Class="pa-0" OnClick="@button.ButtonAction" Color="Color.Primary" />
+         <MudTooltip Text="Edit Setting" Delay="500" Duration="0" ShowOnFocus="false" >
+            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Filled.Edit" Class="pa-0" OnClick="@button.ButtonAction" Color="Color.Primary" />
+        </MudTooltip>
      </EditButtonContent>
  </MudTable>

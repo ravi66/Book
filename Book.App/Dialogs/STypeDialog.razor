@@ -1,0 +1,40 @@
+﻿@using System.Globalization
+@using System.ComponentModel.DataAnnotations
+@using Book.Models
+@using Book.Components
+
+<MudDialog>
+    <DialogContent>
+        <MudForm Model="@SummaryType"  @bind-IsValid="@validationOk">
+            <MudGrid Spacing="1" Justify="Justify.FlexStart" >
+                <MudItem xs="12" sm="6">
+                    <MudPaper Elevation="5">
+                        <MudTextField Variant="Variant.Outlined" Label="Name" Margin="Margin.Dense" @bind-Value=SummaryType.Name For="@(() => SummaryType.Name)" AutoFocus="true" onFocus="this.select()" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudPaper Elevation="5">
+                        <MudNumericField Variant="Variant.Outlined" Label="Order" Margin="Margin.Dense" @bind-Value=SummaryType.Order For="@(() => SummaryType.Order)" HideSpinButtons="true" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem>
+                    <MudPaper Elevation="5">
+                        <MudText>Created: @SummaryType.CreateDate.ToShortDateString()</MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudTooltip Text="Save Summary Type" Delay="500" Duration="0" ShowOnFocus="false" >
+            <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" aria-label="save summary type" OnClick="Save" />
+        </MudTooltip>
+        @if (SummaryType.Types.Count < 1 && SummaryType.SummaryTypeId > 0)
+        {
+            <DeleteSTypeBtn SummaryType="@SummaryType" Size="@Size.Medium" Variant="@Variant.Filled" STypeDialog="@this" />
+        }
+        <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
+            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
+        </MudTooltip>
+    </DialogActions>
+</MudDialog>

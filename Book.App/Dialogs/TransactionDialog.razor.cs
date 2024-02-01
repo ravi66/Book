@@ -13,8 +13,6 @@ namespace Book.Dialogs
 
         [Inject] public MessageSvc MessageSvc { get; set; }
 
-        [Inject] public IDialogService DialogService { get; set; }
-
         [Inject] public TransactionTypeRepository TTypeRepo { get; set; }
 
         [Inject] public TransactionRepository Repo { get; set; }
@@ -31,7 +29,7 @@ namespace Book.Dialogs
 
         private bool validationOk { get; set; }
 
-        void Close() => MudDialog.Cancel();
+        public void Close() => MudDialog.Cancel();
 
         protected override async Task OnInitializedAsync()
         {
@@ -74,35 +72,6 @@ namespace Book.Dialogs
             MudDialog.Close(DialogResult.Ok(true));
         }
 
-        async Task DeleteTransaction()
-        {
-            var parameters = new DialogParameters<ConfirmDialog>();
-            parameters.Add(x => x.ConfirmationTitle, $"Delete {Transaction.TransactionTypeName} Transaction");
-            parameters.Add(x => x.ConfirmationMessage, $"Are you sure you want to delete this transaction for {Transaction.Value:C2}?");
-            parameters.Add(x => x.CancelColorInt, 0);
-            parameters.Add(x => x.DoneColorInt, 1);
-
-            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters);
-            var result = await dialog.Result;
-
-            if (!result.Canceled)
-            {
-                if (Transaction.TransactionId != 0)
-                {
-                    await Repo.DeleteTransaction(Transaction.TransactionId);
-
-                    MessageSvc.ChangeTransactions(new List<int> { Transaction.TransactionDate.Year });
-
-                    MudDialog.Close(DialogResult.Ok(true));
-                }
-                else
-                {
-                    Close();
-                }
-            }
-
-        }
-
         private async Task<IEnumerable<TransactionType>> TypeSearch(string searchValue)
         {
             await Task.Yield();
@@ -114,17 +83,6 @@ namespace Book.Dialogs
 
             return TransactionTypes
                 .Where(t => t.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
-        }
-
-        async Task CopyTransaction()
-        {
-            var parameters = new DialogParameters<TransCopyDialog>
-            {
-                { c => c.DialogTitle, $"Copy {Transaction.Value:C2} {_SelectedTransactionType.Name} entry" },
-                { c => c.TransactionToCopyId, Transaction.TransactionId }
-            };
-
-            DialogService.Show<TransCopyDialog>("Copy", parameters);
         }
 
     }

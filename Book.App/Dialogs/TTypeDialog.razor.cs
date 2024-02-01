@@ -1,4 +1,5 @@
 ﻿using Book.Models;
+using Book.Pages;
 using Book.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -13,7 +14,7 @@ namespace Book.Dialogs
 
         [Parameter] public int NewSummaryTypeId { get; set; }
 
-        [Inject] public MessageSvc MessageSvc { get; set; }
+        [Parameter] public SummaryTypeList? SummaryTypeList { get; set; }
 
         [Inject] public IDialogService DialogService { get; set; }
 
@@ -29,11 +30,13 @@ namespace Book.Dialogs
 
         private bool validationOk {  get; set; }
 
-        void Close() => MudDialog.Cancel();
+        private void Close() => MudDialog.Cancel();
 
+        private bool ReadOnlySummary { get; set; } = false;
+        
         protected override async Task OnInitializedAsync()
         {
-            SummaryTypes = (await SummaryRepo.GetAllSummaryTypes()).ToList();
+            SummaryTypes = await SummaryRepo.GetAutoCompleteList();
 
             if (SavedTransactionTypeId == 0)
             {
@@ -47,6 +50,8 @@ namespace Book.Dialogs
             else
             {
                 TransactionType = await TTypeRepo.GetTransactionTypeById(SavedTransactionTypeId);
+
+                if (SavedTransactionTypeId == -1) ReadOnlySummary = true;
             }
 
             _SelectedSummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == TransactionType.SummaryTypeId);
@@ -106,6 +111,11 @@ namespace Book.Dialogs
                     Close();
                 }
             }
+        }
+
+        public void CloseReload()
+        {
+            MudDialog.Close(DialogResult.Ok(true));
         }
 
     }

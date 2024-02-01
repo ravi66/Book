@@ -3,6 +3,7 @@
 @using MudBlazor;
 @using Book.Services;
 @using Book.Dialogs;
+@using Book.Components;
 
 <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
 <MudDialogProvider />
@@ -10,16 +11,22 @@
 
 <MudLayout>
     <MudAppBar Elevation="0" Dense="true" >
-        <MudIconButton OnClick="@ToggleDrawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" aria-label="menu" />
+        <MudTooltip Text="Menu" Delay="500" Duration="0" ShowOnFocus="false" >
+            <MudIconButton OnClick="@ToggleDrawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" aria-label="menu" />
+        </MudTooltip>
         <MudSpacer />
-        <MudButton OnClick="AddTransaction" StartIcon="@Icons.Material.Filled.AddCircleOutline" Color="Color.Inherit" Variant="Variant.Outlined" >New Entry</MudButton>
+        <TransactionBtn IsIcon="false" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
         <MudSpacer />
-        <MudIconButton Href="info" Icon="@Icons.Material.Filled.Info" Color="Color.Inherit" aria-label="more information" />
+        <MudTooltip Text="More Information" Delay="500" Duration="0" ShowOnFocus="false" >
+            <MudIconButton Href="info" Icon="@Icons.Material.Filled.Info" Color="Color.Inherit" aria-label="more information" />
+        </MudTooltip>
     </MudAppBar>
     <MudDrawer @bind-Open="@drawerOpen" Variant="DrawerVariant.Responsive" Elevation="0">
         <MudDrawerHeader Dense="true" >
             <MudStack AlignItems="AlignItems.Center" Row="true" >
-                <MudIconButton OnClick="@ToggleDrawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" aria-label="menu" />
+                <MudTooltip Text="Menu" Delay="500" Duration="0" ShowOnFocus="false" >
+                    <MudIconButton OnClick="@ToggleDrawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" aria-label="menu" />
+                </MudTooltip>
                 <MudText Typo="Typo.h6">@BookName</MudText>
             </MudStack>
         </MudDrawerHeader>
@@ -28,7 +35,7 @@
             <MudNavLink Href="SummaryTypeList" Icon="@Icons.Material.Filled.Summarize" >Types</MudNavLink>
             <MudNavLink Href="BookSettings" Icon="@Icons.Material.Filled.Settings" >Settings</MudNavLink>
             <MudNavLink Href="Database" Icon="@Icons.Material.Filled.Storage" >Database</MudNavLink>
-            <MudNavLink OnClick="ToggleThemeMode" Icon="@themeIcon" >@themeIconText</MudNavLink>
+            <MudNavLink OnClick="ToggleThemeMode" Icon="@themeIcon" >@themeText</MudNavLink>
         </MudNavMenu>
     </MudDrawer>
     <MudMainContent>
@@ -48,7 +55,7 @@
 
     private bool _isDarkMode = true;
     private string themeIcon = Icons.Material.Filled.LightMode;
-    private string themeIconText = "Light Mode";
+    private string themeText = "Light Mode";
 
     private string BookName = "Book";
 
@@ -61,8 +68,8 @@
         await DbMigrator.EnsureDbCreated();
 
         BookName = await BookSettingSvc.GetBookName();
-        _isDarkMode = await BookSettingSvc.GetDarkMode();
 
+        _isDarkMode = await BookSettingSvc.GetDarkMode();
         SetTheme();
     }
 
@@ -74,24 +81,15 @@
     private async void ToggleThemeMode()
     {
         _isDarkMode = !_isDarkMode;
-
         SetTheme();
 
         await BookSettingSvc.SetDarkMode(_isDarkMode);
     }
 
-    private async Task AddTransaction()
-    {
-        var parameters = new DialogParameters<TransactionDialog>();
-        parameters.Add(x => x.SavedTransactionId, 0);
-
-        DialogService.Show<TransactionDialog>("New Entry", parameters);
-    }
-
     private void SetTheme()
     {
         themeIcon = _isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
-        themeIconText = _isDarkMode ? "Light Mode" : "Dark Mode";
+        themeText = _isDarkMode ? "Light Mode" : "Dark Mode";
     }
 
 }

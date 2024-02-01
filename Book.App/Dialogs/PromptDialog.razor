@@ -5,7 +5,9 @@
     <DialogContent>
         <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="1" >
             @((MarkupString)PromptMessage)
-            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
+            <MudTooltip Text="Exit" Delay="500" Duration="0" ShowOnFocus="false" >
+                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="exit" />
+            </MudTooltip>
         </MudStack>
     </DialogContent>
 </MudDialog>

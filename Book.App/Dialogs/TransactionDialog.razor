@@ -1,5 +1,6 @@
 ﻿@using System.Globalization
 @using System.ComponentModel.DataAnnotations
+@using Book.Components
 @using Book.Models
 
 <MudDialog >
@@ -42,10 +43,14 @@
     <DialogActions>
         @if (SavedTransactionId != 0)
         {
-            <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Variant="Variant.Filled" Color="Color.Primary" aria-label="copy entry" OnClick="CopyTransaction" />
+            <CopyTransactionBtn Transaction="@Transaction" Variant="@Variant.Filled" Size="@Size.Medium" />
+            <DeleteTransactionBtn Transaction="@Transaction" Variant="@Variant.Filled" Size="@Size.Medium" TransactionDialog="@this"/>
         }
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" aria-label="save entry" OnClick="Save" />
-        <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Secondary" aria-label="delete entry" OnClick="DeleteTransaction" />
-        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
+        <MudTooltip Text="Save Entry" Delay="500" Duration="0" ShowOnFocus="false" >
+            <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" aria-label="save entry" OnClick="Save" />
+        </MudTooltip>
+        <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
+            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
+        </MudTooltip>
     </DialogActions>
 </MudDialog>

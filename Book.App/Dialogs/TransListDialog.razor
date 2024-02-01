@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using Book.Components;
 @implements IDisposable
 
 <MudDialog>
@@ -7,8 +8,11 @@
 
         <MudStack Row="true" AlignItems="AlignItems.Center" >
             <MudText Typo="Typo.h5">@DialogTitle</MudText>
+            <TransactionBtn IsIcon="true" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
             <MudSpacer />
-            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
+            <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
+                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
+            </MudTooltip>
         </MudStack>
 
         @if (Mode > 1)
@@ -34,9 +38,9 @@
                 <MudTd DataLabel="Value" Class="@context.CssClass"><MudText>@context.Value.ToString("C2")</MudText></MudTd>
                 <MudTd DataLabel="Dated"><MudText>@context.TransactionDate.ToShortDateString()</MudText></MudTd>
                 <MudTd DataLabel="Tools">
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" aria-label="edit entry" OnClick="()=> EditTransaction(context.TransactionId)" />
-                    <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" Size="Size.Small" aria-label="copy entry" OnClick="()=> CopyTransaction(context.TransactionId, context.TransactionTypeName, context.Value)" />
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" Size="Size.Small" aria-label="delete entry" OnClick="() => DeleteTransaction(context)" /> @*.TransactionId, context.TransactionTypeName, context.Value, context.TransactionDate.Year)" /> *@
+                    <TransactionBtn IsIcon="true" TransactionId="context.TransactionId" Icon="@Icons.Material.Filled.Edit" />
+                    <CopyTransactionBtn Transaction="@context" Variant="@Variant.Text" Size="@Size.Small" />
+                    <DeleteTransactionBtn Transaction="@context" Variant="@Variant.Text" Size="@Size.Small" />
                 </MudTd>
                 <MudTd DataLabel="Notes"><MudText>@context.Notes</MudText></MudTd>
             </RowTemplate>

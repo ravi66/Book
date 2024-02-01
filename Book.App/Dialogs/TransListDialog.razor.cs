@@ -27,8 +27,6 @@ namespace Book.Dialogs
 
         [Inject] public TransactionRepository Repo { get; set; }
 
-        [Inject] public IDialogService DialogService { get; set; }
-
         [Inject] public BookSettingSvc BookSettingSvc { get; set; }
 
         [Inject] public MessageSvc MessageSvc { get; set; }
@@ -125,48 +123,6 @@ namespace Book.Dialogs
 
             DialogTitle = $"{Transactions.Count()} {DialogTitle} [{Transactions.Sum(t => t.Value):C}]";
             MudDialog.StateHasChanged();
-        }
-
-        protected async void EditTransaction(int transactionId)
-        {
-            var parameters = new DialogParameters<TransactionDialog>
-            {
-                { x => x.SavedTransactionId, transactionId }
-            };
-
-            DialogService.Show<TransactionDialog>("Edit Entry", parameters); //, options);
-        }
-
-        async Task CopyTransaction(int transactionId, string typeName, decimal value)
-        {
-            var parameters = new DialogParameters<TransCopyDialog>
-            {
-                { c => c.DialogTitle, $"Copy {value:C2} {typeName} entry" },
-                { c => c.TransactionToCopyId, transactionId }
-            };
-
-            DialogService.Show<TransCopyDialog>("Copy", parameters);
-        }
-
-        async Task DeleteTransaction(Transaction transaction)
-        {
-            var parameters = new DialogParameters<ConfirmDialog>
-            {
-                { x => x.ConfirmationTitle, $"Delete {transaction.TransactionTypeName} Entry" },
-                { x => x.ConfirmationMessage, $"Are you sure you want to delete this entry for {transaction.Value:C2}?" },
-                { x => x.CancelColorInt, 0 },
-                { x => x.DoneColorInt, 1 }
-            };
-
-            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters);
-            var result = await dialog.Result;
-
-            if (!result.Canceled && transaction.TransactionId != 0)
-            {
-                await Repo.DeleteTransaction(transaction.TransactionId);
-
-                MessageSvc.ChangeTransactions(new List<int> { transaction.TransactionDate.Year });
-            }
         }
 
         private void TransactionsChanged(List<int> transactionYears)

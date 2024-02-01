@@ -1,6 +1,7 @@
 ﻿@using System.Globalization
 @using System.ComponentModel.DataAnnotations
 @using Book.Models
+@using Book.Components
 
 <MudDialog>
     <DialogContent>
@@ -13,7 +14,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudPaper Elevation="5">
-                        <MudAutocomplete T="SummaryType" Label="Summary" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="_SelectedSummaryType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
+                        <MudAutocomplete T="SummaryType" Label="Summary" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="_SelectedSummaryType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" ReadOnly="@ReadOnlySummary" />
                     </MudPaper>
                 </MudItem>
                 <MudItem>
@@ -25,11 +26,15 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" aria-label="save" OnClick="() => Save()" />
-        @if (TransactionType.TransactionCount < 1)
+        <MudTooltip Text="Save Entry Type" Delay="500" Duration="0" ShowOnFocus="false" >
+            <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" aria-label="save entry type" OnClick="Save" />
+        </MudTooltip>
+        @if (TransactionType.TransactionCount < 1 && TransactionType.TransactionTypeId > 0)
         {
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Secondary" aria-label="delete" OnClick="() => DeleteTType()" />
+            <DeleteTTypeBtn TransactionType="@TransactionType" Size="@Size.Medium" Variant="@Variant.Filled" TTypeDialog="@this" />
         }
-        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
+        <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
+            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
+        </MudTooltip>
     </DialogActions>
 </MudDialog>

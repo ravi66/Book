@@ -8,8 +8,12 @@
         </MudStack>
     </DialogContent>
     <DialogActions>
-        <MudIconButton Icon="@Icons.Material.Filled.Cancel" OnClick="Close" Color="@CancelColor" Size="Size.Large" />
-        <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" OnClick="Done" Color="@DoneColor" Size="Size.Large" />
+        <MudTooltip Text="Cancel" Delay="500" Duration="0" ShowOnFocus="false" >
+            <MudIconButton Icon="@Icons.Material.Filled.Cancel" OnClick="Close" Color="@CancelColor" Size="Size.Large" aria-label="cancel" />
+        </MudTooltip>
+        <MudTooltip Text="Accept" Delay="500" Duration="0" ShowOnFocus="false" >
+            <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" OnClick="Done" Color="@DoneColor" Size="Size.Large" aria-label="accept" />
+        </MudTooltip>
     </DialogActions>
 </MudDialog>
 

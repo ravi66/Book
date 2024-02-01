@@ -1,0 +1,27 @@
+﻿@using Book.Models;
+
+<MudTooltip Text="Copy Entry" Delay="500" Duration="0" ShowOnFocus="false" >
+    <MudIconButton Variant="@Variant" Size="@Size" Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="CopyTransaction" aria-label="copy entry" />
+</MudTooltip>
+
+@code
+{
+    [Parameter] public Transaction Transaction { get; set; }
+
+    [Parameter] public Variant Variant { get; set; }
+
+    [Parameter] public Size Size { get; set; }
+
+    [Inject] public IDialogService DialogService { get; set; }
+
+    async Task CopyTransaction()
+    {
+        var parameters = new DialogParameters<TransCopyDialog>
+        {
+            { c => c.DialogTitle, $"Copy {Transaction.Value:C2} {Transaction.TransactionTypeName} entry" },
+            { c => c.TransactionToCopyId, Transaction.TransactionId }
+        };
+
+        DialogService.Show<TransCopyDialog>("Copy", parameters);
+    }
+}
