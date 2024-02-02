@@ -9,8 +9,6 @@ namespace Book.Dialogs
     {
         [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-        [Parameter] public string DialogTitle { get; set; }
-
         [Parameter] public int TransactionToCopyId { get; set; }
 
         [Inject] public IDialogService DialogService { get; set; }
@@ -19,11 +17,13 @@ namespace Book.Dialogs
 
         [Inject] public TransactionRepository Repo { get; set; }
 
-        public Transaction TransactionToCopy { get; set; }
+        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
 
-        public IEnumerable<Transaction> NewTransactions { get; set; } = new List<Transaction>();
+        private Transaction TransactionToCopy { get; set; }
 
-        public List<Frequency> Frequencies { get; set; } = new List<Frequency>() {
+        private IEnumerable<Transaction> NewTransactions { get; set; } = new List<Transaction>();
+
+        private List<Frequency> Frequencies { get; set; } = new List<Frequency>() {
                 new Frequency(){ FrequencyID = 3, FrequencyName = "Yearly"},
                 new Frequency(){ FrequencyID = 2, FrequencyName = "Quaterly"},
                 new Frequency(){ FrequencyID = 5, FrequencyName = "Bi-Monthly"},
@@ -32,23 +32,27 @@ namespace Book.Dialogs
                 new Frequency(){ FrequencyID = 6, FrequencyName = "Daily"},
             };
 
-        public Frequency SelectedFrequency { get; set; }
+        private string DialogTitle { get; set; }
 
-        public DateTime NewDate { get; set; }
+        private Frequency SelectedFrequency { get; set; }
+
+        private DateTime? EndDate { get; set; }
+
+        private DateTime NewDate { get; set; }
 
         void Close() => MudDialog.Cancel();
 
         protected override async Task OnInitializedAsync()
         {
-            if (TransactionToCopyId == 0) MudDialog.Cancel();
-
             TransactionToCopy = await Repo.GetTransactionById(TransactionToCopyId);
             if (TransactionToCopy.TransactionId == 0 || TransactionToCopy.TransactionTypeId == 0) MudDialog.Cancel();
 
-            SelectedFrequency = Frequencies.FirstOrDefault(f => f.FrequencyID == 3);
-
             MudDialog.Options.NoHeader = true;
             MudDialog.SetOptions(MudDialog.Options);
+
+            SelectedFrequency = Frequencies.FirstOrDefault(f => f.FrequencyID == 3);
+            EndDate = new DateTime(await BookSettingSvc.GetEndYear(), 12, 31);
+            DialogTitle = $"Copy {TransactionToCopy.Value:C2} {TransactionToCopy.TransactionType.Name} entry";
 
             await LoadCopiedTransactions();
             StateHasChanged();
@@ -61,6 +65,13 @@ namespace Book.Dialogs
             StateHasChanged();
         }
 
+        public async Task EndDateChanged(DateTime? newEndDate)
+        {
+            EndDate = newEndDate;
+            await LoadCopiedTransactions();
+            StateHasChanged();
+        }
+
         private async Task LoadCopiedTransactions()
         {
             NewTransactions = new List<Transaction>();
@@ -68,7 +79,7 @@ namespace Book.Dialogs
             NewDate = TransactionToCopy.TransactionDate;
             SetNewDate();
 
-            while (NewDate <= TransactionToCopy.TransactionDate.AddYears(1))
+            while (NewDate <= EndDate)
             {
                 NewTransactions = NewTransactions.Append(
                     new Transaction
@@ -86,6 +97,23 @@ namespace Book.Dialogs
 
         protected async Task HandleSubmit()
         {
+            if (NewTransactions.Count() < 1) return;
+
+            string confirmText = NewTransactions.Count() > 1 ? $"<h4>Create {NewTransactions.Count()} Entries?</h4>" : $"<h4>Create 1 Entry?</h4>";
+
+            var parameters = new DialogParameters<ConfirmDialog>
+            {
+                { x => x.ConfirmationTitle, "Copy Entry" },
+                { x => x.ConfirmationMessage, confirmText },
+                { x => x.CancelColorInt, 0 },
+                { x => x.DoneColorInt, 1 }
+            };
+
+            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters);
+            var result = await dialog.Result;
+
+            if (result.Canceled) return;
+            
             await Repo.AddTransactions(NewTransactions);
 
             List<int> years = new();
@@ -96,15 +124,6 @@ namespace Book.Dialogs
             }
 
             MessageSvc.ChangeTransactions(years);
-
-            var parameters = new DialogParameters<PromptDialog>();
-            string promptText = NewTransactions.Count() > 1 ? $"<h2>{NewTransactions.Count()} Entries created</h2>" : $"<h2>{NewTransactions.Count()} Entry created</h2>";
-            parameters.Add(x => x.PromptMessage, promptText);
-
-            var options = new DialogOptions() { NoHeader = true };
-
-            var dialog = DialogService.Show<PromptDialog>("", parameters, options);
-            var result = await dialog.Result;
 
             MudDialog.Cancel();
         }

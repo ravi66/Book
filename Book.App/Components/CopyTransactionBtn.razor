@@ -18,7 +18,6 @@
     {
         var parameters = new DialogParameters<TransCopyDialog>
         {
-            { c => c.DialogTitle, $"Copy {Transaction.Value:C2} {Transaction.TransactionTypeName} entry" },
             { c => c.TransactionToCopyId, Transaction.TransactionId }
         };
 
