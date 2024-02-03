@@ -38,7 +38,7 @@
         <MudTd>
             @if (@context.TransactionTypeList.Count > 0)
             {
-                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowTransactionTypeBtnPress(context.SummaryTypeId))">@((context.ShowTransactionTypes == true) ? $"Hide {@context.TransactionTypeList.Count}" : $"Show {@context.TransactionTypeList.Count}") Entry Types</MudButton>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowTransactionTypeBtnPress(context.SummaryTypeId))">@((context.ShowTransactionTypes == true) ? "Hide" : "Show") @context.TransactionTypeList.Count Entry Types</MudButton>
             }
             else
             {
