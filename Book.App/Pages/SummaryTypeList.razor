@@ -8,7 +8,7 @@
         <MudText Typo="Typo.h4">
             <MudIcon Icon="@Icons.Material.Filled.Summarize" Color="Color.Primary" /> Summaries&nbsp;
         </MudText>
-        <MudTooltip Text="Create Summary Type" Delay="500" Duration="0" ShowOnFocus="false" >
+        <MudTooltip Text="New Summary Type" Delay="500" Duration="0" ShowOnFocus="false" >
             <MudIconButton Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="AddSummaryType" aria-label="create summary" />
         </MudTooltip>
     </ToolBarContent>
@@ -36,7 +36,14 @@
         <MudTd DataLabel="Order">@context.Order</MudTd>
         <MudTd DataLabel="Created">@context.CreateDate.ToShortDateString()</MudTd>
         <MudTd>
-            <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowTransactionTypeBtnPress(context.SummaryTypeId))" >@((context.ShowTransactionTypes == true) ? "Hide" : "Show") Entry Types</MudButton>
+            @if (@context.TransactionTypeList.Count > 0)
+            {
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowTransactionTypeBtnPress(context.SummaryTypeId))">@((context.ShowTransactionTypes == true) ? $"Hide {@context.TransactionTypeList.Count}" : $"Show {@context.TransactionTypeList.Count}") Entry Types</MudButton>
+            }
+            else
+            {
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="() => AddTransactionType(context.SummaryTypeId)">New Entry Type</MudButton>
+            }
         </MudTd>
     </RowTemplate>
     <ChildRowContent>
@@ -47,7 +54,7 @@
                     <MudTable Items="@context.TransactionTypeList" Context="TypeContext" Hover="true" Elevation="5" >
                         <ToolBarContent>
                             <MudText Typo="Typo.h5">Entry Types for <strong>@context.Name</strong>&nbsp;</MudText>
-                            <MudTooltip Text="Create Entry Type" Delay="500" Duration="0" ShowOnFocus="false" >
+                            <MudTooltip Text="New Entry Type" Delay="500" Duration="0" ShowOnFocus="false" >
                                 <MudIconButton Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => AddTransactionType(context.SummaryTypeId)" aria-label="create entry type" />
                             </MudTooltip>
                         </ToolBarContent>

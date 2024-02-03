@@ -50,7 +50,7 @@ namespace Book.Pages
 
         private async Task AddSummaryType()
         {
-            var dialog = DialogService.Show<STypeDialog>("Create Summary Type");
+            var dialog = DialogService.Show<STypeDialog>("New Summary Type");
             var result = await dialog.Result;
 
             if (!result.Canceled) await LoadSummaryTypes();
@@ -82,7 +82,7 @@ namespace Book.Pages
                 { x => x.NewSummaryTypeId, summaryTypeId }
             };
 
-            var dialog = DialogService.Show<TTypeDialog>("Create Entry Type", parameters);
+            var dialog = DialogService.Show<TTypeDialog>("New Entry Type", parameters);
             var result = await dialog.Result;
 
             if (!result.Canceled) await LoadSummaryTypes();
