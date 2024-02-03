@@ -51,7 +51,7 @@
         {
             <MudTr>
                 <td colspan="5" class="pa-5">
-                    <MudTable Items="@context.TransactionTypeList" Context="TypeContext" Hover="true" Elevation="5" >
+                    <MudTable Items="@context.TransactionTypeList" Context="TypeContext" Hover="true" Elevation="5" SortLabel="Sort By" AllowUnsorted="false" >
                         <ToolBarContent>
                             <MudText Typo="Typo.h5">Entry Types for <strong>@context.Name</strong>&nbsp;</MudText>
                             <MudTooltip Text="New Entry Type" Delay="500" Duration="0" ShowOnFocus="false" >
@@ -60,8 +60,8 @@
                         </ToolBarContent>
                         <HeaderContent>
                             <MudTh />
-                            <MudTh>Name</MudTh>
-                            <MudTh>Created</MudTh>
+                            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<TransactionType, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
+                            <MudTh><MudTableSortLabel SortBy="new Func<TransactionType, object>(x=>x.CreateDate)">Created</MudTableSortLabel></MudTh>
                         </HeaderContent>
                         <NoRecordsContent>
                             <MudText>No Entry Types for <strong>@context.Name</strong></MudText>
