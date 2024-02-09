@@ -5,8 +5,8 @@
         <MudStack AlignItems="AlignItems.Center" Row="true" Class="pa-2" >
             <MudText Typo="Typo.h6" >@DialogTitle</MudText>
             <MudSpacer />
-            <MudTooltip Text="Create Transactions" Delay="500" Duration="0" ShowOnFocus="false">
-                <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Save" OnClick="HandleSubmit" aria-label="create transactions" Size="Size.Small"/>
+            <MudTooltip Text="Create Entries" Delay="500" Duration="0" ShowOnFocus="false">
+                <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Save" OnClick="HandleSubmit" aria-label="create entries" Size="Size.Small"/>
             </MudTooltip>
             <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false">
                 <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Cancel" OnClick="Close" aria-label="quit" Size="Size.Small" />
@@ -33,8 +33,8 @@
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Dated" >@context.TransactionDate.ToShortDateString()
-                    <MudTooltip Text="Delete Transaction" Delay="500" Duration="0" ShowOnFocus="false" >
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" aria-label="delete transaction" OnClick="() => DeleteTransaction(context.TransactionDate)" Size="Size.Small" />
+                    <MudTooltip Text="Delete Entry" Delay="500" Duration="0" ShowOnFocus="false" >
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" aria-label="delete entry" OnClick="() => DeleteTransaction(context.TransactionDate)" Size="Size.Small" />
                     </MudTooltip>
                 </MudTd>
             </RowTemplate>

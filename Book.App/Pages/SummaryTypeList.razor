@@ -24,9 +24,12 @@
             <MudTooltip Text="Edit Summary Type" Delay="500" Duration="0" ShowOnFocus="false" >
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" aria-label="edit summary type" OnClick="() => EditSType(context.SummaryTypeId)" />
             </MudTooltip>
-            <MudTooltip Text="List Entries for Summary Type" Delay="500" Duration="0" ShowOnFocus="false" >
-                <MudIconButton Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" aria-label="list entries for summary type" OnClick="()=> ListTransactionsSummary(context)" />
-            </MudTooltip>
+            @if (context.Types.Count > 0)
+            {
+                <MudTooltip Text="List Entries for Summary Type" Delay="500" Duration="0" ShowOnFocus="false">
+                    <MudIconButton Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" aria-label="list entries for summary type" OnClick="()=> ListTransactionsSummary(context)" />
+                </MudTooltip>
+            }
             @if (context.Types.Count == 0 && context.SummaryTypeId != -1)
             {
                 <DeleteSTypeBtn SummaryType="@context" Size="@Size.Small" Variant="@Variant.Text" SummaryTypeList="@this" />

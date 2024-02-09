@@ -8,7 +8,7 @@
         public Task<Transaction> UpdateTransaction(Transaction transaction);
         public Task DeleteTransaction(int transactionId);
         public Task<IEnumerable<Transaction>> GetTransactionsByTypeMonth(List<int>? types, int year, int month);
-        public Task<IEnumerable<Transaction>> GetTransactionsBySummary(List<int>? types, DateTime startDate, DateTime endDate);
-        public Task<IEnumerable<Transaction>> GetTransactionsByType(int typeId, DateTime startDate, DateTime endDate);
+        public Task<IEnumerable<Transaction>> GetTransactionsBySummary(List<int>? types);
+        public Task<IEnumerable<Transaction>> GetTransactionsByType(int typeId);
     }
 }

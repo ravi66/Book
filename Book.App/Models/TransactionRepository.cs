@@ -117,10 +117,10 @@ namespace Book.Models
 
             return query
                 .OrderByDescending(t => t.TransactionDate)
-                .ToList();
+                .ToArray();
         }
 
-        public async Task<IEnumerable<Transaction>> GetTransactionsBySummary(List<int>? types, DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<Transaction>> GetTransactionsBySummary(List<int>? types)
         {
             using var dbContext = await _db.CreateDbContextAsync();
 
@@ -141,14 +141,12 @@ namespace Book.Models
                 query = query.Where(t => types.Contains((int)t.TransactionTypeId));
             }
 
-            query = query.Where(t => t.TransactionDate >= startDate && t.TransactionDate <= endDate);
-
             return query
                 .OrderByDescending(t => t.TransactionDate)
-                .ToList();
+                .ToArray();
         }
 
-        public async Task<IEnumerable<Transaction>> GetTransactionsByType(int typeId, DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<Transaction>> GetTransactionsByType(int typeId)
         {
             using var dbContext = await _db.CreateDbContextAsync();
 
@@ -164,11 +162,11 @@ namespace Book.Models
                         Notes = t.Notes
                     });
 
-            query = query.Where(t => t.TransactionTypeId == typeId && t.TransactionDate >= startDate && t.TransactionDate <= endDate);
+            query = query.Where(t => t.TransactionTypeId == typeId);
 
             return query
                 .OrderByDescending(t => t.TransactionDate)
-                .ToList();
+                .ToArray();
         }
 
     }

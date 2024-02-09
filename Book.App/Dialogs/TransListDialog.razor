@@ -4,35 +4,26 @@
 
 <MudDialog>
 
-    <DialogContent  >
+    <DialogContent>
 
-        <MudStack Row="true" AlignItems="AlignItems.Center" >
+        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
             <MudText Typo="Typo.h5">@DialogTitle</MudText>
-            <TransactionBtn IsIcon="true" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
             <MudSpacer />
-            <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
-                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
-            </MudTooltip>
+            <TransactionBtn IsIcon="true" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
+            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
         </MudStack>
 
-        @if (Mode > 1)
-        {
-            <MudPaper Elevation="5" Class="mt-2 mb-2" MaxWidth="300px">
-                <MudDateRangePicker Variant="Variant.Outlined" Label="Filter" Editable="true" DateRange="DateFilter" DateRangeChanged="HandleFilter" AutoClose="true" Margin="Margin.Dense" DisableUnderLine="true" DisableToolbar="true" />
-            </MudPaper>
-        }
-
-        <MudTable Items="@Transactions" T="Transaction" Hover="true" Dense="true" AllowUnsorted="false" SortLabel="Sort By" >
+        <MudTable Class="pa-0" ServerData="@(new Func<TableState, Task<TableData<Transaction>>>(ServerReload))" Dense="true" Hover="true" @ref="table" SortLabel="Sort By" AllowUnsorted="false" >
+            <ToolBarContent>
+                <MudTextField Class="flex-grow-0" Label="Filter" T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Filter" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" ></MudTextField>
+            </ToolBarContent>
             <HeaderContent>
-                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.TransactionTypeName)">Type</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.Value)">Value</MudTableSortLabel></MudTh>
-                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortBy="new Func<Transaction, object>(x=>x.TransactionDate)">Dated</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="type_field" T="Transaction" >Type</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="value_field" T="Transaction" >Value</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortLabel="date_field" T="Transaction" >Dated</MudTableSortLabel></MudTh>
                 <MudTh>Tools</MudTh>
-                <MudTh><MudTableSortLabel SortBy="new Func<Transaction, object>(x=>x.Notes)">Notes</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel SortLabel="notes_field" T="Transaction" >Notes</MudTableSortLabel></MudTh>
             </HeaderContent>
-            <NoRecordsContent>
-                <MudText>No Entries found</MudText>
-            </NoRecordsContent>
             <RowTemplate>
                 <MudTd DataLabel="Type"><MudText>@context.TransactionTypeName</MudText></MudTd>
                 <MudTd DataLabel="Value" Class="@context.CssClass"><MudText>@context.Value.ToString("C2")</MudText></MudTd>
@@ -44,6 +35,12 @@
                 </MudTd>
                 <MudTd DataLabel="Notes"><MudText>@context.Notes</MudText></MudTd>
             </RowTemplate>
+            <NoRecordsContent>
+                <MudText>No Entries found</MudText>
+            </NoRecordsContent>
+            <LoadingContent>
+                <MudText>Loading Entries...</MudText>
+            </LoadingContent>
             <PagerContent>
                 <MudTablePager PageSizeOptions="new int[] { 8, 30, int.MaxValue }" HorizontalAlignment="HorizontalAlignment.Center" />
             </PagerContent>
