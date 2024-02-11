@@ -33,7 +33,5 @@ namespace Book.Models
         [Display(Name = "Notes")]
         public string? Notes { get; set; }
 
-        [NotMapped]
-        public string? CssClass { get; set; }
     }
 }

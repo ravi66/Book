@@ -2,7 +2,6 @@
 using Book.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using static MudBlazor.CategoryTypes;
 
 namespace Book.Dialogs
 {
@@ -32,7 +31,7 @@ namespace Book.Dialogs
 
         [Inject] public ISnackbar Snackbar { get; set; }
 
-        public IEnumerable<Transaction> Transactions { get; set; }
+        private IEnumerable<Transaction> Transactions { get; set; }
 
         private IEnumerable<Transaction> pagedData;
 
@@ -42,11 +41,11 @@ namespace Book.Dialogs
 
         private string searchString = "";
 
-        public List<int> Types { get; set; }
+        private List<int> Types { get; set; }
 
-        public string DialogTitle { get; set; } = "Loading Entries...";
+        private string DialogTitle { get; set; } = "Loading Entries...";
 
-        public string MonthName { get; set; }
+        private string MonthName { get; set; }
 
         void Close() => MudDialog.Cancel();
 
@@ -70,13 +69,26 @@ namespace Book.Dialogs
 
         private async Task<TableData<Transaction>> ServerReload(TableState state)
         {
-            ShowLoadingSnackbar();
+            await Busy();
 
-            await Task.Delay(300); // need this
-            IEnumerable<Transaction> data = await LoadTransactions();
-            totalItems = data.Count();
+            switch (Mode)
+            {
+                case 1:
+                    Transactions = await Repo.GetTransactionsByTypeMonth(Types, Year, Month);
+                    break;
 
-            data = data.Where(transaction =>
+                case 2:
+                    Transactions = await Repo.GetTransactionsBySummary(Types);
+                    break;
+
+                case 3:
+                    Transactions = await Repo.GetTransactionsByType(TransactionTypeId);
+                    break;
+            }
+
+            totalItems = Transactions.Count();
+
+            Transactions = Transactions.Where(transaction =>
             {
                 if (string.IsNullOrWhiteSpace(searchString))
                     return true;
@@ -91,31 +103,29 @@ namespace Book.Dialogs
                 return false;
             }).ToArray();
 
-            if (totalItems - data.Count() > 0) DialogTitle = $"{DialogTitle} ({totalItems - data.Count()} Entries filtered)";
-
-            StateHasChanged();
+            SetDialogTitle();
 
             switch (state.SortLabel)
             {
                 case "type_field":
-                    data = data.OrderByDirection(state.SortDirection, t => t.TransactionTypeName);
+                    Transactions = Transactions.OrderByDirection(state.SortDirection, t => t.TransactionTypeName);
                     break;
                 case "value_field":
-                    data = data.OrderByDirection(state.SortDirection, t => t.Value);
+                    Transactions = Transactions.OrderByDirection(state.SortDirection, t => t.Value);
                     break;
                 case "date_field":
-                    data = data.OrderByDirection(state.SortDirection, t => t.TransactionDate);
+                    Transactions = Transactions.OrderByDirection(state.SortDirection, t => t.TransactionDate);
                     break;
                 case "notes_field":
-                    data = data.OrderByDirection(state.SortDirection, t => t.Notes);
+                    Transactions = Transactions.OrderByDirection(state.SortDirection, t => t.Notes);
                     break;
             }
 
-            pagedData = data.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
-            return new TableData<Transaction>() { TotalItems = totalItems, Items = pagedData };
+            pagedData = Transactions.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+            return new TableData<Transaction>() { TotalItems = Transactions.Count(), Items = pagedData };
         }
-
-        private void ShowLoadingSnackbar()
+        
+        private async Task Busy()
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomStart;
             Snackbar.Add("Loading Entries", Severity.Normal, config =>
@@ -123,43 +133,15 @@ namespace Book.Dialogs
                 config.Icon = Icons.Material.Outlined.HourglassTop;
                 config.ShowCloseIcon = false;
                 config.VisibleStateDuration = 1000;
-                config.ShowTransitionDuration = 0;
+                config.ShowTransitionDuration = 250;
                 config.HideTransitionDuration = 250;
             });
 
-            StateHasChanged();
+            await Task.Delay(300); // need this
         }
 
-        private void OnSearch(string text)
+        private void SetDialogTitle()
         {
-            searchString = text;
-            table.ReloadServerData();
-        }
-
-        public async Task<IEnumerable<Transaction>> LoadTransactions()
-        {
-            switch (Mode)
-            {
-                case 1:
-                    Transactions = await Repo.GetTransactionsByTypeMonth(Types, Year, Month);
-                    break;
-
-                case 2:
-                    Transactions = await Repo.GetTransactionsBySummary(Types); //, DateFilter.Start.Value, DateFilter.End.Value);
-                    break;
-
-                case 3:
-                    Transactions = await Repo.GetTransactionsByType(TransactionTypeId); // , DateFilter.Start.Value, DateFilter.End.Value);
-                    break;
-            }
-
-            /* Set Value text Colour */
-            foreach (Transaction t in Transactions)
-            {
-                t.CssClass = (t.Value <= 0) ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
-            }
-
-            /* Set Dialogue Title */
             string entryOrEntries = (Transactions.Count() == 1) ? " Entry " : " Entries ";
 
             switch (Mode)
@@ -186,13 +168,28 @@ namespace Book.Dialogs
             }
 
             DialogTitle = $"{Transactions.Count()} {DialogTitle} [{Transactions.Sum(t => t.Value):C}]";
-            return Transactions;
+
+            if (totalItems - Transactions.Count() > 0) DialogTitle = $"{DialogTitle} ({totalItems - Transactions.Count()} Entries filtered)";
+
+            StateHasChanged();
+            return;
+        }
+
+        private void OnSearch(string text)
+        {
+            searchString = text;
+            table.ReloadServerData();
         }
 
         private void TransactionsChanged(List<int> transactionYears)
         {
             // Reload regardless of Year
             table.ReloadServerData();
+        }
+
+        private string GetValueCSS(decimal value)
+        {
+            return (value <= 0) ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
         }
 
         public void Dispose()
