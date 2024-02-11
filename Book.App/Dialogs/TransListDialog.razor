@@ -14,7 +14,9 @@
                 <MudSpacer />
             </MudHidden>
             <TransactionBtn IsIcon="true" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
-            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
+            <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
+                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
+            </MudTooltip>
         </MudStack>
 
         <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
