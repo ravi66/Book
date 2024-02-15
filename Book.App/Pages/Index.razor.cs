@@ -27,7 +27,7 @@ namespace Book.Pages
 
         private string BookName { get; set; } = "Book";
 
-        public int Year { get; set; } = DateTime.Today.Year;
+        public int Year { get; set; }
 
         public int[] Years { get; set; } = Array.Empty<int>();
 
@@ -40,6 +40,7 @@ namespace Book.Pages
             MessageSvc.TransactionsChanged += () => TransactionsChanged(MessageSvc.TransactionYears);
 
             Years = Enumerable.Range(await BookSettingSvc.GetStartYear(), await BookSettingSvc.GetEndYear() - await BookSettingSvc.GetStartYear() + 1).ToArray();
+            Year = Years.Max() >= DateTime.Today.Year ? DateTime.Today.Year : Years.Max();
 
             SummaryTypes = (await SummaryRepo.LoadSummary()).Where(s => s.Types.Count > 0).ToList();
 
