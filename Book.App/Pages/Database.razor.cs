@@ -7,6 +7,7 @@ using Book.Services;
 using System.IO;
 using System;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Net.Http;
 
 namespace Book.Pages
 {
@@ -84,7 +85,11 @@ namespace Book.Pages
 
         private async void LoadDemoData()
         {
-            var fileContent = await HttpClient.GetByteArrayAsync("DemoData/Demo.sqlite3");
+
+            using var httpResponse = await HttpClient.GetAsync("Demo.sqlite3").ConfigureAwait(false);
+            byte[] fileContent = await httpResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+            
+            //byte[] fileContent = await HttpClient.GetByteArrayAsync("Demo.sqlite3");
             await jsModule.InvokeVoidAsync("uploadDatabase", fileContent);
             NavigationManager.NavigateTo("/", true);
         }
