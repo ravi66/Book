@@ -34,7 +34,18 @@
                 <MudText Typo="Typo.body2">Replace the database with a previous backup</MudText>
             </MudCardContent>
             <MudCardActions>
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" HtmlTag="label" for="inputFile" StartIcon="@Icons.Material.Filled.CloudUpload">Replace</MudButton>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CloudUpload" >Replace</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" md="6" lg="4">
+        <MudCard Elevation="5">
+            <MudCardContent Style="min-height: 100px;">
+                <MudText Typo="Typo.h5">Load Demo Data</MudText>
+                <MudText Typo="Typo.body2">Replace the database with demonstration data</MudText>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CloudUpload" OnClick="LoadDemoData">Load Demo Data</MudButton>
             </MudCardActions>
         </MudCard>
     </MudItem>

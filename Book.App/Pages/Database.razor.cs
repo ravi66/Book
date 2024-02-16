@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Components.Forms;
 using Book.Dialogs;
 using MudBlazor;
 using Book.Services;
+using System.IO;
+using System;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Book.Pages
 {
@@ -16,6 +19,8 @@ namespace Book.Pages
         [Inject] public IDialogService DialogService { get; set; }
 
         [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+
+        [Inject] HttpClient HttpClient { get; set; }
 
         public IJSObjectReference? jsModule;
 
@@ -75,6 +80,13 @@ namespace Book.Pages
         {
             await BookSettingSvc.SetLastBackupDate(DateTime.Now);
             NavigationManager.NavigateTo("refresh/Database");
+        }
+
+        private async void LoadDemoData()
+        {
+            var fileContent = await HttpClient.GetByteArrayAsync("DemoData/Demo.sqlite3");
+            await jsModule.InvokeVoidAsync("uploadDatabase", fileContent);
+            NavigationManager.NavigateTo("/", true);
         }
 
         async ValueTask IAsyncDisposable.DisposeAsync()
