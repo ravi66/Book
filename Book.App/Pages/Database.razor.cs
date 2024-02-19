@@ -4,10 +4,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Book.Dialogs;
 using MudBlazor;
 using Book.Services;
-using System.IO;
-using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Net.Http;
+using static MudBlazor.CategoryTypes;
 
 namespace Book.Pages
 {
@@ -32,6 +29,8 @@ namespace Book.Pages
         private string BookName { get; set; } = "Book";
 
         public string LastBackupDate { get; set; } = "No backup taken";
+
+        private List<string> HttpMessages { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -85,13 +84,13 @@ namespace Book.Pages
 
         private async void LoadDemoData()
         {
-
-            using var httpResponse = await HttpClient.GetAsync("Demo.sqlite3").ConfigureAwait(false);
-            byte[] fileContent = await httpResponse.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-            
-            //byte[] fileContent = await HttpClient.GetByteArrayAsync("Demo.sqlite3");
-            await jsModule.InvokeVoidAsync("uploadDatabase", fileContent);
-            NavigationManager.NavigateTo("/", true);
+            using HttpResponseMessage response = await HttpClient.GetAsync("Demo.bin");
+            if (response.IsSuccessStatusCode)
+            {
+                var fileContent = await response.Content.ReadAsByteArrayAsync();
+                await jsModule.InvokeVoidAsync("uploadDatabase", fileContent);
+                NavigationManager.NavigateTo("/", true);
+            }
         }
 
         async ValueTask IAsyncDisposable.DisposeAsync()

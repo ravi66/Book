@@ -27,6 +27,9 @@ namespace Book.Services
 
             _ = await _dbContext.Database.EnsureCreatedAsync();
 
+            _ = await _dbContext.Database.ExecuteSqlRawAsync("VACUUM;");
+            await _dbContext.SaveChangesAsync();
+
             var dbVersionBookSetting = await _dbContext.BookSetting.FirstOrDefaultAsync(x => x.BookSettingId == 7);
             await EnsureDbMigrated(dbVersionBookSetting?.SettingValue);
         }
