@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Components;
+@using MudBlazor;
+@using System.Globalization
+
+<MudDialog>
+    <DialogContent>
+        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
+            <MudText Typo="Typo.h5">@DialogTitle</MudText>
+            <MudSpacer />
+            <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
+                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
+            </MudTooltip>
+        </MudStack>
+        <MudPaper Class="pb-2" >
+            <style>.mud-chart-line { overflow: visible; }</style>
+            <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="350px" />
+        </MudPaper>
+    </DialogContent>
+</MudDialog>
+
+@code
+    {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string DialogTitle { get; set; }
+
+    [Parameter] public List<ChartSeries> Series { get; set; }
+
+    public int SelectedOption { get; set; } = 1;
+
+    private string[] XAxisLabels = new DateTimeFormatInfo().AbbreviatedMonthNames;
+
+    void Close() => MudDialog.Close(DialogResult.Ok(true));
+}

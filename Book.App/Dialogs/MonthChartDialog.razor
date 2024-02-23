@@ -1,0 +1,71 @@
+﻿@using Microsoft.AspNetCore.Components;
+@using MudBlazor;
+
+<MudDialog>
+    <DialogContent>
+        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
+            <MudText Typo="Typo.h5">@DialogTitle</MudText>
+            <MudSpacer />
+            <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
+                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
+            </MudTooltip>
+        </MudStack>
+        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
+            <MudRadioGroup T="int" Value="@SelectedOption" ValueChanged="OnSelectedOptionChanged">
+                <MudRadio Value="@(1)" Color="Color.Primary">Summary</MudRadio>
+                <MudRadio Value="@(2)" Color="Color.Primary">Entry Type</MudRadio>
+            </MudRadioGroup>
+        </MudStack>
+        <MudPaper >
+            <MudText Align="Align.Center" >@IndexText</MudText>
+            <MudChart Class="pt-2 pb-0 ps-0 pe-0" ChartType="ChartType.Pie" InputData="@Data" InputLabels="@Labels" SelectedIndex="@Index" SelectedIndexChanged="OnSelectedIndexChanged" Width="250px" Height="250px" />
+        </MudPaper>
+    </DialogContent>
+</MudDialog>
+
+@code
+    {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string DialogTitle { get; set; }
+
+    [Parameter] public double[] SummaryData { get; set; }
+
+    [Parameter] public string[] SummaryLabels { get; set; }
+
+    [Parameter] public double[] TypeData { get; set; }
+
+    [Parameter] public string[] TypeLabels { get; set; }
+
+    public int SelectedOption { get; set; } = 1;
+
+    private double[] Data { get; set; }
+
+    private string[] Labels { get; set; }
+
+    private string IndexText { get; set; } = string.Empty;
+
+    private int Index = -1;
+
+    void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+    protected async override Task OnInitializedAsync()
+    {
+        Data = SummaryData;
+        Labels = SummaryLabels;
+    }
+
+    private void OnSelectedOptionChanged(int selectedOption)
+    {
+        SelectedOption = selectedOption;
+        IndexText = string.Empty;
+        Data = SelectedOption == 1 ? SummaryData : TypeData;
+        Labels = SelectedOption == 1 ? SummaryLabels : TypeLabels;
+    }
+
+    private void OnSelectedIndexChanged(int selectedIndex)
+    {
+        Index = selectedIndex;
+        IndexText = $"{Labels[Index]}: {Data[Index].ToString("C2")} ({(Data[Index] / Data.Sum() * 100).ToString("N0")}%)";
+    }
+}

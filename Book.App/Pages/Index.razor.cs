@@ -31,7 +31,9 @@ namespace Book.Pages
 
         public int[] Years { get; set; } = Array.Empty<int>();
 
-        public List<ColumnInfo> Columns { get; set; } = new List<ColumnInfo>();
+        private DateTime StartDate { get; set; }
+
+        public DateTime EndDate { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
@@ -56,7 +58,6 @@ namespace Book.Pages
 
             CreateSummaryDetails();
             RemoveZeroTransactionsSummaryDetails();
-            CreateColumnInfo();
             StateHasChanged();
         }
 
@@ -69,6 +70,7 @@ namespace Book.Pages
                 MonthlySummaries.Add(new MonthlySummary()
                 {
                     MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i),
+                    MonthNameFull = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
                     MonthNo = i,
                     SummaryDetails = new List<SummaryDetail>()
                 });
@@ -78,6 +80,7 @@ namespace Book.Pages
             MonthlySummaries.Add(new MonthlySummary()
             {
                 MonthName = "Total",
+                MonthNameFull = Year.ToString(),
                 MonthNo = 0,
                 SummaryDetails = new List<SummaryDetail>()
             });
@@ -85,21 +88,9 @@ namespace Book.Pages
 
         private void CreateSummaryDetails()
         {
-            DateTime startDate;
-            DateTime endDate;
-
             foreach (MonthlySummary monthlySummary in MonthlySummaries)
             {
-                if (monthlySummary.MonthNo > 0)
-                {
-                    startDate = new DateTime(Year, monthlySummary.MonthNo, 1);
-                    endDate = startDate.AddMonths(1);
-                }
-                else
-                {
-                    startDate = new DateTime(Year, 1, 1);
-                    endDate = new DateTime(Year + 1, 1, 1);
-                }
+                SetDates(monthlySummary.MonthNo);
 
                 // Add Total Summary (column)
                 monthlySummary.SummaryDetails.Add(new SummaryDetail()
@@ -108,8 +99,7 @@ namespace Book.Pages
                     SummaryName = "Total",
                     Types = new List<int>(),
                     Total = Transactions
-                        .Where(t => t.TransactionDate >= startDate
-                            && t.TransactionDate < endDate)
+                        .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate)
                         .Sum(t => t.Value) * -1,
                 });
 
@@ -122,8 +112,7 @@ namespace Book.Pages
                         SummaryName = summaryType.Name,
                         Types = summaryType.Types,
                         Total = Transactions
-                        .Where(t => t.TransactionDate >= startDate
-                            && t.TransactionDate < endDate
+                        .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate
                             && summaryType.Types.Contains((int)t.TransactionTypeId))
                         .Sum(t => t.Value) * -1,
                     });
@@ -138,10 +127,9 @@ namespace Book.Pages
                     if (summaryDetail.SummaryTypeId != 0)
                     {
                         summaryDetail.HasTransactions = Transactions
-                            .Where(t => t.TransactionDate >= startDate
-                                && t.TransactionDate < endDate
+                            .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate
                                 && summaryDetail.Types.Contains((int)t.TransactionTypeId))
-                                .Count() > 0 ? true : false;
+                            .Count() > 0 ? true : false;
                     }
                     else
                     {
@@ -167,72 +155,30 @@ namespace Book.Pages
             {
                 monthlySummary.SummaryDetails = monthlySummary.SummaryDetails
                     .Select(s => new SummaryDetail
-                    {
-                        SummaryTypeId = s.SummaryTypeId,
-                        SummaryName = s.SummaryName,
-                        Types = s.Types,
-                        Total = s.Total,
-                        CssClass = s.CssClass
-                    })
+                        {
+                            SummaryTypeId = s.SummaryTypeId,
+                            SummaryName = s.SummaryName,
+                            Types = s.Types,
+                            Total = s.Total,
+                            CssClass = s.CssClass
+                        })
                     .Where(s => !summariesToBeRemoved.Contains(s.SummaryTypeId))
                     .ToList();
             }
         }
 
-        private void CreateColumnInfo()
+        private void SetDates(int monthNo)
         {
-            Columns = new List<ColumnInfo>();
-
-            foreach (SummaryDetail columnDetail in MonthlySummaries[12].SummaryDetails)
+            if (monthNo > 0)
             {
-                var columnInfo = new ColumnInfo();
-                columnInfo.Name = columnDetail.SummaryName;
-
-                if (DateTime.Today.Year == Year)
-                {
-                    decimal curTot = 0;
-
-                    if (columnDetail.Types.Count > 0)
-                    {
-                        curTot = Transactions.Where(t => t.TransactionDate <= DateTime.Today && columnDetail.Types.Contains((int)t.TransactionTypeId))
-                            .Sum(t => t.Value) * -1 / DateTime.Today.DayOfYear * new DateTime(Year, 12, 31).DayOfYear;
-                    }
-                    else
-                    {
-                        curTot = Transactions.Where(t => t.TransactionDate <= DateTime.Today)
-                            .Sum(t => t.Value) * -1 / DateTime.Today.DayOfYear * new DateTime(Year, 12, 31).DayOfYear;
-                    }
-
-                    columnInfo.InfoText = SetInfoText(columnDetail.SummaryName, curTot / 12, curTot);
-                }
-                else
-                {
-                    columnInfo.InfoText = SetInfoText(columnDetail.SummaryName, (columnDetail.Total / 12), 0);
-                }
-
-                Columns.Add(columnInfo);
-            }
-        }
-
-        private string SetInfoText(string name, decimal curAvg, decimal projTotal)
-        {
-            string infoText = "<h2>" + name + "</h2>";
-            string curAvgTextClass = curAvg >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
-            string projTotalTextClass = projTotal >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
-
-            if (DateTime.Now.Year == Year)
-            {
-                infoText += "<h3>Projected Month: <span class=\"" + curAvgTextClass + "\">" + curAvg.ToString("N2") + "</span></h3>";
-                infoText += "<h3>Projected Year: <span class=\"" + projTotalTextClass + "\">" + projTotal.ToString("N2") + "</span></h3>";
-                
-                // No apologies
+                StartDate = new DateTime(Year, monthNo, 1);
+                EndDate = StartDate.AddMonths(1);
             }
             else
             {
-                infoText += "<h3>Month Average: <span class=\"" + curAvgTextClass + "\">" + curAvg.ToString("N2") + "</span></h3>";
+                StartDate = new DateTime(Year, 1, 1);
+                EndDate = new DateTime(Year + 1, 1, 1);
             }
-
-            return infoText;
         }
 
         public async void YearChanged(int year)
@@ -253,26 +199,85 @@ namespace Book.Pages
             }
         }
 
-        private void TotalInfo(string infoText)
+        private void YearChart(int summaryTypeId)
         {
-            var parameters = new DialogParameters<PromptDialog>();
-            parameters.Add(x => x.PromptMessage, infoText);
+            List<ChartSeries> summarySeries = new List<ChartSeries>();
+
+            if (summaryTypeId > 0)
+            {
+                summarySeries.Add(GetSummarySeries(summaryTypeId));
+            }
+            else
+            {
+                foreach (var summary in MonthlySummaries[12].SummaryDetails)
+                {
+                    summarySeries.Add(GetSummarySeries(summary.SummaryTypeId));
+                }
+            }
+
+            var parameters = new DialogParameters<YearChartDialog>
+            {
+                { p => p.DialogTitle, $"{Year} Chart" },
+                { p => p.Series, summarySeries },
+            };
+
+            var options = new DialogOptions() { NoHeader = true, MaxWidth = MaxWidth.ExtraLarge };
+
+            DialogService.Show<YearChartDialog>("", parameters, options);
+        }
+
+        private ChartSeries GetSummarySeries(int summaryTypeId)
+        {
+            List<double> summaryData = new List<double>();
+
+            for (int i = 0; i < 12; i++)
+            {
+                summaryData.Add((double)MonthlySummaries[i].SummaryDetails.Single(s => s.SummaryTypeId == summaryTypeId).Total);
+            }
+
+            return new ChartSeries { Name = MonthlySummaries[12].SummaryDetails.Single(s => s.SummaryTypeId == summaryTypeId).SummaryName, Data = summaryData.ToArray() };
+        }
+
+        private void MonthChart(int monthNo)
+        {
+            SetDates(monthNo + 1);
+
+            monthNo = monthNo < 0 ? 12 : monthNo;
+
+            string dialogTitle = monthNo < 12 ? $"{MonthlySummaries[monthNo].MonthNameFull} {Year} Expenditure" : $"{Year} Expenditure";
+
+            var monthlyTransactions = Transactions
+                .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && t.Value > 0)
+                .GroupBy(t => t.TransactionTypeName)
+                .Select(g => new { TransactionTypeName = g.Key, Value = g.Sum(t => t.Value) })
+                .ToList();
+
+            var parameters = new DialogParameters<MonthChartDialog>
+            {
+                { x => x.DialogTitle, dialogTitle },
+                { x => x.SummaryData, MonthlySummaries[monthNo].SummaryDetails.Where(s => s.Total < 0 && s.SummaryTypeId != 0).Select(s => (double)(s.Total * -1)).ToArray() },
+                { x => x.SummaryLabels, MonthlySummaries[monthNo].SummaryDetails.Where(s => s.Total < 0 && s.SummaryTypeId != 0).Select(s => s.SummaryName).ToArray() },
+                { x => x.TypeData, monthlyTransactions.Select(s => (double)(s.Value)).ToArray() },
+                { x => x.TypeLabels, monthlyTransactions.Select(s => s.TransactionTypeName).ToArray() },
+            };
 
             var options = new DialogOptions() { NoHeader = true };
 
-            DialogService.Show<PromptDialog>("", parameters, options);
+            DialogService.Show<MonthChartDialog>("", parameters, options);
         }
 
         protected async void TransList(string summaryName, List<int> types, int month)
         {
             string typesString = (types != null && types.Count > 0) ? typesString = string.Join(",", types) : String.Empty;
 
-            var parameters = new DialogParameters<TransListDialog>();
-            parameters.Add(x => x.Mode, 1);
-            parameters.Add(x => x.Name, summaryName);
-            parameters.Add(x => x.TypesString, typesString);
-            parameters.Add(x => x.Year, Year);
-            parameters.Add(x => x.Month, month);
+            var parameters = new DialogParameters<TransListDialog>
+            {
+                { x => x.Mode, 1 },
+                { x => x.Name, summaryName },
+                { x => x.TypesString, typesString },
+                { x => x.Year, Year },
+                { x => x.Month, month }
+            };
 
             DialogService.Show<TransListDialog>("Entry List", parameters);
         }
@@ -287,6 +292,8 @@ namespace Book.Pages
     public class MonthlySummary
     {
         public string MonthName { get; set; }
+
+        public string MonthNameFull { get; set; }
 
         public int MonthNo { get; set; }
 
@@ -306,13 +313,6 @@ namespace Book.Pages
         public string CssClass { get; set; }
 
         public bool HasTransactions { get; set; }
-    }
-
-    public class ColumnInfo
-    {
-        public string Name { get; set; }
-
-        public string InfoText { get; set; }
     }
 
 }
