@@ -13,22 +13,46 @@
         </MudStack>
         <MudPaper Class="pb-2" >
             <style>.mud-chart-line { overflow: visible; }</style>
-            <MudChart ChartType="ChartType.Line" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="350px" />
+            <MudChart ChartType="ChartType.Line" ChartOptions="@Options" ChartSeries="@Series" XAxisLabels="@XAxisLabels" Width="100%" Height="350px" SelectedIndexChanged="OnSelectedIndexChanged" />
+            @if (RemovedSeries.Count > 0)
+            {
+                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
+                    <MudButton Size="Size.Small" Variant="Variant.Outlined" OnClick="Reset">Reset</MudButton>
+                </MudStack>
+            }
         </MudPaper>
     </DialogContent>
 </MudDialog>
 
 @code
-    {
+{
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
     [Parameter] public string DialogTitle { get; set; }
 
     [Parameter] public List<ChartSeries> Series { get; set; }
 
-    public int SelectedOption { get; set; } = 1;
+    private List<ChartSeries> RemovedSeries { get; set; } = new();
 
     private string[] XAxisLabels = new DateTimeFormatInfo().AbbreviatedMonthNames;
 
+    private ChartOptions Options = new();
+
     void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+    protected async override Task OnInitializedAsync() => Options.LineStrokeWidth = 5.0;
+
+    private void OnSelectedIndexChanged(int selectedIndex)
+    {
+        if (Series.Count() == 1) return;
+
+        RemovedSeries.Add(Series[selectedIndex]);
+        Series.Remove(Series[selectedIndex]);
+    }
+
+    private void Reset()
+    {
+        foreach (var series in RemovedSeries) { Series.Add(series); }
+        RemovedSeries.Clear();
+    }
 }

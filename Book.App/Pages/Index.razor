@@ -11,11 +11,14 @@
                 <MudMenuItem OnClick="() => YearChanged(year)" OnTouch="() => YearChanged(year)">@year</MudMenuItem>
             }
         </MudMenu>
-        @foreach (var summary in MonthlySummaries[12].SummaryDetails)
+        @if (MonthlySummaries != null)
         {
-            <MudItem >
-                <MudButton Variant="Variant.Outlined" OnClick="@(e => YearChart(summary.SummaryTypeId))" Size="Size.Small">@summary.SummaryName</MudButton>
-            </MudItem>
+            foreach (var summary in MonthlySummaries[12].SummaryDetails)
+            {
+                <MudItem>
+                    <MudButton Variant="Variant.Outlined" OnClick="@(e => YearChart(summary.SummaryTypeId))" Size="Size.Small">@summary.SummaryName</MudButton>
+                </MudItem>
+            }
         }
     </MudGrid>
 </MudHidden>
