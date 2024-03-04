@@ -5,14 +5,15 @@
 
 <MudHidden Breakpoint="Breakpoint.Xs" Invert="true" >
     <MudGrid Class="pa-2" Justify="Justify.Center" Spacing="1" >
-        <MudMenu Dense="true" AnchorOrigin="Origin.BottomLeft" Label="@Year.ToString()" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small ">
-            @foreach (int year in Years)
-            {
-                <MudMenuItem OnClick="() => YearChanged(year)" OnTouch="() => YearChanged(year)">@year</MudMenuItem>
-            }
-        </MudMenu>
         @if (MonthlySummaries != null)
         {
+            <MudMenu Dense="true" AnchorOrigin="Origin.BottomLeft" Label="@Year.ToString()" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small ">
+                @foreach (int year in Years)
+                {
+                    <MudMenuItem OnClick="() => YearChanged(year)" OnTouch="() => YearChanged(year)">@year</MudMenuItem>
+                }
+            </MudMenu>
+
             foreach (var summary in MonthlySummaries[12].SummaryDetails)
             {
                 <MudItem>

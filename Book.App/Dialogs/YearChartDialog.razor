@@ -45,7 +45,6 @@
     private void OnSelectedIndexChanged(int selectedIndex)
     {
         if (Series.Count() == 1) return;
-
         RemovedSeries.Add(Series[selectedIndex]);
         Series.Remove(Series[selectedIndex]);
     }
