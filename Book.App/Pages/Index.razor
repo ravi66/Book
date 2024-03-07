@@ -53,9 +53,9 @@
         }
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Month" Class="pt-0 pb-0" >
+        <MudTd DataLabel="Month" Class="pt-1 pb-1" >
             <MudTooltip Text="@($"{context.MonthNameFull} expenditure chart")" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
-                <MudButton Variant="Variant.Text" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" ><MudText>@context.MonthName</MudText></MudButton>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="pt-0 pb-0" ><MudText>@context.MonthName</MudText></MudButton>
             </MudTooltip>    
         </MudTd>
         @foreach (var summary in context.SummaryDetails)
