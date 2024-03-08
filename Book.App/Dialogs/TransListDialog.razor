@@ -20,7 +20,7 @@
         </MudStack>
 
         <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
-            <MudTextField Class="flex-grow-0 mt-0 " T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Filter" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" AutoFocus="true" DisableUnderLine="true" ></MudTextField>
+            <MudTextField Class="flex-grow-0 mt-0 " T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Filter" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" DisableUnderLine="true" ></MudTextField>
         </MudHidden>
 
         <MudTable Class="pa-0" ServerData="@(new Func<TableState, Task<TableData<Transaction>>>(ServerReload))" Dense="true" Hover="true" @ref="table" SortLabel="Sort By" AllowUnsorted="false" >
