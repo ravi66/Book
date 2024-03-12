@@ -34,7 +34,7 @@
     </ColGroup>
     <HeaderContent>
         <MudTh Class="pt-0 pb-1">
-            <MudTooltip Text="View another year" Delay="500" Duration="0" ShowOnFocus="false">
+            <MudTooltip Text="View another year" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
                 <MudMenu Dense="true" AnchorOrigin="Origin.BottomLeft" Label="@Year.ToString()" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small" Class="pt-0 pb-0">
                     @foreach (int year in Years)
                     {
