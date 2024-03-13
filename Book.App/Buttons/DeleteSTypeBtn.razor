@@ -19,7 +19,7 @@
 
     [Inject] public IDialogService DialogService { get; set; }
 
-    [Inject] public SummaryTypeRepository Repo { get; set; }
+    [Inject] internal ISummaryTypeRepository Repo { get; set; }
 
     async Task Delete()
     {

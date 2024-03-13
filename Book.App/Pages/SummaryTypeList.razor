@@ -4,7 +4,7 @@
 
 <PageTitle>@BookName - Types</PageTitle>
 
-<MudTable Elevation="5" Items="@SummaryTypes" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="selectedSummaryType" SortLabel="Sort By" Class="pa-2" AllowUnsorted="false" >
+<MudTable Elevation="5" Items="@SummaryTypes" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="SelectedSummaryType" SortLabel="Sort By" Class="pa-2" AllowUnsorted="false" >
     <ToolBarContent>
         <MudTooltip Text="New Summary Type" Delay="500" Duration="0" ShowOnFocus="false">
             <MudIconButton Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="AddSummaryType" aria-label="create summary" />

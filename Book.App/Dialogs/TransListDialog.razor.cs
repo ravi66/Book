@@ -23,9 +23,9 @@ namespace Book.Dialogs
 
         [Parameter] public int SummaryTypeId { get; set; }
 
-        [Inject] public TransactionRepository Repo { get; set; }
+        [Inject] internal ITransactionRepository Repo { get; set; }
 
-        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+        [Inject] internal BookSettingSvc BookSettingSvc { get; set; }
 
         [Inject] public MessageSvc MessageSvc { get; set; }
 
@@ -61,7 +61,7 @@ namespace Book.Dialogs
             if ((Mode == 1 || Mode == 2) && Name == "Total") Name = "";
             if (Mode == 3) TypesString = String.Empty;
 
-            Types = TypesString != String.Empty ? TypesString.Split(',').Select(int.Parse).ToList() : new List<int>();
+            Types = TypesString != String.Empty ? TypesString.Split(',').Select(int.Parse).ToList() : [];
 
             MessageSvc.TransactionsChanged += () => TransactionsChanged(MessageSvc.TransactionYears);
         }
@@ -186,7 +186,7 @@ namespace Book.Dialogs
             table.ReloadServerData();
         }
 
-        private string GetValueCSS(decimal value)
+        private static string GetValueCSS(decimal value)
         {
             return (value <= 0) ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
         }
@@ -194,6 +194,7 @@ namespace Book.Dialogs
         public void Dispose()
         {
             MessageSvc.TransactionsChanged -= () => TransactionsChanged(MessageSvc.TransactionYears);
+            GC.SuppressFinalize(this);
         }
 
     }

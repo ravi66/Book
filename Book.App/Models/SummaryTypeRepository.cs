@@ -3,48 +3,54 @@ using SqliteWasmHelper;
 
 namespace Book.Models
 {
-    public class SummaryTypeRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ISummaryTypeRepository
+    internal sealed class SummaryTypeRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ISummaryTypeRepository
     {
         public async Task<List<SummaryType>> GetAllSummaryTypes()
         {
             using var dbContext = await db.CreateDbContextAsync();
 
-            return dbContext.SummaryTypes
-                .Select(s => new SummaryType
-                {
-                    SummaryTypeId = s.SummaryTypeId,
-                    Name = s.Name,
-                    Order = s.Order,
-                    CreateDate = s.CreateDate,
-                    TransactionTypeList = new List<TransactionType>(s.TransactionTypes
-                        .Select(t => new TransactionType
-                        {
-                            TransactionTypeId = t.TransactionTypeId,
-                            SummaryTypeId = t.SummaryTypeId,
-                            Name = t.Name,
-                            CreateDate = t.CreateDate,
-                            TransactionCount = t.Transactions.Count(),
-                        })
-                        .OrderBy(t => t.Name).ToList()),
-                    Types = new List<int>(s.TransactionTypes.Select(t => t.TransactionTypeId).ToList())
-                })
-                .OrderBy(s => s.Order)
-                .ToList();
+            return
+            [
+                .. dbContext.SummaryTypes
+                                .Select(s => new SummaryType
+                                {
+                                    SummaryTypeId = s.SummaryTypeId,
+                                    Name = s.Name,
+                                    Order = s.Order,
+                                    CreateDate = s.CreateDate,
+                                    TransactionTypeList = new List<TransactionType>(s.TransactionTypes
+                                        .Select(t => new TransactionType
+                                        {
+                                            TransactionTypeId = t.TransactionTypeId,
+                                            SummaryTypeId = t.SummaryTypeId,
+                                            Name = t.Name,
+                                            CreateDate = t.CreateDate,
+                                            TransactionCount = t.Transactions.Count,
+                                        })
+                                        .OrderBy(t => t.Name).ToList()),
+                                    Types = new List<int>(s.TransactionTypes.Select(t => t.TransactionTypeId).ToList())
+                                })
+                                .OrderBy(s => s.Order)
+,
+            ];
         }
 
         public async Task<List<SummaryType>> GetAutoCompleteList()
         {
             using var dbContext = await db.CreateDbContextAsync();
 
-            return dbContext.SummaryTypes
-                .Select(s => new SummaryType
-                {
-                    SummaryTypeId = s.SummaryTypeId,
-                    Name = s.Name,
-                    Order = s.Order,
-                })
-                .OrderBy(s => s.Order)
-                .ToList();
+            return
+            [
+                .. dbContext.SummaryTypes
+                                .Select(s => new SummaryType
+                                {
+                                    SummaryTypeId = s.SummaryTypeId,
+                                    Name = s.Name,
+                                    Order = s.Order,
+                                })
+                                .OrderBy(s => s.Order)
+,
+            ];
         }
 
         public async Task<SummaryType?> GetSummaryTypeById(int summaryTypeId)
@@ -101,17 +107,20 @@ namespace Book.Models
         public async Task<List<SummaryType>> LoadSummary()
         {
             using var dbContext = await db.CreateDbContextAsync();
-            return dbContext.SummaryTypes
-                .Select(s => new SummaryType
-                {
-                    SummaryTypeId = s.SummaryTypeId,
-                    Name = s.Name,
-                    Order = s.Order,
-                    Types = new List<int>(s.TransactionTypes.Select(t => t.TransactionTypeId).ToList())
-                })
-                .OrderBy(s => s.Order)
-                .AsNoTracking()
-                .ToList();
+            return
+            [
+                .. dbContext.SummaryTypes
+                                .Select(s => new SummaryType
+                                {
+                                    SummaryTypeId = s.SummaryTypeId,
+                                    Name = s.Name,
+                                    Order = s.Order,
+                                    Types = new List<int>(s.TransactionTypes.Select(t => t.TransactionTypeId).ToList())
+                                })
+                                .OrderBy(s => s.Order)
+                                .AsNoTracking()
+,
+            ];
         }
 
     }

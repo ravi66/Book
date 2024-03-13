@@ -9,19 +9,19 @@ namespace Book.Pages
     {
         [Inject] public IDialogService DialogService { get; set; }
 
-        [Inject] public NavigationManager navigationManager { get; set; }
+        [Inject] public NavigationManager NavigationManager { get; set; }
 
-        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+        [Inject] internal BookSettingSvc BookSettingSvc { get; set; }
 
-        [Inject] public BookSettingRepository Repo { get; set; }
+        [Inject] internal IBookSettingRepository Repo { get; set; }
 
         private string BookName { get; set; } = "Book";
 
         public List<BookSetting> BookSettings { get; set; }
 
-        private BookSetting selectedBookSetting { get; set; }
+        private BookSetting SelectedBookSetting { get; set; }
 
-        private BookSetting bookSettingBeforeEdit { get; set; }
+        private BookSetting BookSettingBeforeEdit { get; set; }
 
         private MudTable<BookSetting> Table { get; set; }
 
@@ -35,7 +35,7 @@ namespace Book.Pages
 
         private void BackupItem(object bookSetting)
         {
-            bookSettingBeforeEdit = new()
+            BookSettingBeforeEdit = new()
             {
                 BookSettingId = ((BookSetting)bookSetting).BookSettingId,
                 SettingName = ((BookSetting)bookSetting).SettingName,
@@ -46,10 +46,10 @@ namespace Book.Pages
 
         private void ResetItemToOriginalValues(object bookSetting)
         {
-            ((BookSetting)bookSetting).BookSettingId = bookSettingBeforeEdit.BookSettingId;
-            ((BookSetting)bookSetting).SettingName = bookSettingBeforeEdit.SettingName;
-            ((BookSetting)bookSetting).UserAmendable = bookSettingBeforeEdit.UserAmendable;
-            ((BookSetting)bookSetting).SettingValue = bookSettingBeforeEdit.SettingValue;
+            ((BookSetting)bookSetting).BookSettingId = BookSettingBeforeEdit.BookSettingId;
+            ((BookSetting)bookSetting).SettingName = BookSettingBeforeEdit.SettingName;
+            ((BookSetting)bookSetting).UserAmendable = BookSettingBeforeEdit.UserAmendable;
+            ((BookSetting)bookSetting).SettingValue = BookSettingBeforeEdit.SettingValue;
 
             BlockSwitch = false;
             StateHasChanged();
@@ -58,7 +58,7 @@ namespace Book.Pages
         private async void ItemHasBeenCommitted(object bookSetting)
         {
             await Repo.UpdateBookSettings(BookSettings);
-            navigationManager.NavigateTo("/", true);
+            NavigationManager.NavigateTo("/", true);
         }
     }
 }

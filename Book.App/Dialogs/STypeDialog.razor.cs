@@ -13,7 +13,7 @@ namespace Book.Dialogs
 
         [Inject] public IDialogService DialogService { get; set; }
 
-        [Inject] public SummaryTypeRepository Repo { get; set; }
+        [Inject] internal ISummaryTypeRepository Repo { get; set; }
 
         public SummaryType SummaryType { get; set; }
 
@@ -29,7 +29,7 @@ namespace Book.Dialogs
                 {
                     CreateDate = DateTime.Today,
                     Order = 0,
-                    Types = new List<int>()
+                    Types = []
                 };
             }
             else

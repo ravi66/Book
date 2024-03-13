@@ -16,7 +16,7 @@ namespace Book.Pages
 
         [Inject] public IDialogService DialogService { get; set; }
 
-        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+        [Inject] internal BookSettingSvc BookSettingSvc { get; set; }
 
         [Inject] HttpClient HttpClient { get; set; }
 
@@ -29,8 +29,6 @@ namespace Book.Pages
         private string BookName { get; set; } = "Book";
 
         public string LastBackupDate { get; set; } = "No backup taken";
-
-        private List<string> HttpMessages { get; set; } = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -99,6 +97,8 @@ namespace Book.Pages
             {
                 await jsModule.DisposeAsync();
             }
+
+            GC.SuppressFinalize(this);
         }
 
     }

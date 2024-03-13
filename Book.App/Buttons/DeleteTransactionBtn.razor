@@ -17,7 +17,7 @@
 
     [Inject] public IDialogService DialogService { get; set; }
 
-    [Inject] public TransactionRepository Repo { get; set; }
+    [Inject] internal ITransactionRepository Repo { get; set; }
 
     [Inject] public MessageSvc MessageSvc { get; set; }
 

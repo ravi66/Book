@@ -10,9 +10,9 @@ namespace Book.Pages
     {
         [Inject] public IDialogService DialogService { get; set; }
 
-        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+        [Inject] internal BookSettingSvc BookSettingSvc { get; set; }
 
-        [Inject] public SummaryTypeRepository Repo { get; set; }
+        [Inject] internal ISummaryTypeRepository Repo { get; set; }
 
         [Inject] public MessageSvc MessageSvc { get; set; }
 
@@ -20,7 +20,7 @@ namespace Book.Pages
 
         public List<SummaryType> SummaryTypes { get; set; }
 
-        private SummaryType selectedSummaryType { get; set; }
+        private SummaryType SelectedSummaryType { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
@@ -126,6 +126,7 @@ namespace Book.Pages
         public void Dispose()
         {
             MessageSvc.TransactionsChanged -= () => TransactionsChanged(MessageSvc.TransactionYears);
+            GC.SuppressFinalize(this);
         }
 
     }

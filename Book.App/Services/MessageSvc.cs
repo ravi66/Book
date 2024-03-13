@@ -4,7 +4,7 @@
     {
         public event Action? TransactionsChanged;
 
-        public List<int> TransactionYears = new();
+        public List<int> TransactionYears = [];
 
         public void ChangeTransactions (List<int> transactionYears)
         {

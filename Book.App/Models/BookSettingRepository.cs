@@ -2,7 +2,7 @@
 
 namespace Book.Models
 {
-    public class BookSettingRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : IBookSettingRepository
+    internal sealed class BookSettingRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : IBookSettingRepository
     {
         public async Task<IEnumerable<BookSetting>> GetAllBookSettings()
         {

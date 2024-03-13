@@ -7,10 +7,10 @@ namespace Book.Services
         public static IServiceCollection AddBookServices(this IServiceCollection services)
         {
             services.AddSingleton<BookDbMigratorSvc>();
-            services.AddSingleton<BookSettingRepository>();
-            services.AddSingleton<SummaryTypeRepository>();
-            services.AddSingleton<TransactionTypeRepository>();
-            services.AddSingleton<TransactionRepository>();
+            services.AddSingleton<IBookSettingRepository, BookSettingRepository>();
+            services.AddSingleton<ISummaryTypeRepository, SummaryTypeRepository>();
+            services.AddSingleton<ITransactionTypeRepository, TransactionTypeRepository>();
+            services.AddSingleton<ITransactionRepository, TransactionRepository>();
             services.AddSingleton<BookSettingSvc>();
             services.AddSingleton<MessageSvc>();
 

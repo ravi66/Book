@@ -11,13 +11,13 @@ namespace Book.Pages
     {
         [Inject] public IDialogService DialogService { get; set; }
 
-        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+        [Inject] internal BookSettingSvc BookSettingSvc { get; set; }
 
         [Inject] public MessageSvc MessageSvc { get; set; }
 
-        [Inject] public TransactionRepository Repo { get; set; }
+        [Inject] internal ITransactionRepository Repo { get; set; }
 
-        [Inject] public SummaryTypeRepository SummaryRepo { get; set; }
+        [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
 
         public IEnumerable<SummaryType> SummaryTypes { get; set; }
 
@@ -29,7 +29,7 @@ namespace Book.Pages
 
         public int Year { get; set; }
 
-        public int[] Years { get; set; } = Array.Empty<int>();
+        public int[] Years { get; set; } = [];
 
         private DateTime StartDate { get; set; }
 
@@ -54,7 +54,7 @@ namespace Book.Pages
             CreateMonthlySummaries();
 
             // Get all Transactions for year
-            Transactions = await Repo.GetTransactionsByTypeMonth(new List<int>(), Year, 0);
+            Transactions = await Repo.GetTransactionsByTypeMonth([], Year, 0);
 
             CreateSummaryDetails();
             RemoveZeroTransactionsSummaryDetails();
@@ -63,7 +63,7 @@ namespace Book.Pages
 
         private void CreateMonthlySummaries()
         {
-            MonthlySummaries = new List<MonthlySummary>();
+            MonthlySummaries = [];
 
             for (int i = 1; i < 13; i++)
             {
@@ -72,7 +72,7 @@ namespace Book.Pages
                     MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i),
                     MonthNameFull = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
                     MonthNo = i,
-                    SummaryDetails = new List<SummaryDetail>()
+                    SummaryDetails = []
                 });
             }
 
@@ -82,7 +82,7 @@ namespace Book.Pages
                 MonthName = "Total",
                 MonthNameFull = Year.ToString(),
                 MonthNo = 0,
-                SummaryDetails = new List<SummaryDetail>()
+                SummaryDetails = []
             });
         }
 
@@ -97,7 +97,7 @@ namespace Book.Pages
                 {
                     SummaryTypeId = 0,
                     SummaryName = "Total",
-                    Types = new List<int>(),
+                    Types = [],
                     Total = Transactions
                         .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate)
                         .Sum(t => t.Value) * -1,
@@ -128,8 +128,7 @@ namespace Book.Pages
                     {
                         summaryDetail.HasTransactions = Transactions
                             .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate
-                                && summaryDetail.Types.Contains((int)t.TransactionTypeId))
-                            .Count() > 0 ? true : false;
+                                && summaryDetail.Types.Contains((int)t.TransactionTypeId)).Any();
                     }
                     else
                     {
@@ -141,7 +140,7 @@ namespace Book.Pages
 
         private void RemoveZeroTransactionsSummaryDetails()
         {
-            List<int> summariesToBeRemoved = new List<int>();
+            List<int> summariesToBeRemoved = [];
 
             foreach (SummaryDetail totalDetail in MonthlySummaries[12].SummaryDetails)  // Total Row
             {
@@ -201,7 +200,7 @@ namespace Book.Pages
 
         private void YearChart(int summaryTypeId)
         {
-            List<ChartSeries> summarySeries = new List<ChartSeries>();
+            List<ChartSeries> summarySeries = [];
 
             if (summaryTypeId > 0)
             {
@@ -228,14 +227,14 @@ namespace Book.Pages
 
         private ChartSeries GetSummarySeries(int summaryTypeId)
         {
-            List<double> summaryData = new List<double>();
+            List<double> summaryData = [];
 
             for (int i = 0; i < 12; i++)
             {
                 summaryData.Add((double)MonthlySummaries[i].SummaryDetails.Single(s => s.SummaryTypeId == summaryTypeId).Total);
             }
 
-            return new ChartSeries { Name = MonthlySummaries[12].SummaryDetails.Single(s => s.SummaryTypeId == summaryTypeId).SummaryName, Data = summaryData.ToArray() };
+            return new ChartSeries { Name = MonthlySummaries[12].SummaryDetails.Single(s => s.SummaryTypeId == summaryTypeId).SummaryName, Data = [.. summaryData] };
         }
 
         private void MonthChart(int monthNo)
@@ -285,6 +284,7 @@ namespace Book.Pages
         public void Dispose()
         {
             MessageSvc.TransactionsChanged -= () => TransactionsChanged(MessageSvc.TransactionYears);
+            GC.SuppressFinalize(this);
         }
 
     }

@@ -2,16 +2,9 @@
 
 namespace Book.Services
 {
-    public class BookSettingSvc
+    internal class BookSettingSvc(IBookSettingRepository repo)
     {
         private BookSetting? BookSetting { get; set; }
-
-        private BookSettingRepository _repo;
-
-        public BookSettingSvc(BookSettingRepository repo)
-        {
-            _repo = repo;
-        }
 
         // Gets
 
@@ -22,7 +15,7 @@ namespace Book.Services
 
         public async Task<bool> GetDarkMode()
         {
-            return await GetSettingValue(2, "[ALL] Dark Mode", false, "true") == "true" ? true : false;
+            return await GetSettingValue(2, "[ALL] Dark Mode", false, "true") == "true";
         }
 
         public async Task<int> GetStartYear()
@@ -91,27 +84,23 @@ namespace Book.Services
             return;
         }
 
-        public async Task SetDbVersion(string version)
-        {
-            // Always set in BookDbMigratorSvc
-            return;
-        }
-
         // Privates
 
         private async Task<string> GetSettingValue (int settingId, string settingName, bool userAmendable, string defaultValue)
         {
-            BookSetting = await _repo.GetBookSettingById(settingId);
+            BookSetting = await repo.GetBookSettingById(settingId);
 
             if (BookSetting == null)
             {
-                BookSetting = new BookSetting();
-                BookSetting.BookSettingId = settingId;
-                BookSetting.SettingName = settingName;
-                BookSetting.UserAmendable = userAmendable;
-                BookSetting.SettingValue = defaultValue;
+                BookSetting = new BookSetting
+                {
+                    BookSettingId = settingId,
+                    SettingName = settingName,
+                    UserAmendable = userAmendable,
+                    SettingValue = defaultValue
+                };
 
-                BookSetting = await _repo.AddBookSetting(BookSetting);
+                BookSetting = await repo.AddBookSetting(BookSetting);
             }
 
             return BookSetting.SettingValue;
@@ -119,23 +108,25 @@ namespace Book.Services
 
         private async Task SetSettingValue(int settingId, string settingName, bool userAmendable, string newValue)
         {
-            BookSetting = await _repo.GetBookSettingById(settingId);
+            BookSetting = await repo.GetBookSettingById(settingId);
 
             if (BookSetting == null)
             {
-                BookSetting = new BookSetting();
-                BookSetting.BookSettingId = settingId;
-                BookSetting.SettingName = settingName;
-                BookSetting.UserAmendable = userAmendable;
-                BookSetting.SettingValue = newValue;
+                BookSetting = new BookSetting
+                {
+                    BookSettingId = settingId,
+                    SettingName = settingName,
+                    UserAmendable = userAmendable,
+                    SettingValue = newValue
+                };
 
-                BookSetting = await _repo.AddBookSetting(BookSetting);
+                BookSetting = await repo.AddBookSetting(BookSetting);
             }
             else
             {
                 BookSetting.SettingValue = newValue;
 
-                BookSetting = await _repo.UpdateBookSetting(BookSetting);
+                BookSetting = await repo.UpdateBookSetting(BookSetting);
             }
 
             return;

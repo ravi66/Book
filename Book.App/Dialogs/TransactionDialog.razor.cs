@@ -13,21 +13,21 @@ namespace Book.Dialogs
 
         [Inject] public MessageSvc MessageSvc { get; set; }
 
-        [Inject] public TransactionTypeRepository TTypeRepo { get; set; }
+        [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
 
-        [Inject] public TransactionRepository Repo { get; set; }
+        [Inject] internal ITransactionRepository Repo { get; set; }
 
         public Transaction Transaction { get; set; }
 
         private List<TransactionType> TransactionTypes { get; set; }
 
-        private TransactionType _SelectedTransactionType {  get; set; }
+        private TransactionType SelectedTransactionType {  get; set; }
 
-        private DateTime? _SelectedDate {  get; set; }
+        private DateTime? SelectedDate {  get; set; }
 
         private int OriginalYear { get; set; } = 0;
 
-        private bool validationOk { get; set; }
+        private bool ValidationOk { get; set; }
 
         public void Close() => MudDialog.Cancel();
 
@@ -52,20 +52,20 @@ namespace Book.Dialogs
                 OriginalYear = Transaction.TransactionDate.Year;
             }
 
-            _SelectedTransactionType = TransactionTypes.FirstOrDefault(t => t.TransactionTypeId == Transaction.TransactionTypeId);
-            _SelectedDate = Transaction.TransactionDate;
+            SelectedTransactionType = TransactionTypes.FirstOrDefault(t => t.TransactionTypeId == Transaction.TransactionTypeId);
+            SelectedDate = Transaction.TransactionDate;
         }
 
         async void Save()
         {
-            if (!validationOk) return;
+            if (!ValidationOk) return;
 
-            Transaction.TransactionTypeId = _SelectedTransactionType.TransactionTypeId;
-            Transaction.TransactionDate = (DateTime)(_SelectedDate is null ? DateTime.Today : _SelectedDate);
+            Transaction.TransactionTypeId = SelectedTransactionType.TransactionTypeId;
+            Transaction.TransactionDate = (DateTime)(SelectedDate is null ? DateTime.Today : SelectedDate);
 
             _ = SavedTransactionId == 0 ? await Repo.AddTransaction(Transaction) : await Repo.UpdateTransaction(Transaction);
 
-            List<int> years = new List<int> { Transaction.TransactionDate.Year };
+            List<int> years = new() { Transaction.TransactionDate.Year };
             if (OriginalYear != 0 && OriginalYear != Transaction.TransactionDate.Year) years.Add(OriginalYear);
             MessageSvc.ChangeTransactions(years);
 

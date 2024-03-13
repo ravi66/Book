@@ -19,7 +19,7 @@
 
     [Inject] public IDialogService DialogService { get; set; }
 
-    [Inject] public TransactionTypeRepository Repo { get; set; }
+    [Inject] internal ITransactionTypeRepository Repo { get; set; }
 
     async Task Delete()
     {

@@ -15,9 +15,9 @@ namespace Book.Dialogs
 
         [Inject] public MessageSvc MessageSvc { get; set; }
 
-        [Inject] public TransactionRepository Repo { get; set; }
+        [Inject] internal ITransactionRepository Repo { get; set; }
 
-        [Inject] public BookSettingSvc BookSettingSvc { get; set; }
+        [Inject] internal BookSettingSvc BookSettingSvc { get; set; }
 
         private Transaction TransactionToCopy { get; set; }
 
@@ -97,7 +97,7 @@ namespace Book.Dialogs
 
         protected async Task HandleSubmit()
         {
-            if (NewTransactions.Count() < 1) return;
+            if (!NewTransactions.Any()) return;
 
             string confirmText = NewTransactions.Count() > 1 ? $"<h4>Create {NewTransactions.Count()} Entries?</h4>" : $"<h4>Create 1 Entry?</h4>";
 
@@ -116,7 +116,7 @@ namespace Book.Dialogs
             
             await Repo.AddTransactions(NewTransactions);
 
-            List<int> years = new();
+            List<int> years = [];
             
             foreach (Transaction transaction in NewTransactions)
             {
@@ -132,41 +132,21 @@ namespace Book.Dialogs
         {
             NewTransactions = NewTransactions.Where(ct => ct.TransactionDate != transDate);
 
-            if (NewTransactions.Count() == 0) MudDialog.Cancel();
+            if (!NewTransactions.Any()) MudDialog.Cancel();
         }
 
         private void SetNewDate()
         {
-            switch (SelectedFrequency.FrequencyID)
+            NewDate = SelectedFrequency.FrequencyID switch
             {
-                case 1:
-                    NewDate = NewDate.AddMonths(1);
-                    break;
-
-                case 2:
-                    NewDate = NewDate.AddMonths(3);
-                    break;
-
-                case 3:
-                    NewDate = NewDate.AddYears(1);
-                    break;
-
-                case 4:
-                    NewDate = NewDate.AddDays(7);
-                    break;
-
-                case 5:
-                    NewDate = NewDate.AddMonths(2);
-                    break;
-
-                case 6:
-                    NewDate = NewDate.AddDays(1);
-                    break;
-
-                default:
-                    NewDate = NewDate.AddMonths(1);
-                    break;
-            }
+                1 => NewDate.AddMonths(1),
+                2 => NewDate.AddMonths(3),
+                3 => NewDate.AddYears(1),
+                4 => NewDate.AddDays(7),
+                5 => NewDate.AddMonths(2),
+                6 => NewDate.AddDays(1),
+                _ => NewDate.AddMonths(1),
+            };
         }
 
     }

@@ -18,15 +18,15 @@ namespace Book.Dialogs
 
         [Inject] public IDialogService DialogService { get; set; }
 
-        [Inject] public SummaryTypeRepository SummaryRepo { get; set; }
+        [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
 
-        [Inject] public TransactionTypeRepository TTypeRepo { get; set; }
+        [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
 
         public TransactionType TransactionType { get; set; }
 
         private List<SummaryType> SummaryTypes { get; set; }
 
-        private SummaryType _SelectedSummaryType {  get; set; }
+        private SummaryType SelectedSummaryType {  get; set; }
 
         private bool ValidationOk { get; set; }
 
@@ -54,14 +54,14 @@ namespace Book.Dialogs
                 if (SavedTransactionTypeId == -1) ReadOnlySummary = true;
             }
 
-            _SelectedSummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == TransactionType.SummaryTypeId);
+            SelectedSummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == TransactionType.SummaryTypeId);
         }
 
         async void Save()
         {
             if (!ValidationOk) return;
 
-            TransactionType.SummaryTypeId = _SelectedSummaryType.SummaryTypeId;
+            TransactionType.SummaryTypeId = SelectedSummaryType.SummaryTypeId;
 
             if (SavedTransactionTypeId == 0)
             {

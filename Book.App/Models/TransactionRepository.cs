@@ -3,7 +3,7 @@ using SqliteWasmHelper;
 
 namespace Book.Models
 {
-    public class TransactionRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ITransactionRepository
+    internal sealed class TransactionRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ITransactionRepository
     {
         public async Task<Transaction?> GetTransactionById(int transactionId)
         {

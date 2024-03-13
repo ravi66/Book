@@ -3,13 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Book.Models
 {
-    public class BookDbContext : DbContext
+    public class BookDbContext(DbContextOptions<BookDbContext> options) : DbContext(options)
     {
-        public BookDbContext(DbContextOptions<BookDbContext> options) : base(options)
-        {
-
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

@@ -4,17 +4,12 @@ using SqliteWasmHelper;
 
 namespace Book.Services
 {
-    public class BookDbMigratorSvc
+    public class BookDbMigratorSvc(ISqliteWasmDbContextFactory<BookDbContext> dbContextFactory)
     {
         private const string CurrentDbVersion = "1.00";
 
         private BookDbContext _dbContext;
-        private readonly ISqliteWasmDbContextFactory<BookDbContext> _dbContextFactory;
-
-        public BookDbMigratorSvc(ISqliteWasmDbContextFactory<BookDbContext> dbContextFactory)
-        {
-            _dbContextFactory = dbContextFactory;
-        }
+        private readonly ISqliteWasmDbContextFactory<BookDbContext> _dbContextFactory = dbContextFactory;
 
         public async Task EnsureDbCreated()
         {
