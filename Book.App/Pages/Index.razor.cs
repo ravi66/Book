@@ -260,7 +260,7 @@ namespace Book.Pages
                 { x => x.TypeLabels, monthlyTransactions.Select(s => s.TransactionTypeName).ToArray() },
             };
 
-            var options = new DialogOptions() { NoHeader = true, MaxWidth = MaxWidth.ExtraSmall };
+            var options = new DialogOptions() { NoHeader = true, MaxWidth = MaxWidth.ExtraLarge };
 
             DialogService.Show<MonthChartDialog>("", parameters, options);
         }
