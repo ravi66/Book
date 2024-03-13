@@ -23,9 +23,9 @@ namespace Book.Pages
 
         private BookSetting bookSettingBeforeEdit { get; set; }
 
-        private MudTable<BookSetting> _table { get; set; }
+        private MudTable<BookSetting> Table { get; set; }
 
-        private bool blockSwitch { get; set; } = false;
+        private bool BlockSwitch { get; set; } = false;
 
         protected async override Task OnInitializedAsync()
         {
@@ -51,7 +51,7 @@ namespace Book.Pages
             ((BookSetting)bookSetting).UserAmendable = bookSettingBeforeEdit.UserAmendable;
             ((BookSetting)bookSetting).SettingValue = bookSettingBeforeEdit.SettingValue;
 
-            blockSwitch = false;
+            BlockSwitch = false;
             StateHasChanged();
         }
 

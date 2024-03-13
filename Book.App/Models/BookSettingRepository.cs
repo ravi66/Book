@@ -2,18 +2,11 @@
 
 namespace Book.Models
 {
-    public class BookSettingRepository : IBookSettingRepository
+    public class BookSettingRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : IBookSettingRepository
     {
-        private readonly ISqliteWasmDbContextFactory<BookDbContext> _db;
-
-        public BookSettingRepository(ISqliteWasmDbContextFactory<BookDbContext> db)
-        {
-            _db = db;
-        }
-
         public async Task<IEnumerable<BookSetting>> GetAllBookSettings()
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             return dbContext.BookSetting
                 .Select(b => new BookSetting
@@ -30,7 +23,7 @@ namespace Book.Models
 
         public async Task<BookSetting?> GetBookSettingById(int bookSettingId)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             return dbContext.BookSetting
                 .Select(b => new BookSetting
@@ -45,7 +38,7 @@ namespace Book.Models
 
         public async Task<BookSetting> AddBookSetting(BookSetting bookSetting)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
             var addedEntity = dbContext.BookSetting.Add(bookSetting);
             await dbContext.SaveChangesAsync();
             return addedEntity.Entity;
@@ -53,7 +46,7 @@ namespace Book.Models
 
         public async Task<BookSetting?> UpdateBookSetting(BookSetting bookSetting)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             var foundBookSetting = dbContext.BookSetting
                 .FirstOrDefault(b => b.BookSettingId == bookSetting.BookSettingId);
@@ -76,7 +69,7 @@ namespace Book.Models
         {
             if (bookSettings == null) return;
 
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             foreach (var bookSetting in bookSettings)
             {

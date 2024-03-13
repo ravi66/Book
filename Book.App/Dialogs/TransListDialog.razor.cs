@@ -54,7 +54,6 @@ namespace Book.Dialogs
             if (Mode < 1 || Mode > 3) Close();
 
             MudDialog.Options.MaxWidth = MaxWidth.ExtraLarge;
-            //MudDialog.Options.FullWidth = true;
             MudDialog.Options.NoHeader = true;
 
             MudDialog.SetOptions(MudDialog.Options);
@@ -92,7 +91,7 @@ namespace Book.Dialogs
             {
                 if (string.IsNullOrWhiteSpace(searchString))
                     return true;
-                if (transaction.TransactionTypeName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                if (transaction.TransactionTypeName != null && transaction.TransactionTypeName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
                     return true;
                 if (transaction.TransactionDate.ToShortDateString().Contains(searchString))
                     return true;

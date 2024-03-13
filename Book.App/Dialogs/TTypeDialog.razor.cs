@@ -28,7 +28,7 @@ namespace Book.Dialogs
 
         private SummaryType _SelectedSummaryType {  get; set; }
 
-        private bool validationOk {  get; set; }
+        private bool ValidationOk { get; set; }
 
         private void Close() => MudDialog.Cancel();
 
@@ -59,7 +59,7 @@ namespace Book.Dialogs
 
         async void Save()
         {
-            if (!validationOk) return;
+            if (!ValidationOk) return;
 
             TransactionType.SummaryTypeId = _SelectedSummaryType.SummaryTypeId;
 
@@ -84,33 +84,7 @@ namespace Book.Dialogs
                 return SummaryTypes;
             }
 
-            return SummaryTypes
-                .Where(s => s.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
-        }
-
-        async Task DeleteTType()
-        {
-            var parameters = new DialogParameters<ConfirmDialog>();
-            parameters.Add(x => x.ConfirmationTitle, $"Delete {TransactionType.Name} Entry Type");
-            parameters.Add(x => x.ConfirmationMessage, "Are you sure you want to delete this Entry Type?");
-            parameters.Add(x => x.CancelColorInt, 0);
-            parameters.Add(x => x.DoneColorInt, 1);
-
-            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters);
-            var result = await dialog.Result;
-
-            if (!result.Canceled)
-            {
-                if (TransactionType.TransactionTypeId != 0)
-                {
-                    await TTypeRepo.DeleteTransactionType(TransactionType.TransactionTypeId);
-                    MudDialog.Close(DialogResult.Ok(true));
-                }
-                else
-                {
-                    Close();
-                }
-            }
+            return SummaryTypes.Where(s => s.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public void CloseReload()

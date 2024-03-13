@@ -23,14 +23,14 @@ namespace Book.Dialogs
 
         private IEnumerable<Transaction> NewTransactions { get; set; } = new List<Transaction>();
 
-        private List<Frequency> Frequencies { get; set; } = new List<Frequency>() {
+        private List<Frequency> Frequencies { get; set; } = [
                 new Frequency(){ FrequencyID = 3, FrequencyName = "Yearly"},
                 new Frequency(){ FrequencyID = 2, FrequencyName = "Quaterly"},
                 new Frequency(){ FrequencyID = 5, FrequencyName = "Bi-Monthly"},
                 new Frequency(){ FrequencyID = 1, FrequencyName = "Monthly"},
                 new Frequency(){ FrequencyID = 4, FrequencyName = "Weekly"},
                 new Frequency(){ FrequencyID = 6, FrequencyName = "Daily"},
-            };
+            ];
 
         private string DialogTitle { get; set; }
 

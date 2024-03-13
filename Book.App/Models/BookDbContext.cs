@@ -5,12 +5,6 @@ namespace Book.Models
 {
     public class BookDbContext : DbContext
     {
-        /// <summary>
-        /// FIXME: This is required for EF Core 6.0 as it is not compatible with trimming.
-        /// </summary>
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-        private static Type _keepDateOnly = typeof(DateOnly);
-
         public BookDbContext(DbContextOptions<BookDbContext> options) : base(options)
         {
 

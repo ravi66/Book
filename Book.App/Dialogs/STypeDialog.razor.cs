@@ -17,7 +17,7 @@ namespace Book.Dialogs
 
         public SummaryType SummaryType { get; set; }
 
-        private bool validationOk {  get; set; }
+        private bool ValidationOk {  get; set; }
 
         void Close() => MudDialog.Cancel();
 
@@ -40,7 +40,7 @@ namespace Book.Dialogs
 
         async void Save()
         {
-            if (!validationOk) return;
+            if (!ValidationOk) return;
 
             if (SavedSummaryTypeId == 0)
             {
@@ -58,7 +58,5 @@ namespace Book.Dialogs
         {
             MudDialog.Close(DialogResult.Ok(true));
         }
-
-
     }
 }

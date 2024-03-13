@@ -3,18 +3,11 @@ using SqliteWasmHelper;
 
 namespace Book.Models
 {
-    public class TransactionRepository : ITransactionRepository
+    public class TransactionRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ITransactionRepository
     {
-        private readonly ISqliteWasmDbContextFactory<BookDbContext> _db;
-
-        public TransactionRepository(ISqliteWasmDbContextFactory<BookDbContext> db)
-        {
-            _db = db;
-        }
-
         public async Task<Transaction?> GetTransactionById(int transactionId)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             return dbContext.Transactions
                 .Include(t => t.TransactionType)
@@ -23,7 +16,7 @@ namespace Book.Models
 
         public async Task<Transaction> AddTransaction(Transaction transaction)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
             transaction.TransactionType = null;
             var addedEntity = dbContext.Transactions.Add(transaction);
             await dbContext.SaveChangesAsync();
@@ -34,7 +27,7 @@ namespace Book.Models
         {
             if (transactions == null) return;
 
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             foreach (var transaction in transactions)
             {
@@ -47,7 +40,7 @@ namespace Book.Models
 
         public async Task<Transaction> UpdateTransaction(Transaction transaction)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             var foundTransaction = dbContext.Transactions
                 .FirstOrDefault(t => t.TransactionId == transaction.TransactionId);
@@ -69,7 +62,7 @@ namespace Book.Models
 
         public async Task DeleteTransaction(int transactionId)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             var foundTransaction = dbContext.Transactions.FirstOrDefault(t => t.TransactionId == transactionId);
             if (foundTransaction == null) return;
@@ -80,7 +73,7 @@ namespace Book.Models
 
         public async Task<IEnumerable<Transaction>> GetTransactionsByTypeMonth(List<int>? types, int year, int month)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             var query = dbContext.Transactions
                     .Select(t => new Transaction
@@ -122,7 +115,7 @@ namespace Book.Models
 
         public async Task<IEnumerable<Transaction>> GetTransactionsBySummary(List<int>? types)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             var query = dbContext.Transactions
                     .Select(t => new Transaction
@@ -148,7 +141,7 @@ namespace Book.Models
 
         public async Task<IEnumerable<Transaction>> GetTransactionsByType(int typeId)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             var query = dbContext.Transactions
                     .Select(t => new Transaction

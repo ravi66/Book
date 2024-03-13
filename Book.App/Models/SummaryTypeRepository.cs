@@ -3,18 +3,11 @@ using SqliteWasmHelper;
 
 namespace Book.Models
 {
-    public class SummaryTypeRepository : ISummaryTypeRepository
+    public class SummaryTypeRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ISummaryTypeRepository
     {
-        private readonly ISqliteWasmDbContextFactory<BookDbContext> _db;
-
-        public SummaryTypeRepository(ISqliteWasmDbContextFactory<BookDbContext> db)
-        {
-            _db = db;
-        }
-
         public async Task<List<SummaryType>> GetAllSummaryTypes()
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             return dbContext.SummaryTypes
                 .Select(s => new SummaryType
@@ -41,7 +34,7 @@ namespace Book.Models
 
         public async Task<List<SummaryType>> GetAutoCompleteList()
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             return dbContext.SummaryTypes
                 .Select(s => new SummaryType
@@ -56,7 +49,7 @@ namespace Book.Models
 
         public async Task<SummaryType?> GetSummaryTypeById(int summaryTypeId)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
             return dbContext.SummaryTypes
                 .Select(s => new SummaryType
                 {
@@ -71,7 +64,7 @@ namespace Book.Models
 
         public async Task<SummaryType> AddSummaryType(SummaryType summaryType)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
             var addedEntity = dbContext.SummaryTypes.Add(summaryType);
             await dbContext.SaveChangesAsync();
             return addedEntity.Entity;
@@ -79,7 +72,7 @@ namespace Book.Models
 
         public async Task<SummaryType?> UpdateSummaryType(SummaryType summaryType)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
             var foundSummaryType = dbContext.SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == summaryType.SummaryTypeId);
 
             if (foundSummaryType != null)
@@ -97,7 +90,7 @@ namespace Book.Models
 
         public async Task DeleteSummaryType(int summaryTypeId)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
             var foundSummaryType = dbContext.SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == summaryTypeId);
             if (foundSummaryType == null) return;
 
@@ -107,7 +100,7 @@ namespace Book.Models
 
         public async Task<List<SummaryType>> LoadSummary()
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
             return dbContext.SummaryTypes
                 .Select(s => new SummaryType
                 {

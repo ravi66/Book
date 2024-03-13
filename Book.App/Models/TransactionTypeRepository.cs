@@ -2,18 +2,11 @@
 
 namespace Book.Models
 {
-    public class TransactionTypeRepository : ITransactionTypeRepository
+    public class TransactionTypeRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ITransactionTypeRepository
     {
-        private readonly ISqliteWasmDbContextFactory<BookDbContext> _db;
-
-        public TransactionTypeRepository(ISqliteWasmDbContextFactory<BookDbContext> db)
-        {
-            _db = db;
-        }
-
         public async Task<IEnumerable<TransactionType>> GetAllTransactionTypes()
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             return dbContext.TransactionTypes
                 .Select(t => new TransactionType
@@ -30,7 +23,7 @@ namespace Book.Models
 
         public async Task<TransactionType?> GetTransactionTypeById(int transactionTypeId)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             return dbContext.TransactionTypes
                 .Select(t => new TransactionType
@@ -45,10 +38,9 @@ namespace Book.Models
                 .FirstOrDefault(t => t.TransactionTypeId == transactionTypeId);
         }
 
-
         public async Task<TransactionType> AddTransactionType(TransactionType transactionType)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             transactionType.SummaryType = null;
             var addedEntity = dbContext.TransactionTypes.Add(transactionType);
@@ -58,7 +50,7 @@ namespace Book.Models
 
         public async Task<TransactionType?> UpdateTransactionType(TransactionType transactionType)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             var foundTransactionType = dbContext.TransactionTypes
                 .FirstOrDefault(t => t.TransactionTypeId == transactionType.TransactionTypeId);
@@ -78,7 +70,7 @@ namespace Book.Models
 
         public async Task DeleteTransactionType(int transactionTypeId)
         {
-            using var dbContext = await _db.CreateDbContextAsync();
+            using var dbContext = await db.CreateDbContextAsync();
 
             var foundTransactionType = dbContext.TransactionTypes.FirstOrDefault(t => t.TransactionTypeId == transactionTypeId);
             if (foundTransactionType == null) return;
