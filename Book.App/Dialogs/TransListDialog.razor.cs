@@ -180,7 +180,7 @@ namespace Book.Dialogs
             table.ReloadServerData();
         }
 
-        private void TransactionsChanged(List<int> transactionYears)
+        private void TransactionsChanged(List<int> _1)
         {
             // Reload regardless of Year
             table.ReloadServerData();

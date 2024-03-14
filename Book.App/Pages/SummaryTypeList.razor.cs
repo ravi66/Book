@@ -117,7 +117,7 @@ namespace Book.Pages
             if (!result.Canceled) await LoadSummaryTypes();
         }
 
-        private void TransactionsChanged(List<int> transactionYears)
+        private void TransactionsChanged(List<int> _1)
         {
             // Reload regardless of year
             LoadSummaryTypes();

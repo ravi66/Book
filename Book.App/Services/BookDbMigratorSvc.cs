@@ -15,8 +15,8 @@ namespace Book.Services
         {
             _dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-            // uncomment the following line to see the CREATE TABLE scripts in the browser
-            // console when generating a new database - this is useful when creating new
+            // uncomment the following (and the method) to see the CREATE TABLE scripts in the
+            // browser console when generating a new database - this is useful when creating new
             // migrations
             //OutputDbScriptToConsole();
 
@@ -42,7 +42,7 @@ namespace Book.Services
                 return;
             }
 
-            // Uncomment the following when there are migrations
+            // Uncomment the following (and the methods) when there are migrations
 
             /*
             if (currentDbVersion == "1.00")
@@ -77,6 +77,8 @@ namespace Book.Services
             await _dbContext.SaveChangesAsync();
         }
 
+        /*
+        
         private async Task Migrate_101()
         {
             const string Alter_Table_TransactionTypes = @"ALTER TABLE ""TransactionTypes"" ADD ""Credit"" INTEGER;";
@@ -91,5 +93,8 @@ namespace Book.Services
             Console.WriteLine("Db Creation SQL:");
             Console.WriteLine(dbCreationSql);
         }
+
+        */
+
     }
 }

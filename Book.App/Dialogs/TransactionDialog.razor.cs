@@ -65,7 +65,7 @@ namespace Book.Dialogs
 
             _ = SavedTransactionId == 0 ? await Repo.AddTransaction(Transaction) : await Repo.UpdateTransaction(Transaction);
 
-            List<int> years = new() { Transaction.TransactionDate.Year };
+            List<int> years = [Transaction.TransactionDate.Year];
             if (OriginalYear != 0 && OriginalYear != Transaction.TransactionDate.Year) years.Add(OriginalYear);
             MessageSvc.ChangeTransactions(years);
 

@@ -21,7 +21,7 @@ namespace Book.Dialogs
 
         private Transaction TransactionToCopy { get; set; }
 
-        private IEnumerable<Transaction> NewTransactions { get; set; } = new List<Transaction>();
+        private IEnumerable<Transaction> NewTransactions { get; set; } = [];
 
         private List<Frequency> Frequencies { get; set; } = [
                 new Frequency(){ FrequencyID = 3, FrequencyName = "Yearly"},
@@ -74,7 +74,7 @@ namespace Book.Dialogs
 
         private async Task LoadCopiedTransactions()
         {
-            NewTransactions = new List<Transaction>();
+            NewTransactions = [];
 
             NewDate = TransactionToCopy.TransactionDate;
             SetNewDate();

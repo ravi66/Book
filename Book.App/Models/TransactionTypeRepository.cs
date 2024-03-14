@@ -8,7 +8,7 @@ namespace Book.Models
         {
             using var dbContext = await db.CreateDbContextAsync();
 
-            return dbContext.TransactionTypes
+            return [.. dbContext.TransactionTypes
                 .Select(t => new TransactionType
                 {
                     TransactionTypeId = t.TransactionTypeId,
@@ -17,8 +17,7 @@ namespace Book.Models
                     SummaryName = t.SummaryType.Name,
                     CreateDate = t.CreateDate,
                 })
-                .OrderBy(t => t.Name)
-                .ToList();
+                .OrderBy(t => t.Name)];
         }
 
         public async Task<TransactionType?> GetTransactionTypeById(int transactionTypeId)

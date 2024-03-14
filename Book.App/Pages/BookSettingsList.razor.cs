@@ -23,8 +23,6 @@ namespace Book.Pages
 
         private BookSetting BookSettingBeforeEdit { get; set; }
 
-        private MudTable<BookSetting> Table { get; set; }
-
         private bool BlockSwitch { get; set; } = false;
 
         protected async override Task OnInitializedAsync()

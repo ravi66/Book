@@ -8,7 +8,7 @@ namespace Book.Models
         {
             using var dbContext = await db.CreateDbContextAsync();
 
-            return dbContext.BookSetting
+            return [.. dbContext.BookSetting
                 .Select(b => new BookSetting
                 {
                     BookSettingId = b.BookSettingId,
@@ -17,8 +17,7 @@ namespace Book.Models
                     SettingValue = b.SettingValue
                 })
                 .Where(b => b.UserAmendable == true)
-                .OrderBy(b => b.SettingName)
-                .ToList();
+                .OrderBy(b => b.SettingName)];
         }
 
         public async Task<BookSetting?> GetBookSettingById(int bookSettingId)

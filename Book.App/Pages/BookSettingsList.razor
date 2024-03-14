@@ -2,7 +2,7 @@
 
 <PageTitle>@BookName - Settings</PageTitle>
 
-<MudTable Elevation="5" Items="@BookSettings" @ref="Table" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="SelectedBookSetting" SortLabel="Sort By" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" IsEditRowSwitchingBlocked="@BlockSwitch" EditTrigger="TableEditTrigger.EditButton" EditButtonPosition="TableEditButtonPosition.Start" ApplyButtonPosition="TableApplyButtonPosition.Start" RowEditCommit="ItemHasBeenCommitted" AllowUnsorted="false" CancelEditTooltip="Cancel" CommitEditTooltip="Save Setting" >
+<MudTable Elevation="5" Items="@BookSettings" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="SelectedBookSetting" SortLabel="Sort By" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" IsEditRowSwitchingBlocked="@BlockSwitch" EditTrigger="TableEditTrigger.EditButton" EditButtonPosition="TableEditButtonPosition.Start" ApplyButtonPosition="TableApplyButtonPosition.Start" RowEditCommit="ItemHasBeenCommitted" AllowUnsorted="false" CancelEditTooltip="Cancel" CommitEditTooltip="Save Setting" >
     <ToolBarContent>
         <MudText Typo="Typo.h4">
             <MudIcon Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" /> Settings

@@ -51,12 +51,10 @@ namespace Book.Pages
 
         private async Task LoadSummary()
         {
-            CreateMonthlySummaries();
-
             // Get all Transactions for year
             Transactions = await Repo.GetTransactionsByTypeMonth([], Year, 0);
 
-            CreateSummaryDetails();
+            CreateMonthlySummaries();
             RemoveZeroTransactionsSummaryDetails();
             StateHasChanged();
         }
@@ -72,7 +70,7 @@ namespace Book.Pages
                     MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i),
                     MonthNameFull = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
                     MonthNo = i,
-                    SummaryDetails = []
+                    SummaryDetails = CreateSummaryDetails(i),
                 });
             }
 
@@ -82,60 +80,46 @@ namespace Book.Pages
                 MonthName = "Total",
                 MonthNameFull = Year.ToString(),
                 MonthNo = 0,
-                SummaryDetails = []
+                SummaryDetails = CreateSummaryDetails(0),
             });
         }
 
-        private void CreateSummaryDetails()
+        private List<SummaryDetail> CreateSummaryDetails(int monthNo)
         {
-            foreach (MonthlySummary monthlySummary in MonthlySummaries)
+            List<SummaryDetail> summaryDetails = [];
+
+            SetDates(monthNo);
+
+            // Total Summary (column)
+            var total = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate).Sum(t => t.Value) * -1;
+
+            summaryDetails.Add(new SummaryDetail()
             {
-                SetDates(monthlySummary.MonthNo);
+                SummaryTypeId = 0,
+                SummaryName = "Total",
+                Types = [],
+                Total = total,
+                HasTransactions = true,
+                CssClass = total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass,
+            });
 
-                // Add Total Summary (column)
-                monthlySummary.SummaryDetails.Add(new SummaryDetail()
+            // User defined Summaries
+            foreach (SummaryType summaryType in SummaryTypes)
+            {
+                total = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.Types.Contains((int)t.TransactionTypeId)).Sum(t => t.Value) * -1;
+
+                summaryDetails.Add(new SummaryDetail()
                 {
-                    SummaryTypeId = 0,
-                    SummaryName = "Total",
-                    Types = [],
-                    Total = Transactions
-                        .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate)
-                        .Sum(t => t.Value) * -1,
+                    SummaryTypeId = summaryType.SummaryTypeId,
+                    SummaryName = summaryType.Name,
+                    Types = summaryType.Types,
+                    Total = total,
+                    HasTransactions = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.Types.Contains((int)t.TransactionTypeId)).Any(),
+                    CssClass = total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass,
                 });
-
-                // Add user defined Summaries
-                foreach (SummaryType summaryType in SummaryTypes)
-                {
-                    monthlySummary.SummaryDetails.Add(new SummaryDetail()
-                    {
-                        SummaryTypeId = summaryType.SummaryTypeId,
-                        SummaryName = summaryType.Name,
-                        Types = summaryType.Types,
-                        Total = Transactions
-                        .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate
-                            && summaryType.Types.Contains((int)t.TransactionTypeId))
-                        .Sum(t => t.Value) * -1,
-                    });
-                }
-
-                // Set CSS Class and HasTransactions
-                foreach (SummaryDetail summaryDetail in monthlySummary.SummaryDetails)
-                {
-                    summaryDetail.CssClass = summaryDetail.Total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
-
-                    // Always keep the total column
-                    if (summaryDetail.SummaryTypeId != 0)
-                    {
-                        summaryDetail.HasTransactions = Transactions
-                            .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate
-                                && summaryDetail.Types.Contains((int)t.TransactionTypeId)).Any();
-                    }
-                    else
-                    {
-                        summaryDetail.HasTransactions = true;
-                    }
-                }
             }
+
+            return summaryDetails;
         }
 
         private void RemoveZeroTransactionsSummaryDetails()
