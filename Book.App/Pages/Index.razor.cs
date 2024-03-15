@@ -54,13 +54,6 @@ namespace Book.Pages
             // Get all Transactions for year
             Transactions = await Repo.GetTransactionsByTypeMonth([], Year, 0);
 
-            CreateMonthlySummaries();
-            RemoveZeroTransactionsSummaryDetails();
-            StateHasChanged();
-        }
-
-        private void CreateMonthlySummaries()
-        {
             MonthlySummaries = [];
 
             for (int i = 1; i < 13; i++)
@@ -74,7 +67,7 @@ namespace Book.Pages
                 });
             }
 
-            // Add Total to MonthlySummary (row)
+            // Add Total row
             MonthlySummaries.Add(new MonthlySummary()
             {
                 MonthName = "Total",
@@ -82,6 +75,24 @@ namespace Book.Pages
                 MonthNo = 0,
                 SummaryDetails = CreateSummaryDetails(0),
             });
+
+            // Remove Zero Transactions SummaryDetails
+            List<int> summariesToBeRemoved = [];
+
+            foreach (SummaryDetail totalDetail in MonthlySummaries[12].SummaryDetails)  // Total Row
+            {
+                if (!totalDetail.HasTransactions)
+                {
+                    summariesToBeRemoved.Add(totalDetail.SummaryTypeId);
+                }
+            }
+
+            foreach (MonthlySummary monthlySummary in MonthlySummaries)
+            {
+                monthlySummary.SummaryDetails.RemoveAll(x => summariesToBeRemoved.Contains(x.SummaryTypeId));
+            }
+
+            StateHasChanged();
         }
 
         private List<SummaryDetail> CreateSummaryDetails(int monthNo)
@@ -110,44 +121,16 @@ namespace Book.Pages
 
                 summaryDetails.Add(new SummaryDetail()
                 {
-                    SummaryTypeId = summaryType.SummaryTypeId,
-                    SummaryName = summaryType.Name,
-                    Types = summaryType.Types,
-                    Total = total,
-                    HasTransactions = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.Types.Contains((int)t.TransactionTypeId)).Any(),
-                    CssClass = total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass,
+                        SummaryTypeId = summaryType.SummaryTypeId,
+                        SummaryName = summaryType.Name,
+                        Types = summaryType.Types,
+                        Total = total,
+                        HasTransactions = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.Types.Contains((int)t.TransactionTypeId)).Any(),
+                        CssClass = total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass,
                 });
             }
 
             return summaryDetails;
-        }
-
-        private void RemoveZeroTransactionsSummaryDetails()
-        {
-            List<int> summariesToBeRemoved = [];
-
-            foreach (SummaryDetail totalDetail in MonthlySummaries[12].SummaryDetails)  // Total Row
-            {
-                if (!totalDetail.HasTransactions)
-                {
-                    summariesToBeRemoved.Add(totalDetail.SummaryTypeId);
-                }
-            }
-
-            foreach (MonthlySummary monthlySummary in MonthlySummaries)
-            {
-                monthlySummary.SummaryDetails = monthlySummary.SummaryDetails
-                    .Select(s => new SummaryDetail
-                        {
-                            SummaryTypeId = s.SummaryTypeId,
-                            SummaryName = s.SummaryName,
-                            Types = s.Types,
-                            Total = s.Total,
-                            CssClass = s.CssClass
-                        })
-                    .Where(s => !summariesToBeRemoved.Contains(s.SummaryTypeId))
-                    .ToList();
-            }
         }
 
         private void SetDates(int monthNo)
