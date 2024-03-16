@@ -21,6 +21,10 @@ namespace Book.Pages
 
         public IEnumerable<SummaryType> SummaryTypes { get; set; }
 
+        public record MonthlySummary(string MonthName, string MonthNameFull, int MonthNo, List<SummaryDetail> SummaryDetails);
+
+        public record SummaryDetail(int SummaryTypeId, string SummaryName, List<int> Types, decimal Total, string CssClass, bool HasTransactions);
+
         public List<MonthlySummary> MonthlySummaries { get; set; }
 
         private IEnumerable<Transaction> Transactions { get; set; }
@@ -58,23 +62,11 @@ namespace Book.Pages
 
             for (int i = 1; i < 13; i++)
             {
-                MonthlySummaries.Add(new MonthlySummary()
-                {
-                    MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i),
-                    MonthNameFull = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
-                    MonthNo = i,
-                    SummaryDetails = CreateSummaryDetails(i),
-                });
+                MonthlySummaries.Add(new MonthlySummary(CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i), CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i), i, CreateSummaryDetails(i)));
             }
 
             // Add Total row
-            MonthlySummaries.Add(new MonthlySummary()
-            {
-                MonthName = "Total",
-                MonthNameFull = Year.ToString(),
-                MonthNo = 0,
-                SummaryDetails = CreateSummaryDetails(0),
-            });
+            MonthlySummaries.Add(new MonthlySummary("Total", Year.ToString(), 0, CreateSummaryDetails(0)));
 
             // Remove Zero Transactions SummaryDetails
             List<int> summariesToBeRemoved = MonthlySummaries[12].SummaryDetails.Where(s => !s.HasTransactions).Select(s => s.SummaryTypeId).ToList();
@@ -96,30 +88,14 @@ namespace Book.Pages
             // Total Summary (column)
             var total = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate).Sum(t => t.Value) * -1;
 
-            summaryDetails.Add(new SummaryDetail()
-            {
-                SummaryTypeId = 0,
-                SummaryName = "Total",
-                Types = [],
-                Total = total,
-                HasTransactions = true,
-                CssClass = total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass,
-            });
+            summaryDetails.Add(new SummaryDetail(0, "Total", [], total, total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass, true));
 
             // User defined Summaries
             foreach (SummaryType summaryType in SummaryTypes)
             {
                 total = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.Types.Contains((int)t.TransactionTypeId)).Sum(t => t.Value) * -1;
 
-                summaryDetails.Add(new SummaryDetail()
-                {
-                        SummaryTypeId = summaryType.SummaryTypeId,
-                        SummaryName = summaryType.Name,
-                        Types = summaryType.Types,
-                        Total = total,
-                        HasTransactions = monthNo == 0 && Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.Types.Contains((int)t.TransactionTypeId)).Any(),
-                        CssClass = total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass,
-                });
+                summaryDetails.Add(new SummaryDetail(summaryType.SummaryTypeId, summaryType.Name, summaryType.Types, total, total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass, monthNo == 0 && Transactions.Any(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.Types.Contains((int)t.TransactionTypeId))));
             }
 
             return summaryDetails;
@@ -226,7 +202,7 @@ namespace Book.Pages
 
         protected async void TransList(string summaryName, List<int> types, int month)
         {
-            string typesString = (types != null && types.Count > 0) ? typesString = string.Join(",", types) : String.Empty;
+            string typesString = (types != null && types.Count > 0) ? typesString = string.Join(",", types) : string.Empty;
 
             var parameters = new DialogParameters<TransListDialog>
             {
@@ -247,31 +223,4 @@ namespace Book.Pages
         }
 
     }
-
-    public class MonthlySummary
-    {
-        public string MonthName { get; set; }
-
-        public string MonthNameFull { get; set; }
-
-        public int MonthNo { get; set; }
-
-        public List<SummaryDetail> SummaryDetails { get; set; }
-    }
-
-    public class SummaryDetail
-    {
-        public int SummaryTypeId { get; set; }
-
-        public string SummaryName { get; set; }
-
-        public List<int> Types { get; set; }
-
-        public decimal Total { get; set; }
-
-        public string CssClass { get; set; }
-
-        public bool HasTransactions { get; set; }
-    }
-
 }
