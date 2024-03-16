@@ -77,15 +77,7 @@ namespace Book.Pages
             });
 
             // Remove Zero Transactions SummaryDetails
-            List<int> summariesToBeRemoved = [];
-
-            foreach (SummaryDetail totalDetail in MonthlySummaries[12].SummaryDetails)  // Total Row
-            {
-                if (!totalDetail.HasTransactions)
-                {
-                    summariesToBeRemoved.Add(totalDetail.SummaryTypeId);
-                }
-            }
+            List<int> summariesToBeRemoved = MonthlySummaries[12].SummaryDetails.Where(s => !s.HasTransactions).Select(s => s.SummaryTypeId).ToList();
 
             foreach (MonthlySummary monthlySummary in MonthlySummaries)
             {
@@ -125,7 +117,7 @@ namespace Book.Pages
                         SummaryName = summaryType.Name,
                         Types = summaryType.Types,
                         Total = total,
-                        HasTransactions = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.Types.Contains((int)t.TransactionTypeId)).Any(),
+                        HasTransactions = monthNo == 0 && Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.Types.Contains((int)t.TransactionTypeId)).Any(),
                         CssClass = total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass,
                 });
             }
