@@ -15,7 +15,7 @@
             </MudTooltip>
         </MudStack>
 
-        <MudTable Class="mt-0" ServerData="@(new Func<TableState, Task<TableData<Transaction>>>(ServerReload))" Dense="true" Hover="true" @ref="table" SortLabel="Sort By" AllowUnsorted="false" >
+        <MudTable Class="mt-0" ServerData="@(new Func<TableState, Task<TableData<Transaction>>>(ServerReload))" Dense="true" Hover="true" @ref="table" SortLabel="Sort By" AllowUnsorted="false" Breakpoint="Breakpoint.Sm" >
             <ToolBarContent>
                 <MudText >Entries</MudText>
                 <MudSpacer />
@@ -46,7 +46,7 @@
                 <MudText>Loading Entries...</MudText>
             </LoadingContent>
             <PagerContent>
-                <MudTablePager PageSizeOptions="new int[] { 8, 30, int.MaxValue }" HorizontalAlignment="HorizontalAlignment.Center" />
+                <MudTablePager PageSizeOptions="new int[] { 5, 10, 50, int.MaxValue }" HorizontalAlignment="HorizontalAlignment.Center" />
             </PagerContent>
         </MudTable>
 

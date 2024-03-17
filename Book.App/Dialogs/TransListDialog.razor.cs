@@ -51,7 +51,8 @@ namespace Book.Dialogs
         {
             if (Mode < 1 || Mode > 3) Close();
 
-            MudDialog.Options.MaxWidth = MaxWidth.ExtraLarge;
+            MudDialog.Options.MaxWidth = MaxWidth.Large;
+            MudDialog.Options.FullWidth = true;
             MudDialog.Options.NoHeader = true;
 
             MudDialog.SetOptions(MudDialog.Options);
