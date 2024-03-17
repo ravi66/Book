@@ -23,13 +23,15 @@ namespace Book.Dialogs
 
         private IEnumerable<Transaction> NewTransactions { get; set; } = [];
 
+        public record Frequency(int FrequencyID, string FrequencyName);
+
         private List<Frequency> Frequencies { get; set; } = [
-                new Frequency(){ FrequencyID = 3, FrequencyName = "Yearly"},
-                new Frequency(){ FrequencyID = 2, FrequencyName = "Quaterly"},
-                new Frequency(){ FrequencyID = 5, FrequencyName = "Bi-Monthly"},
-                new Frequency(){ FrequencyID = 1, FrequencyName = "Monthly"},
-                new Frequency(){ FrequencyID = 4, FrequencyName = "Weekly"},
-                new Frequency(){ FrequencyID = 6, FrequencyName = "Daily"},
+                new Frequency(3, "Yearly"),
+                new Frequency(2, "Quaterly"),
+                new Frequency(5, "Bi-Monthly"),
+                new Frequency(1, "Monthly"),
+                new Frequency(4, "Weekly"),
+                new Frequency(6, "Daily"),
             ];
 
         private string DialogTitle { get; set; }
@@ -50,7 +52,7 @@ namespace Book.Dialogs
             MudDialog.Options.NoHeader = true;
             MudDialog.SetOptions(MudDialog.Options);
 
-            SelectedFrequency = Frequencies.FirstOrDefault(f => f.FrequencyID == 3);
+            SelectedFrequency = Frequencies.First(f => f.FrequencyID == 3);
             EndDate = new DateTime(await BookSettingSvc.GetEndYear(), 12, 31);
             DialogTitle = $"Copy {TransactionToCopy.Value:C2} {TransactionToCopy.TransactionType.Name} entry";
 
@@ -99,20 +101,15 @@ namespace Book.Dialogs
         {
             if (!NewTransactions.Any()) return;
 
-            string confirmText = NewTransactions.Count() > 1 ? $"<h4>Create {NewTransactions.Count()} Entries?</h4>" : $"<h4>Create 1 Entry?</h4>";
-
             var parameters = new DialogParameters<ConfirmDialog>
             {
                 { x => x.ConfirmationTitle, "Copy Entry" },
-                { x => x.ConfirmationMessage, confirmText },
+                { x => x.ConfirmationMessage, NewTransactions.Count() > 1 ? $"<h4>Create {NewTransactions.Count()} Entries?</h4>" : $"<h4>Create 1 Entry?</h4>" },
                 { x => x.CancelColorInt, 0 },
                 { x => x.DoneColorInt, 1 }
             };
 
-            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters);
-            var result = await dialog.Result;
-
-            if (result.Canceled) return;
+            if ((await DialogService.Show<ConfirmDialog>("Confirm", parameters).Result).Canceled) return;
             
             await Repo.AddTransactions(NewTransactions);
 
@@ -148,14 +145,6 @@ namespace Book.Dialogs
                 _ => NewDate.AddMonths(1),
             };
         }
-
-    }
-
-    public class Frequency
-    {
-        public int FrequencyID { get; set; }
-
-        public string FrequencyName { get; set; }
 
     }
 }

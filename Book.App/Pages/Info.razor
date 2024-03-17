@@ -4,19 +4,22 @@
 <PageTitle>@BookName - Info</PageTitle>
 
 <MudText Typo="Typo.h4" GutterBottom="true">
-    <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" /> Book @Version
+    <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" />&nbsp;Book @Version Visited @VisitCount times
 </MudText>
 
 <MudStack Class="mb-4">
 
     <MudPaper Class="pa-4" Elevation="5">
         <MudText Typo="Typo.h5" >
-            Book enables the recording of Entries via the New Entry button (top middle) while the
-            Summary page shows monthly balances. An Entry has a Type, these Types are collated into 
-            Summaries that are used as columns on the Summary page. You can add Summaries by pressing
-            the menu button (top left) and then the Types option. This page also lets you create and
-            edit Entry Types.
+            Book enables the recording of Entries via the New Entry button while the Summary (Home)
+            page shows monthly balances. An Entry has a Type, these Types are collated into Summaries
+            that are used as columns on the Summary page. You can add Summaries by pressing the menu
+            button and then the Types option. This page also lets you create and edit Entry Types.
         </MudText>
+    </MudPaper>
+
+    <MudPaper Class="pa-4" Elevation="5">
+        <MudText Typo="Typo.h4">Credtis</MudText>
     </MudPaper>
 
     <MudPaper Class="pa-2" Elevation="5">
@@ -118,12 +121,21 @@
 {
     [Inject] internal BookSettingSvc BookSettingSvc { get; set; }
 
+    [Inject] public NavigationManager NavigationManager { get; set; }
+
+    [Inject] HttpClient HttpClient { get; set; }
+
+    private string Version { get; set; } = Constants.BookVersion; 
+
     private string BookName { get; set; } = "Book";
 
-    private string Version { get; set; } = Constants.BookVersion;
+    private int VisitCount { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
         BookName = await BookSettingSvc.GetBookName();
+
+        VisitsCounter visitsCounter = new(HttpClient, new Uri(NavigationManager.Uri).Host);
+        VisitCount = await visitsCounter.GetVisitsCount();
     }
 }

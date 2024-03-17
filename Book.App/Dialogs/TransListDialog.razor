@@ -9,21 +9,18 @@
         <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
             <MudText Typo="Typo.h5">@DialogTitle</MudText>
             <MudSpacer />
-            <MudHidden Breakpoint="Breakpoint.Xs" Invert="false">
-                <MudTextField Class="flex-grow-0 mt-0 " T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Filter" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" DisableUnderLine="true" ></MudTextField>
-                <MudSpacer />
-            </MudHidden>
             <TransactionBtn IsIcon="true" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
             <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
                 <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
             </MudTooltip>
         </MudStack>
 
-        <MudHidden Breakpoint="Breakpoint.Xs" Invert="true">
-            <MudTextField Class="flex-grow-0 mt-0 " T="string" ValueChanged="@(s=>OnSearch(s))" Placeholder="Filter" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" DisableUnderLine="true" ></MudTextField>
-        </MudHidden>
-
-        <MudTable Class="pa-0" ServerData="@(new Func<TableState, Task<TableData<Transaction>>>(ServerReload))" Dense="true" Hover="true" @ref="table" SortLabel="Sort By" AllowUnsorted="false" >
+        <MudTable Class="mt-0" ServerData="@(new Func<TableState, Task<TableData<Transaction>>>(ServerReload))" Dense="true" Hover="true" @ref="table" SortLabel="Sort By" AllowUnsorted="false" >
+            <ToolBarContent>
+                <MudText >Entries</MudText>
+                <MudSpacer />
+                <MudTextField Variant="Variant.Outlined" Clearable="true" T="string" ValueChanged="@(e => OnSearch(e))" DisableUnderLine="true" Margin="Margin.Dense" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small" ></MudTextField>
+            </ToolBarContent>
             <HeaderContent>
                 <MudTh><MudTableSortLabel SortLabel="type_field" T="Transaction" >Type</MudTableSortLabel></MudTh>
                 <MudTh><MudTableSortLabel SortLabel="value_field" T="Transaction" >Value</MudTableSortLabel></MudTh>

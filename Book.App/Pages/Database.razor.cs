@@ -40,9 +40,7 @@ namespace Book.Pages
             BookDownloadUrl = await GetDownloadUrl();
         }
 
-        public async ValueTask<string?> GetDownloadUrl() =>
-            jsModule is not null ?
-                await jsModule.InvokeAsync<string>("generateDownloadUrl") : null;
+        public async ValueTask<string?> GetDownloadUrl() => jsModule is not null ? await jsModule.InvokeAsync<string>("generateDownloadUrl") : null;
 
         private async void UploadDb(InputFileChangeEventArgs e)
         {
@@ -63,10 +61,7 @@ namespace Book.Pages
 
             var options = new DialogOptions() { NoHeader = true };
 
-            var dialog = DialogService.Show<ConfirmDialog>("Confirm", parameters, options);
-            var result = await dialog.Result;
-
-            if (!result.Canceled)
+            if (!(await DialogService.Show<ConfirmDialog>("Confirm", parameters, options).Result).Canceled)
             {
                 var success = await jsModule.InvokeAsync<bool>("deleteDatabase");
                 if (success) NavigationManager.NavigateTo("/", true);
@@ -85,8 +80,7 @@ namespace Book.Pages
             using HttpResponseMessage response = await HttpClient.GetAsync("Demo.bin");
             if (response.IsSuccessStatusCode)
             {
-                var fileContent = await response.Content.ReadAsByteArrayAsync();
-                await jsModule.InvokeVoidAsync("uploadDatabase", fileContent);
+                await jsModule.InvokeVoidAsync("uploadDatabase", (byte[]?)await response.Content.ReadAsByteArrayAsync());
                 NavigationManager.NavigateTo("/", true);
             }
         }

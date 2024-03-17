@@ -76,13 +76,7 @@ namespace Book.Dialogs
         {
             await Task.Yield();
 
-            if (string.IsNullOrEmpty(searchValue))
-            {
-                return TransactionTypes;
-            }
-
-            return TransactionTypes
-                .Where(t => t.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
+            return string.IsNullOrEmpty(searchValue) ? (IEnumerable<TransactionType>)TransactionTypes : TransactionTypes.Where(t => t.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
         }
 
     }

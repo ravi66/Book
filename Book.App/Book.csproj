@@ -31,6 +31,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="MudBlazor" Version="6.17.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.8" />
     <PackageReference Include="SqliteWasmHelper" Version="1.2.0-beta-gf8e1db1f31" />
     <PackageReference Include="System.Net.Http.Json" Version="8.0.0" />

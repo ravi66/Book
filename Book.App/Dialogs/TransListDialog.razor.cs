@@ -45,8 +45,6 @@ namespace Book.Dialogs
 
         private string DialogTitle { get; set; } = "Loading Entries...";
 
-        private string MonthName { get; set; }
-
         void Close() => MudDialog.Cancel();
 
         protected override async Task OnInitializedAsync()
@@ -59,9 +57,9 @@ namespace Book.Dialogs
             MudDialog.SetOptions(MudDialog.Options);
 
             if ((Mode == 1 || Mode == 2) && Name == "Total") Name = "";
-            if (Mode == 3) TypesString = String.Empty;
+            if (Mode == 3) TypesString = string.Empty;
 
-            Types = TypesString != String.Empty ? TypesString.Split(',').Select(int.Parse).ToList() : [];
+            Types = TypesString != string.Empty ? TypesString.Split(',').Select(int.Parse).ToList() : [];
 
             MessageSvc.TransactionsChanged += () => TransactionsChanged(MessageSvc.TransactionYears);
         }
@@ -70,18 +68,20 @@ namespace Book.Dialogs
         {
             await Busy();
 
+            Transactions = [];
+
             switch (Mode)
             {
                 case 1:
                     Transactions = await Repo.GetTransactionsByTypeMonth(Types, Year, Month);
                     break;
-
                 case 2:
                     Transactions = await Repo.GetTransactionsBySummary(Types);
                     break;
-
                 case 3:
                     Transactions = await Repo.GetTransactionsByType(TransactionTypeId);
+                    break;
+                default:
                     break;
             }
 
@@ -118,12 +118,14 @@ namespace Book.Dialogs
                 case "notes_field":
                     Transactions = Transactions.OrderByDirection(state.SortDirection, t => t.Notes);
                     break;
+                default:
+                    break;
             }
 
             pagedData = Transactions.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
             return new TableData<Transaction>() { TotalItems = Transactions.Count(), Items = pagedData };
         }
-        
+
         private async Task Busy()
         {
             Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomStart;
@@ -146,15 +148,7 @@ namespace Book.Dialogs
             switch (Mode)
             {
                 case 1:
-                    if (Month > 0)
-                    {
-                        MonthName = new DateTime(2020, Month, 1).ToString("MMMM");
-                        DialogTitle = $"{Name} {entryOrEntries} in {MonthName}, {Year}";
-                    }
-                    else
-                    {
-                        DialogTitle = $"{Name} {entryOrEntries} in {Year}";
-                    }
+                    DialogTitle = Month > 0 ? $"{Name} {entryOrEntries} in {new DateTime(2020, Month, 1):MMMM}, {Year}" : DialogTitle = $"{Name} {entryOrEntries} in {Year}";
                     break;
 
                 case 2:

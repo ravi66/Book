@@ -12,14 +12,14 @@
         <MudText Typo="Typo.h4">&nbsp;Summaries</MudText>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh />
+        <MudTh>Tools</MudTh>
         <MudTh><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<SummaryType, object>(x=>x.Order)">Order</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.CreateDate)">Created</MudTableSortLabel></MudTh>
         <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd>
+        <MudTd DataLabel="Tools">
             <MudTooltip Text="Edit Summary Type" Delay="500" Duration="0" ShowOnFocus="false" >
                 <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" aria-label="edit summary type" OnClick="() => EditSType(context.SummaryTypeId)" />
             </MudTooltip>
@@ -58,10 +58,10 @@
                             <MudTooltip Text="New Entry Type" Delay="500" Duration="0" ShowOnFocus="false">
                                 <MudIconButton Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => AddTransactionType(context.SummaryTypeId)" aria-label="create entry type" />
                             </MudTooltip>
-                            <MudText Typo="Typo.h5">&nbsp;Entry Types for <strong>@context.Name</strong></MudText>
+                            <MudText Typo="Typo.h5">&nbsp;<strong>@context.Name</strong> Entry Types</MudText>
                         </ToolBarContent>
                         <HeaderContent>
-                            <MudTh />
+                            <MudTh>Tools</MudTh>
                             <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<TransactionType, object>(x=>x.Name)">Name</MudTableSortLabel></MudTh>
                             <MudTh><MudTableSortLabel SortBy="new Func<TransactionType, object>(x=>x.CreateDate)">Created</MudTableSortLabel></MudTh>
                         </HeaderContent>

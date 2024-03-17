@@ -4,6 +4,7 @@
 @using Book.Services;
 @using Book.Dialogs;
 @using Book.Buttons;
+@using Book.Shared;
 
 <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
 <MudDialogProvider />
@@ -53,6 +54,10 @@
 
     [Inject] public BookDbMigratorSvc DbMigrator { get; set; }
 
+    [Inject] public NavigationManager NavigationManager { get; set; }
+
+    [Inject] HttpClient HttpClient { get; set; }
+
     private bool _isDarkMode = true;
     private string themeIcon = Icons.Material.Filled.LightMode;
     private string themeText = "Light Mode";
@@ -71,6 +76,9 @@
 
         _isDarkMode = await BookSettingSvc.GetDarkMode();
         SetTheme();
+
+        VisitsCounter visitsCounter = new(HttpClient, new Uri(NavigationManager.Uri).Host);
+        await visitsCounter.UpdateVisitsCount();
     }
 
     void ToggleDrawer()
@@ -91,5 +99,4 @@
         themeIcon = _isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
         themeText = _isDarkMode ? "Light Mode" : "Dark Mode";
     }
-
-}
+}|

@@ -62,15 +62,7 @@ namespace Book.Pages
 
         private async Task EditSType(int summaryTypeId)
         {
-            var parameters = new DialogParameters<STypeDialog>
-            {
-                { x => x.SavedSummaryTypeId, summaryTypeId }
-            };
-
-            var dialog = DialogService.Show<STypeDialog>("Edit Summary Type", parameters);
-            var result = await dialog.Result;
-
-            if (!result.Canceled) await LoadSummaryTypes();
+            if (!(await DialogService.Show<STypeDialog>("Edit Summary Type", new DialogParameters<STypeDialog>{ { x => x.SavedSummaryTypeId, summaryTypeId } }).Result).Canceled) await LoadSummaryTypes();
         }
 
         private void ShowTransactionTypeBtnPress(int summaryTypeId)
@@ -81,40 +73,17 @@ namespace Book.Pages
 
         private async Task AddTransactionType(int summaryTypeId)
         {
-            var parameters = new DialogParameters<TTypeDialog>
-            {
-                { x => x.NewSummaryTypeId, summaryTypeId }
-            };
-
-            var dialog = DialogService.Show<TTypeDialog>("New Entry Type", parameters);
-            var result = await dialog.Result;
-
-            if (!result.Canceled) await LoadSummaryTypes();
+            if (!(await DialogService.Show<TTypeDialog>("New Entry Type", new DialogParameters<TTypeDialog>{ { x => x.NewSummaryTypeId, summaryTypeId } }).Result).Canceled) await LoadSummaryTypes();
         }
 
         protected async Task ListTransactionsTType(TransactionType transactionType)
         {
-            var parameters = new DialogParameters<TransListDialog>
-            {
-                { x => x.Mode, 3 },
-                { x => x.Name, transactionType.Name },
-                { x => x.TransactionTypeId, transactionType.TransactionTypeId }
-            };
-
-            DialogService.Show<TransListDialog>("Entries List", parameters);
+            DialogService.Show<TransListDialog>("Entries List", new DialogParameters<TransListDialog>{ { x => x.Mode, 3 }, { x => x.Name, transactionType.Name }, { x => x.TransactionTypeId, transactionType.TransactionTypeId } });
         }
 
         protected async Task EditTType(int transactionTypeId)
         {
-            var parameters = new DialogParameters<TTypeDialog>
-            {
-                { x => x.SavedTransactionTypeId, transactionTypeId },
-            };
-
-            var dialog = DialogService.Show<TTypeDialog>("Edit Entry Type", parameters);
-            var result = await dialog.Result;
-
-            if (!result.Canceled) await LoadSummaryTypes();
+            if (!(await DialogService.Show<TTypeDialog>("Edit Entry Type", new DialogParameters<TTypeDialog>{ { x => x.SavedTransactionTypeId, transactionTypeId }, }).Result).Canceled) await LoadSummaryTypes();
         }
 
         private void TransactionsChanged(List<int> _1)
