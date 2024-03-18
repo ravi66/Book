@@ -11,7 +11,7 @@ namespace Book.Pages
 
         [Inject] public NavigationManager NavigationManager { get; set; }
 
-        [Inject] internal BookSettingSvc BookSettingSvc { get; set; }
+        [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
         [Inject] internal IBookSettingRepository Repo { get; set; }
 

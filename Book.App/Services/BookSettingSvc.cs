@@ -2,7 +2,7 @@
 
 namespace Book.Services
 {
-    internal class BookSettingSvc(IBookSettingRepository repo)
+    internal class BookSettingSvc(IBookSettingRepository repo) : IBookSettingSvc
     {
         private BookSetting? BookSetting { get; set; }
 

@@ -17,7 +17,7 @@ namespace Book.Dialogs
 
         [Inject] internal ITransactionRepository Repo { get; set; }
 
-        [Inject] internal BookSettingSvc BookSettingSvc { get; set; }
+        [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
         private Transaction TransactionToCopy { get; set; }
 

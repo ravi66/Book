@@ -48,11 +48,11 @@
 
 @code
 {
-    [Inject] internal BookSettingSvc BookSettingSvc { get; set; }
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
     [Inject] public IDialogService DialogService { get; set; }
 
-    [Inject] public BookDbMigratorSvc DbMigrator { get; set; }
+    [Inject] public IBookDbMigratorSvc DbMigrator { get; set; }
 
     [Inject] public NavigationManager NavigationManager { get; set; }
 

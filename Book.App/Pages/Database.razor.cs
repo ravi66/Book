@@ -16,7 +16,7 @@ namespace Book.Pages
 
         [Inject] public IDialogService DialogService { get; set; }
 
-        [Inject] internal BookSettingSvc BookSettingSvc { get; set; }
+        [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
         [Inject] HttpClient HttpClient { get; set; }
 
