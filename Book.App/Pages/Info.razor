@@ -3,9 +3,22 @@
 
 <PageTitle>@BookName - Info</PageTitle>
 
-<MudText Typo="Typo.h4" GutterBottom="true">
-    <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" />&nbsp;Book @Version Visited @VisitCount times
-</MudText>
+<MudPaper Class="pa-2" Elevation="5">
+    <MudGrid Class="align-center">
+        <MudItem>
+            <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" Size="Size.Large" />
+        </MudItem>
+        <MudItem>
+            <MudText Typo="Typo.h4">Book @Version</MudText>
+        </MudItem>
+        @if (VisitCount > -1)
+        {
+            <MudItem>
+                <MudText Typo="Typo.h4">Visited @VisitCount times</MudText>
+            </MudItem>
+        }
+    </MudGrid>
+</MudPaper>
 
 <MudStack Class="mb-4">
 
@@ -19,7 +32,7 @@
     </MudPaper>
 
     <MudPaper Class="pa-4" Elevation="5">
-        <MudText Typo="Typo.h4">Credtis</MudText>
+        <MudText Typo="Typo.h4">Credits</MudText>
     </MudPaper>
 
     <MudPaper Class="pa-2" Elevation="5">

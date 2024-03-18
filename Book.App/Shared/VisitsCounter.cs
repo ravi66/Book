@@ -4,8 +4,6 @@ namespace Book.Shared
 {
     public class VisitsCounter (HttpClient HttpClient, string Host)
     {
-        public string VisitsCountUriBase = "https://api.counterapi.dev/v1/RavsBook/";
-
         HttpResponseMessage HttpResponse { get; set; }
 
         record CounterContent(int Id, string Name, int Count);
@@ -14,14 +12,31 @@ namespace Book.Shared
         {
             using var cts = new CancellationTokenSource();
             cts.CancelAfter(TimeSpan.FromSeconds(15));
-            _ = await HttpClient.GetAsync($"{VisitsCountUriBase}{Host}/up", cts.Token);
+
+            try
+            {
+                _ = await HttpClient.GetAsync($"{Constants.VisitsCountBaseUri}{Host}/up", cts.Token);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         public async Task<int> GetVisitsCount()
         {
             using var cts = new CancellationTokenSource();
             cts.CancelAfter(TimeSpan.FromSeconds(15));
-            HttpResponse = await HttpClient.GetAsync($"{VisitsCountUriBase}{Host}", cts.Token);
+
+            try
+            {
+                HttpResponse = await HttpClient.GetAsync($"{Constants.VisitsCountBaseUri}{Host}", cts.Token);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return -1;
+            }
 
             if (HttpResponse.IsSuccessStatusCode)
             {
