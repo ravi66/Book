@@ -7,21 +7,59 @@ namespace Book.Models
     {
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            /*
+             * Summaries
+             */
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = -1, Order = 9999, Name = "Unknown", CreateDate = DateTime.Today });
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 1, Order = 1, Name = "Food", CreateDate = DateTime.Today });
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 2, Order = 2, Name = "Fun", CreateDate = DateTime.Today });
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 3, Order = 3, Name = "Property", CreateDate = DateTime.Today });
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 4, Order = 4, Name = "Personal", CreateDate = DateTime.Today });
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 5, Order = 5, Name = "Health", CreateDate = DateTime.Today });
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 6, Order = 9, Name = "Work", CreateDate = DateTime.Today });
 
-            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = -1, Name = "Unknown", Order = 9999, CreateDate = DateTime.Today });
-            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 1, Name = "Fun", Order = 1, CreateDate = DateTime.Today });
-            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 2, Name = "Life", Order = 2, CreateDate = DateTime.Today });
-            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 3, Name = "Work", Order = 3, CreateDate = DateTime.Today });
+            /*
+             * Entry Types
+             */
 
+            // Unknown
             modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = -1, TransactionTypeId = -1,  Name = "Unknown", CreateDate = DateTime.Today });
-            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 1, TransactionTypeId = 1, Name = "Cash", CreateDate = DateTime.Today });
-            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 1, TransactionTypeId = 2, Name = "Beer", CreateDate = DateTime.Today });
-            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 2, TransactionTypeId = 3, Name = "Groceries", CreateDate = DateTime.Today });
-            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 2, TransactionTypeId = 4, Name = "Takeaway", CreateDate = DateTime.Today });
-            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 2, TransactionTypeId = 5, Name = "Rent", CreateDate = DateTime.Today });
-            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 2, TransactionTypeId = 6, Name = "Council Tax", CreateDate = DateTime.Today });
-            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 3, TransactionTypeId = 7, Name = "Wages", CreateDate = DateTime.Today });
-            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 3, TransactionTypeId = 8, Name = "Work Expenses", CreateDate = DateTime.Today });
+
+            // Food
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 1, TransactionTypeId = 1, Name = "Groceries", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 1, TransactionTypeId = 2, Name = "Takeaway", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 1, TransactionTypeId = 3, Name = "Restaurant", CreateDate = DateTime.Today });
+
+            // Fun
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 2, TransactionTypeId = 4, Name = "Alcohol", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 2, TransactionTypeId = 5, Name = "Going Out", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 2, TransactionTypeId = 6, Name = "Games", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 2, TransactionTypeId = 7, Name = "Music", CreateDate = DateTime.Today });
+
+            // Property
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 3, TransactionTypeId = 8, Name = "Rent", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 3, TransactionTypeId = 9, Name = "Council Tax", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 3, TransactionTypeId = 10, Name = "Electricity", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 3, TransactionTypeId = 11, Name = "Gas", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 3, TransactionTypeId = 12, Name = "Broadband", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 3, TransactionTypeId = 13, Name = "Mobile Phone", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 3, TransactionTypeId = 14, Name = "Water Rates", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 3, TransactionTypeId = 15, Name = "TV Licence", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 3, TransactionTypeId = 16, Name = "Household", CreateDate = DateTime.Today });
+
+            // Personal
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 4, TransactionTypeId = 17, Name = "Cash", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 4, TransactionTypeId = 18, Name = "Clothing", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 4, TransactionTypeId = 19, Name = "Holiday", CreateDate = DateTime.Today });
+
+            // Health
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 5, TransactionTypeId = 20, Name = "Prescription", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 5, TransactionTypeId = 21, Name = "Optician", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 5, TransactionTypeId = 22, Name = "Dentist", CreateDate = DateTime.Today });
+
+            // Work
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 6, TransactionTypeId = 23, Name = "Wages", CreateDate = DateTime.Today });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = 6, TransactionTypeId = 24, Name = "Work Expenses", CreateDate = DateTime.Today });
 
             base.OnModelCreating(modelBuilder);
         }

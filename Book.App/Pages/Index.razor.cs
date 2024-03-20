@@ -14,7 +14,7 @@ namespace Book.Pages
 
         [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
-        [Inject] public MessageSvc MessageSvc { get; set; }
+        [Inject] public INotifierSvc NotifierSvc { get; set; }
 
         [Inject] internal ITransactionRepository Repo { get; set; }
 
@@ -44,7 +44,7 @@ namespace Book.Pages
         {
             BookName = await BookSettingSvc.GetBookName();
 
-            MessageSvc.TransactionsChanged += () => TransactionsChanged(MessageSvc.TransactionYears);
+            NotifierSvc.TransactionsChanged += TransactionsChanged;
 
             Years = Enumerable.Range(await BookSettingSvc.GetStartYear(), await BookSettingSvc.GetEndYear() - await BookSettingSvc.GetStartYear() + 1).ToArray();
             Year = Years.Max() >= DateTime.Today.Year ? DateTime.Today.Year : Years.Max();
@@ -122,9 +122,9 @@ namespace Book.Pages
             await LoadSummary();
         }
 
-        private void TransactionsChanged(List<int> transactionYears)
+        private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
         {
-            foreach (int transactionYear in transactionYears)
+            foreach (int transactionYear in args.Years)
             {
                 if (transactionYear == Year)
                 {
@@ -219,7 +219,7 @@ namespace Book.Pages
 
         public void Dispose()
         {
-            MessageSvc.TransactionsChanged -= () => TransactionsChanged(MessageSvc.TransactionYears);
+            NotifierSvc.TransactionsChanged -= TransactionsChanged;
             GC.SuppressFinalize(this);
         }
 

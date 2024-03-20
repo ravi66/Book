@@ -11,7 +11,7 @@ namespace Book.Dialogs
 
         [Parameter] public int SavedTransactionId { get; set; }
 
-        [Inject] public MessageSvc MessageSvc { get; set; }
+        [Inject] public INotifierSvc NotifierSvc { get; set; }
 
         [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
 
@@ -67,7 +67,7 @@ namespace Book.Dialogs
 
             List<int> years = [Transaction.TransactionDate.Year];
             if (OriginalYear != 0 && OriginalYear != Transaction.TransactionDate.Year) years.Add(OriginalYear);
-            MessageSvc.ChangeTransactions(years);
+            NotifierSvc.OnTransactionsChanged(this, years);
 
             MudDialog.Close(DialogResult.Ok(true));
         }

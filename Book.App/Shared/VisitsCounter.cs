@@ -19,7 +19,9 @@ namespace Book.Shared
             }
             catch (Exception ex)
             {
+#if DEBUG
                 Console.WriteLine(ex.ToString());
+#endif
             }
         }
 
@@ -34,7 +36,9 @@ namespace Book.Shared
             }
             catch (Exception ex)
             {
+#if DEBUG
                 Console.WriteLine(ex.ToString());
+#endif
                 return -1;
             }
 

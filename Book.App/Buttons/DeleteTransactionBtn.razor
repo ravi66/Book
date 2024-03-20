@@ -19,7 +19,7 @@
 
     [Inject] internal ITransactionRepository Repo { get; set; }
 
-    [Inject] public MessageSvc MessageSvc { get; set; }
+    [Inject] public INotifierSvc NotifierSvc { get; set; }
 
     async Task DeleteTransaction()
     {
@@ -38,7 +38,7 @@
         {
             await Repo.DeleteTransaction(Transaction.TransactionId);
 
-            MessageSvc.ChangeTransactions(new List<int> { Transaction.TransactionDate.Year });
+            NotifierSvc.OnTransactionsChanged(this, new List<int> { Transaction.TransactionDate.Year });
 
             if (TransactionDialog != null) TransactionDialog.Close();
         }

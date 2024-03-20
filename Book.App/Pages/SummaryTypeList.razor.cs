@@ -14,7 +14,7 @@ namespace Book.Pages
 
         [Inject] internal ISummaryTypeRepository Repo { get; set; }
 
-        [Inject] public MessageSvc MessageSvc { get; set; }
+        [Inject] public INotifierSvc NotifierSvc { get; set; }
 
         private string BookName { get; set; } = "Book";
 
@@ -26,7 +26,7 @@ namespace Book.Pages
         {
             BookName = await BookSettingSvc.GetBookName();
 
-            MessageSvc.TransactionsChanged += () => TransactionsChanged(MessageSvc.TransactionYears);
+            NotifierSvc.TransactionsChanged += TransactionsChanged;
 
             await LoadSummaryTypes();
         }
@@ -86,7 +86,7 @@ namespace Book.Pages
             if (!(await DialogService.Show<TTypeDialog>("Edit Entry Type", new DialogParameters<TTypeDialog>{ { x => x.SavedTransactionTypeId, transactionTypeId }, }).Result).Canceled) await LoadSummaryTypes();
         }
 
-        private void TransactionsChanged(List<int> _1)
+        private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
         {
             // Reload regardless of year
             LoadSummaryTypes();
@@ -94,7 +94,7 @@ namespace Book.Pages
 
         public void Dispose()
         {
-            MessageSvc.TransactionsChanged -= () => TransactionsChanged(MessageSvc.TransactionYears);
+            NotifierSvc.TransactionsChanged -= TransactionsChanged;
             GC.SuppressFinalize(this);
         }
 

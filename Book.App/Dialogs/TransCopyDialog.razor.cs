@@ -13,7 +13,7 @@ namespace Book.Dialogs
 
         [Inject] public IDialogService DialogService { get; set; }
 
-        [Inject] public MessageSvc MessageSvc { get; set; }
+        [Inject] public INotifierSvc NotifierSvc { get; set; }
 
         [Inject] internal ITransactionRepository Repo { get; set; }
 
@@ -120,7 +120,7 @@ namespace Book.Dialogs
                 if (years.IndexOf(transaction.TransactionDate.Year) == -1) years.Add(transaction.TransactionDate.Year);
             }
 
-            MessageSvc.ChangeTransactions(years);
+            NotifierSvc.OnTransactionsChanged(this, years);
 
             MudDialog.Cancel();
         }

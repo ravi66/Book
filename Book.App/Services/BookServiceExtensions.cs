@@ -12,7 +12,7 @@ namespace Book.Services
             services.AddSingleton<ITransactionTypeRepository, TransactionTypeRepository>();
             services.AddSingleton<ITransactionRepository, TransactionRepository>();
             services.AddSingleton<IBookSettingSvc, BookSettingSvc>();
-            services.AddSingleton<MessageSvc>();
+            services.AddSingleton<INotifierSvc, NotifierSvc>();
 
             return services;
         }

@@ -28,7 +28,7 @@ namespace Book.Dialogs
 
         [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
-        [Inject] public MessageSvc MessageSvc { get; set; }
+        [Inject] public INotifierSvc NotifierSvc { get; set; }
 
         [Inject] public ISnackbar Snackbar { get; set; }
 
@@ -63,7 +63,7 @@ namespace Book.Dialogs
 
             Types = TypesString != string.Empty ? TypesString.Split(',').Select(int.Parse).ToList() : [];
 
-            MessageSvc.TransactionsChanged += () => TransactionsChanged(MessageSvc.TransactionYears);
+            NotifierSvc.TransactionsChanged += TransactionsChanged;
         }
 
         private async Task<TableData<Transaction>> ServerReload(TableState state)
@@ -176,7 +176,7 @@ namespace Book.Dialogs
             table.ReloadServerData();
         }
 
-        private void TransactionsChanged(List<int> _1)
+        private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
         {
             // Reload regardless of Year
             table.ReloadServerData();
@@ -189,7 +189,7 @@ namespace Book.Dialogs
 
         public void Dispose()
         {
-            MessageSvc.TransactionsChanged -= () => TransactionsChanged(MessageSvc.TransactionYears);
+            NotifierSvc.TransactionsChanged -= TransactionsChanged;
             GC.SuppressFinalize(this);
         }
 
