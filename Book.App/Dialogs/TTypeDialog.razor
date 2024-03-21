@@ -1,7 +1,4 @@
-﻿@using System.Globalization
-@using System.ComponentModel.DataAnnotations
-@using Book.Models
-@using Book.Buttons
+﻿@implements IDisposable
 
 <MudDialog>
     <DialogContent>
@@ -31,10 +28,98 @@
         </MudTooltip>
         @if (TransactionType.TransactionCount < 1 && TransactionType.TransactionTypeId > 0)
         {
-            <DeleteTTypeBtn TransactionType="@TransactionType" Size="@Size.Medium" Variant="@Variant.Filled" TTypeDialog="@this" />
+            <DeleteTTypeBtn TransactionType="@TransactionType" Size="@Size.Medium" Variant="@Variant.Filled" />
         }
         <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
             <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
         </MudTooltip>
     </DialogActions>
 </MudDialog>
+
+@code
+{
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public int SavedTransactionTypeId { get; set; }
+
+    [Parameter] public int NewSummaryTypeId { get; set; }
+
+    [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
+
+    [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
+
+    [Inject] public INotifierSvc NotifierSvc { get; set; }
+
+    public TransactionType TransactionType { get; set; }
+
+    private List<SummaryType> SummaryTypes { get; set; }
+
+    private SummaryType SelectedSummaryType { get; set; }
+
+    private bool ValidationOk { get; set; }
+
+    private void Close() => MudDialog.Cancel();
+
+    private bool ReadOnlySummary { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        SummaryTypes = await SummaryRepo.GetAutoCompleteList();
+
+        if (SavedTransactionTypeId == 0)
+        {
+            TransactionType = new TransactionType
+                {
+                    SummaryTypeId = NewSummaryTypeId,
+                    CreateDate = DateTime.Today,
+                    SummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == NewSummaryTypeId),
+                };
+        }
+        else
+        {
+            TransactionType = await TTypeRepo.GetTransactionTypeById(SavedTransactionTypeId);
+
+            if (SavedTransactionTypeId == -1) ReadOnlySummary = true;
+        }
+
+        SelectedSummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == TransactionType.SummaryTypeId);
+
+        NotifierSvc.TransactionTypeDeleted += () => Close();
+    }
+
+    async void Save()
+    {
+        if (!ValidationOk) return;
+
+        TransactionType.SummaryTypeId = SelectedSummaryType.SummaryTypeId;
+
+        if (SavedTransactionTypeId == 0)
+        {
+            await TTypeRepo.AddTransactionType(TransactionType);
+        }
+        else
+        {
+            await TTypeRepo.UpdateTransactionType(TransactionType);
+        }
+
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private async Task<IEnumerable<SummaryType>> TypeSearch(string searchValue)
+    {
+        await Task.Yield();
+
+        if (string.IsNullOrEmpty(searchValue))
+        {
+            return SummaryTypes;
+        }
+
+        return SummaryTypes.Where(s => s.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    public void Dispose()
+    {
+        NotifierSvc.TransactionTypeDeleted -= () => Close();
+        GC.SuppressFinalize(this);
+    }
+}

@@ -1,8 +1,4 @@
-﻿using Book.Models;
-using Microsoft.EntityFrameworkCore;
-using SqliteWasmHelper;
-
-namespace Book.Services
+﻿namespace Book.Services
 {
     public class BookDbMigratorSvc(ISqliteWasmDbContextFactory<BookDbContext> dbContextFactory) : IBookDbMigratorSvc
     {

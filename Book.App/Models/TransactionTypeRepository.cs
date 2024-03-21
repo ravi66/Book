@@ -1,6 +1,4 @@
-﻿using SqliteWasmHelper;
-
-namespace Book.Models
+﻿namespace Book.Models
 {
     internal sealed class TransactionTypeRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ITransactionTypeRepository
     {

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Book.Models
+﻿namespace Book.Models
 {
     public class BookSetting
     {

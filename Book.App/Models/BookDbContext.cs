@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
-
-namespace Book.Models
+﻿namespace Book.Models
 {
     public class BookDbContext(DbContextOptions<BookDbContext> options) : DbContext(options)
     {

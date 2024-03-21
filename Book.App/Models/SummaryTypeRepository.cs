@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SqliteWasmHelper;
-
-namespace Book.Models
+﻿namespace Book.Models
 {
     internal sealed class SummaryTypeRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ISummaryTypeRepository
     {

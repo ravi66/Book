@@ -1,7 +1,4 @@
-﻿@using System.Globalization
-@using System.ComponentModel.DataAnnotations
-@using Book.Models
-@using Book.Buttons
+﻿@implements IDisposable
 
 <MudDialog>
     <DialogContent>
@@ -31,10 +28,68 @@
         </MudTooltip>
         @if (SummaryType.Types.Count < 1 && SummaryType.SummaryTypeId > 0)
         {
-            <DeleteSTypeBtn SummaryType="@SummaryType" Size="@Size.Medium" Variant="@Variant.Filled" STypeDialog="@this" />
+            <DeleteSTypeBtn SummaryType="@SummaryType" Size="@Size.Medium" Variant="@Variant.Filled" />
         }
         <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
             <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
         </MudTooltip>
     </DialogActions>
 </MudDialog>
+
+@code
+{
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public int SavedSummaryTypeId { get; set; }
+
+    [Inject] internal ISummaryTypeRepository Repo { get; set; }
+
+    [Inject] public INotifierSvc NotifierSvc { get; set; }
+
+    public SummaryType SummaryType { get; set; }
+
+    private bool ValidationOk { get; set; }
+
+    void Close() => MudDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (SavedSummaryTypeId == 0)
+        {
+            SummaryType = new SummaryType
+                {
+                    CreateDate = DateTime.Today,
+                    Order = 0,
+                    Types = []
+                };
+        }
+        else
+        {
+            SummaryType = await Repo.GetSummaryTypeById(SavedSummaryTypeId);
+        }
+
+        NotifierSvc.SummaryTypeDeleted += () => Close();
+    }
+
+    async void Save()
+    {
+        if (!ValidationOk) return;
+
+        if (SavedSummaryTypeId == 0)
+        {
+            await Repo.AddSummaryType(SummaryType);
+        }
+        else
+        {
+            await Repo.UpdateSummaryType(SummaryType);
+        }
+
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    public void Dispose()
+    {
+        NotifierSvc.SummaryTypeDeleted -= () => Close();
+        GC.SuppressFinalize(this);
+    }
+}

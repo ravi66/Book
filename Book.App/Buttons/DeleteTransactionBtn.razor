@@ -1,7 +1,4 @@
-﻿@using Book.Models;
-@using Book.Services;
-
-<MudTooltip Text="Delete Entry" Delay="500" Duration="0" ShowOnFocus="false" >
+﻿<MudTooltip Text="Delete Entry" Delay="500" Duration="0" ShowOnFocus="false" >
     <MudIconButton Variant="@Variant" Size="@Size" Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="DeleteTransaction" aria-label="delete entry" />
 </MudTooltip>
 
@@ -12,8 +9,6 @@
     [Parameter] public Variant Variant { get; set; }
 
     [Parameter] public Size Size { get; set; }
-
-    [Parameter] public TransactionDialog? TransactionDialog { get; set; }
 
     [Inject] public IDialogService DialogService { get; set; }
 
@@ -39,8 +34,6 @@
             await Repo.DeleteTransaction(Transaction.TransactionId);
 
             NotifierSvc.OnTransactionsChanged(this, new List<int> { Transaction.TransactionDate.Year });
-
-            if (TransactionDialog != null) TransactionDialog.Close();
         }
     }
 }

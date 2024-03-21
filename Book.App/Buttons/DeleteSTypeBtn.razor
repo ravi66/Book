@@ -1,7 +1,4 @@
-﻿@using Book.Models;
-@using Book.Pages
-
-<MudTooltip Text="Delete Summary Type" Delay="500" Duration="0" ShowOnFocus="false" >
+﻿<MudTooltip Text="Delete Summary Type" Delay="500" Duration="0" ShowOnFocus="false" >
     <MudIconButton Variant="@Variant" Size="@Size" Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="Delete" aria-label="delete summary type" />
 </MudTooltip>
 
@@ -13,13 +10,11 @@
 
     [Parameter] public Size Size { get; set; }
 
-    [Parameter] public STypeDialog? STypeDialog { get; set; }
-
-    [Parameter] public SummaryTypeList? SummaryTypeList { get; set; }
-
     [Inject] public IDialogService DialogService { get; set; }
 
     [Inject] internal ISummaryTypeRepository Repo { get; set; }
+
+    [Inject] public INotifierSvc NotifierSvc { get; set; }
 
     async Task Delete()
     {
@@ -38,8 +33,7 @@
         {
             await Repo.DeleteSummaryType(SummaryType.SummaryTypeId);
 
-            if (STypeDialog != null) STypeDialog.CloseReload();
-            if (SummaryTypeList != null) SummaryTypeList.LoadSummaryTypes();
+            NotifierSvc.OnSummaryTypeDeleted();
         }
     }
 }

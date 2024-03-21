@@ -1,6 +1,4 @@
-﻿using Book.Models;
-
-namespace Book.Services
+﻿namespace Book.Services
 {
     internal class BookSettingSvc(IBookSettingRepository repo) : IBookSettingSvc
     {
