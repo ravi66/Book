@@ -12,8 +12,9 @@
             services.AddSingleton<IBookSettingSvc, BookSettingSvc>();
             services.AddSingleton<INotifierSvc, NotifierSvc>();
 
+            services.AddScoped<TransListSvc>();
+
             return services;
         }
-
     }
 }

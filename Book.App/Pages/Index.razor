@@ -78,6 +78,8 @@ else
 
 @code
 {
+    [Inject] public NavigationManager NavigationManager { get; set; }
+
     [Inject] public IDialogService DialogService { get; set; }
 
     [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
@@ -87,6 +89,8 @@ else
     [Inject] internal ITransactionRepository Repo { get; set; }
 
     [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
+
+    [Inject] TransListSvc TransListSvc { get; set; }
 
     public IEnumerable<SummaryType> SummaryTypes { get; set; }
 
@@ -271,18 +275,14 @@ else
 
     protected async void TransList(string summaryName, List<int> types, int month)
     {
-        string typesString = (types != null && types.Count > 0) ? typesString = string.Join(",", types) : string.Empty;
+        TransListSvc.Mode = 1;
+        TransListSvc.Name = summaryName;
+        TransListSvc.Types = types;
+        TransListSvc.Year = Year;
+        TransListSvc.Month = month;
+        TransListSvc.PreviousPage = "/";
 
-        var parameters = new DialogParameters<TransListDialog>
-            {
-                { x => x.Mode, 1 },
-                { x => x.Name, summaryName },
-                { x => x.TypesString, typesString },
-                { x => x.Year, Year },
-                { x => x.Month, month }
-            };
-
-        DialogService.Show<TransListDialog>("Entry List", parameters);
+        NavigationManager.NavigateTo("TransList", false);
     }
 
     public void Dispose()

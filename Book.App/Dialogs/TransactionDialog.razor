@@ -64,6 +64,8 @@
 
     [Inject] internal ITransactionRepository Repo { get; set; }
 
+    [Inject] IBrowserViewportService BrowserViewportService { get; set; }
+
     public Transaction Transaction { get; set; }
 
     private List<TransactionType> TransactionTypes { get; set; }
@@ -103,6 +105,8 @@
         SelectedDate = Transaction.TransactionDate;
 
         NotifierSvc.TransactionsChanged += TransactionsChanged;
+
+        await HelperMethods.MaximiseIfMobile(BrowserViewportService, MudDialog);
     }
 
     async void Save()

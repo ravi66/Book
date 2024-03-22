@@ -100,6 +100,10 @@
 
     [Inject] public INotifierSvc NotifierSvc { get; set; }
 
+    [Inject] public NavigationManager NavigationManager { get; set; }
+
+    [Inject] TransListSvc TransListSvc { get; set; }
+
     private string BookName { get; set; } = "Book";
 
     public List<SummaryType> SummaryTypes { get; set; }
@@ -125,17 +129,12 @@
 
     protected async void ListTransactionsSummary(SummaryType summary)
     {
-        string typesString = (summary.Types != null && summary.Types.Count > 0) ? typesString = string.Join(",", summary.Types) : String.Empty;
+        TransListSvc.Mode = 2;
+        TransListSvc.Name = summary.Name;
+        TransListSvc.Types = summary.Types;
+        TransListSvc.PreviousPage = "/SummaryTypeList";
 
-        var parameters = new DialogParameters<TransListDialog>
-            {
-                { x => x.Mode, 2 },
-                { x => x.Name, summary.Name },
-                { x => x.TypesString, typesString },
-                { x => x.SummaryTypeId, summary.SummaryTypeId }
-            };
-
-        DialogService.Show<TransListDialog>("Transaction List", parameters);
+        NavigationManager.NavigateTo("TransList", false);
     }
 
     private async Task AddSummaryType()
@@ -164,7 +163,12 @@
 
     protected async Task ListTransactionsTType(TransactionType transactionType)
     {
-        DialogService.Show<TransListDialog>("Entries List", new DialogParameters<TransListDialog> { { x => x.Mode, 3 }, { x => x.Name, transactionType.Name }, { x => x.TransactionTypeId, transactionType.TransactionTypeId } });
+        TransListSvc.Mode = 3;
+        TransListSvc.Name = transactionType.Name;
+        TransListSvc.TransactionTypeId = transactionType.TransactionTypeId;
+        TransListSvc.PreviousPage = "/SummaryTypeList";
+
+        NavigationManager.NavigateTo("TransList", false);
     }
 
     protected async Task EditTType(int transactionTypeId)
