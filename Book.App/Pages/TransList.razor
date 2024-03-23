@@ -3,7 +3,7 @@
 
 <PageTitle>@BookName - Entries</PageTitle>
 
-<MudPaper Class="pa-2" Elevation="5">
+<MudPaper Class="pa-2 mb-2" Elevation="5">
     <MudGrid Class="align-center">
         <MudItem Class="pa-0">
             <MudTooltip Text="Back" Delay="500" Duration="0" ShowOnFocus="false">
@@ -26,22 +26,22 @@
 </MudPaper>
 <MudTable ServerData="@(new Func<TableState, Task<TableData<Transaction>>>(ServerReload))" Dense="true" Hover="true" @ref="table" SortLabel="Sort By" AllowUnsorted="false" Breakpoint="Breakpoint.Sm" Elevation="5">
     <HeaderContent>
-        <MudTh><MudTableSortLabel SortLabel="type_field" T="Transaction">Type</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="value_field" T="Transaction">Value</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Descending" SortLabel="date_field" T="Transaction">Dated</MudTableSortLabel></MudTh>
-        <MudTh>Tools</MudTh>
-        <MudTh><MudTableSortLabel SortLabel="notes_field" T="Transaction">Notes</MudTableSortLabel></MudTh>
+        <MudTh Class="py-1" ><MudTableSortLabel SortLabel="type_field" T="Transaction">Type</MudTableSortLabel></MudTh>
+        <MudTh Class="py-1" ><MudTableSortLabel SortLabel="value_field" T="Transaction">Value</MudTableSortLabel></MudTh>
+        <MudTh Class="py-1" ><MudTableSortLabel InitialDirection="SortDirection.Descending" SortLabel="date_field" T="Transaction">Dated</MudTableSortLabel></MudTh>
+        <MudTh Class="py-1" >Tools</MudTh>
+        <MudTh Class="py-1" ><MudTableSortLabel SortLabel="notes_field" T="Transaction">Notes</MudTableSortLabel></MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Type"><MudText>@context.TransactionTypeName</MudText></MudTd>
-        <MudTd DataLabel="Value" Class="@GetValueCSS(context.Value)"><MudText>@context.Value.ToString("C2")</MudText></MudTd>
-        <MudTd DataLabel="Dated"><MudText>@context.TransactionDate.ToShortDateString()</MudText></MudTd>
-        <MudTd DataLabel="Tools">
+        <MudTd DataLabel="Type" Class="py-0" ><MudText>@context.TransactionTypeName</MudText></MudTd>
+        <MudTd DataLabel="Value" Class="@GetValueCSS(context.Value)" ><MudText>@context.Value.ToString("C2")</MudText></MudTd>
+        <MudTd DataLabel="Dated" Class="py-0" ><MudText>@context.TransactionDate.ToShortDateString()</MudText></MudTd>
+        <MudTd DataLabel="Tools" Class="py-0" >
             <TransactionBtn IsIcon="true" TransactionId="context.TransactionId" Icon="@Icons.Material.Filled.Edit" />
             <CopyTransactionBtn Transaction="@context" Variant="@Variant.Text" Size="@Size.Small" />
             <DeleteTransactionBtn Transaction="@context" Variant="@Variant.Text" Size="@Size.Small" />
         </MudTd>
-        <MudTd DataLabel="Notes"><MudText>@context.Notes</MudText></MudTd>
+        <MudTd DataLabel="Notes" Class="py-0"><MudText>@context.Notes</MudText></MudTd>
     </RowTemplate>
     <NoRecordsContent>
         <MudText>No Entries found</MudText>
@@ -216,7 +216,7 @@
 
     private static string GetValueCSS(decimal value)
     {
-        return (value <= 0) ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass;
+        return (value <= 0) ? $"{Constants.PositiveValueCssClass} py-0" : $"{Constants.NegativeValueCssClass} py-0";
     }
 
     void GoBack() => NavigationManager.NavigateTo(TransListSvc.PreviousPage, false);

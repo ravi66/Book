@@ -2,12 +2,18 @@
 
 <PageTitle>@BookName - Settings</PageTitle>
 
-<MudTable Elevation="5" Items="@BookSettings" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="SelectedBookSetting" SortLabel="Sort By" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" IsEditRowSwitchingBlocked="@BlockSwitch" EditTrigger="TableEditTrigger.EditButton" EditButtonPosition="TableEditButtonPosition.Start" ApplyButtonPosition="TableApplyButtonPosition.Start" RowEditCommit="ItemHasBeenCommitted" AllowUnsorted="false" CancelEditTooltip="Cancel" CommitEditTooltip="Save Setting" >
-    <ToolBarContent>
-        <MudText Typo="Typo.h4">
-            <MudIcon Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" /> Settings
-        </MudText>
-    </ToolBarContent>
+<MudPaper Class="pa-2" Elevation="5">
+    <MudGrid Class="align-center">
+        <MudItem>
+            <MudIcon Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" Size="Size.Large" />
+        </MudItem>
+        <MudItem Class="pa-0">
+            <MudText Typo="Typo.h5">Settings</MudText>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+<MudTable Class="mt-2 pa-2" Elevation="5" Items="@BookSettings" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="SelectedBookSetting" SortLabel="Sort By" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" IsEditRowSwitchingBlocked="@BlockSwitch" EditTrigger="TableEditTrigger.EditButton" EditButtonPosition="TableEditButtonPosition.Start" ApplyButtonPosition="TableApplyButtonPosition.Start" RowEditCommit="ItemHasBeenCommitted" AllowUnsorted="false" CancelEditTooltip="Cancel" CommitEditTooltip="Save Setting" >
     <HeaderContent>
         <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<BookSetting, object>(x=>x.SettingName)">Name</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortBy="new Func<BookSetting, object>(x=>x.SettingValue)">Value</MudTableSortLabel></MudTh>

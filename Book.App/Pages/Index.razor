@@ -55,16 +55,16 @@
             }
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Month" Class="pt-1 pb-1">
+            <MudTd DataLabel="Month" Class="py-1" >
                 <MudTooltip Text="@($"{context.MonthNameFull} expenditure chart")" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
                     <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="pt-0 pb-0"><MudText>@context.MonthName</MudText></MudButton>
-                    </MudTooltip>
-                </MudTd>
-                @foreach (var summary in context.SummaryDetails)
+                </MudTooltip>
+            </MudTd>
+            @foreach (var summary in context.SummaryDetails)
             {
-                <MudTd Style="text-align:center" DataLabel="@summary.SummaryName" Class="pt-0 pb-0">
+                <MudTd Style="text-align:center" DataLabel="@summary.SummaryName" Class="py-0" >
                     <MudLink OnClick="(e => TransList(summary.SummaryName, summary.Types, context.MonthNo))" Class="@summary.CssClass">@summary.Total.ToString("N2")</MudLink>
-                    </MudTd>
+                </MudTd>
             }
         </RowTemplate>
     </MudTable>
