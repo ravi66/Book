@@ -1,27 +1,21 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
     <MudAppBar Elevation="0" Dense="true" >
-        <MudTooltip Text="Open Menu" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
-            <MudIconButton Class="pa-0" OnClick="@ToggleDrawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Info" Edge="Edge.Start" Size="Size.Large" aria-label="menu" />
-        </MudTooltip>
+        <MudIconButton Class="pa-0" OnClick="@ToggleDrawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Info" Edge="Edge.Start" Size="Size.Large" Title="Open Menu" />
         <MudSpacer />
         <TransactionBtn IsIcon="false" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
         <MudSpacer />
-        <MudTooltip Text="More Information" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.Start" Arrow="true">
-            <MudIconButton Class="pa-0" Href="info" Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large" aria-label="more information" />
-        </MudTooltip>
+        <MudIconButton Class="pa-0" Href="info" Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large" Title="More Information" />
     </MudAppBar>
     <MudDrawer @bind-Open="@drawerOpen" Variant="DrawerVariant.Responsive" Elevation="0">
         <MudDrawerHeader Dense="true" >
             <MudStack AlignItems="AlignItems.Center" Row="true" >
-                <MudTooltip Text="Close Menu" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
-                    <MudIconButton Class="pa-0" OnClick="@ToggleDrawer" Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Info" Edge="Edge.Start" Size="Size.Large" aria-label="menu" />
-                </MudTooltip>
+                <MudIconButton Class="pa-0" OnClick="@ToggleDrawer" Icon="@Icons.Material.Filled.MenuOpen" Color="Color.Info" Edge="Edge.Start" Size="Size.Large" Title="Close Menu" />
                 <MudText Typo="Typo.h6" Class="pa-0" Color="Color.Info">@BookName</MudText>
             </MudStack>
         </MudDrawerHeader>
@@ -67,58 +61,3 @@
         </MudContainer>
     </MudMainContent>
 </MudLayout>
-
-@code
-{
-    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
-
-    [Inject] public IDialogService DialogService { get; set; }
-
-    [Inject] public IBookDbMigratorSvc DbMigrator { get; set; }
-
-    [Inject] public NavigationManager NavigationManager { get; set; }
-
-    [Inject] HttpClient HttpClient { get; set; }
-
-    private bool _isDarkMode = true;
-    private string themeIcon = Icons.Material.Filled.LightMode;
-    private string themeText = "Light Mode";
-
-    private string BookName = "Book";
-
-    private MudThemeProvider _mudThemeProvider;
-
-    private bool drawerOpen = false;
-
-    protected async override Task OnInitializedAsync()
-    {
-        await DbMigrator.EnsureDbCreated();
-
-        BookName = await BookSettingSvc.GetBookName();
-
-        _isDarkMode = await BookSettingSvc.GetDarkMode();
-        SetTheme();
-
-        VisitsCounter visitsCounter = new(HttpClient, new Uri(NavigationManager.Uri).Host);
-        await visitsCounter.UpdateVisitsCount();
-    }
-
-    void ToggleDrawer()
-    {
-        drawerOpen = !drawerOpen;
-    }
-
-    private async void ToggleThemeMode()
-    {
-        _isDarkMode = !_isDarkMode;
-        SetTheme();
-
-        await BookSettingSvc.SetDarkMode(_isDarkMode);
-    }
-
-    private void SetTheme()
-    {
-        themeIcon = _isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
-        themeText = _isDarkMode ? "Light Mode" : "Dark Mode";
-    }
-}

@@ -1,17 +1,17 @@
 ﻿@implements IDisposable
 
-<MudDialog>
+<MudDialog >
     <DialogContent>
-        <MudForm Model="@SummaryType"  @bind-IsValid="@ValidationOk">
+        <MudForm Model="@SummaryType" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0">
             <MudGrid Spacing="1" Justify="Justify.FlexStart" >
                 <MudItem xs="12" sm="6">
                     <MudPaper Elevation="5">
-                        <MudTextField Variant="Variant.Outlined" Label="Name" Margin="Margin.Dense" @bind-Value=SummaryType.Name For="@(() => SummaryType.Name)" AutoFocus="true" onFocus="this.select()" />
+                        <MudTextField Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="SummaryType.Name" For="@(() => SummaryType.Name)" Required="true" />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudPaper Elevation="5">
-                        <MudNumericField Variant="Variant.Outlined" Label="Order" Margin="Margin.Dense" @bind-Value=SummaryType.Order For="@(() => SummaryType.Order)" HideSpinButtons="true" />
+                        <MudNumericField Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="SummaryType.Order" For="@(() => SummaryType.Order)" HideSpinButtons="true" />
                     </MudPaper>
                 </MudItem>
                 <MudItem>
@@ -23,73 +23,11 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudTooltip Text="Save Summary Type" Delay="500" Duration="0" ShowOnFocus="false" >
-            <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" aria-label="save summary type" OnClick="Save" />
-        </MudTooltip>
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="Save Summary Type" OnClick="@(async () => await Save())" />
         @if (SummaryType.Types.Count < 1 && SummaryType.SummaryTypeId > 0)
         {
             <DeleteSTypeBtn SummaryType="@SummaryType" Size="@Size.Medium" Variant="@Variant.Filled" />
         }
-        <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
-            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
-        </MudTooltip>
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="quit" OnClick="Close" />
     </DialogActions>
 </MudDialog>
-
-@code
-{
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-
-    [Parameter] public int SavedSummaryTypeId { get; set; }
-
-    [Inject] internal ISummaryTypeRepository Repo { get; set; }
-
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
-
-    public SummaryType SummaryType { get; set; }
-
-    private bool ValidationOk { get; set; }
-
-    void Close() => MudDialog.Cancel();
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (SavedSummaryTypeId == 0)
-        {
-            SummaryType = new SummaryType
-                {
-                    CreateDate = DateTime.Today,
-                    Order = 0,
-                    Types = []
-                };
-        }
-        else
-        {
-            SummaryType = await Repo.GetSummaryTypeById(SavedSummaryTypeId);
-        }
-
-        NotifierSvc.SummaryTypeDeleted += () => Close();
-    }
-
-    async void Save()
-    {
-        if (!ValidationOk) return;
-
-        if (SavedSummaryTypeId == 0)
-        {
-            await Repo.AddSummaryType(SummaryType);
-        }
-        else
-        {
-            await Repo.UpdateSummaryType(SummaryType);
-        }
-
-        MudDialog.Close(DialogResult.Ok(true));
-    }
-
-    public void Dispose()
-    {
-        NotifierSvc.SummaryTypeDeleted -= () => Close();
-        GC.SuppressFinalize(this);
-    }
-}

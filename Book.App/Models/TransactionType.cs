@@ -1,4 +1,6 @@
-﻿namespace Book.Models
+﻿using FluentValidation;
+
+namespace Book.Models
 {
     public class TransactionType
     {
@@ -9,21 +11,33 @@
         public SummaryType? SummaryType { get; set; }
 
         [NotMapped]
-        [Display(Name = "Summary")]
+        [Label("Summary")]
         public string? SummaryName { get; set; }
 
-        [Required]
-        [StringLength(50, ErrorMessage = "Name is too long [50].")]
-        [Display(Name = "Name")]
+        [Label("Name")]
         public string Name { get; set; }
 
-        [Display(Name = "Created")]
+        [Label("Date Created")]
         public DateTime CreateDate { get; set; }
 
         public ICollection<Transaction>? Transactions { get; set; }
 
         [NotMapped]
         public int TransactionCount { get; set; }
+    }
 
+    public class TransactionTypeValidator : AbstractValidator<TransactionType>
+    {
+        public TransactionTypeValidator()
+        {
+            RuleFor(x => x.Name).NotEmpty().MaximumLength(50);
+        }
+
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<TransactionType>.CreateWithOptions((TransactionType)model, x => x.IncludeProperties(propertyName)));
+            if (result.IsValid) return [];
+            return result.Errors.Select(e => e.ErrorMessage);
+        };
     }
 }

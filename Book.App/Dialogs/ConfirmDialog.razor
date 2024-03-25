@@ -1,48 +1,20 @@
-﻿<MudDialog>
+﻿<MudDialog ClassContent="@ContentClass" >
     <DialogContent>
-        <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Spacing="1">
-            @((MarkupString)ConfirmationMessage)
+        @if (Warning)
+        {
+            <MudPaper Elevation="5">
+                <MudText Typo="Typo.h3" Color="Color.Warning" Align="Align.Center">WARNING</MudText>
+            </MudPaper>
+            @if (!string.IsNullOrEmpty(WarningMessage))
+            {
+                <MudPaper Elevation="5" Class="pa-2">
+                    <MudText Typo="Typo.h5" Color="Color.Warning" Align="Align.Center">@WarningMessage</MudText>
+                </MudPaper>
+            }
+        }
+        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
+            <MudFab Class="pa-2 my-1" Color="@AcceptColour" Title="@AcceptToolTip" Label="@AcceptLabel" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Accept" Size="Size.Large" />
+            <MudFab Class="pa-2 my-1" Color="@CancelColour" Title="@CancelToolTip" Label="@CancelLabel" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Close" Size="Size.Large" />
         </MudStack>
     </DialogContent>
-    <DialogActions>
-        <MudTooltip Text="Cancel" Delay="500" Duration="0" ShowOnFocus="false" >
-            <MudIconButton Icon="@Icons.Material.Filled.Cancel" OnClick="Close" Color="@CancelColor" Size="Size.Large" aria-label="cancel" />
-        </MudTooltip>
-        <MudTooltip Text="Accept" Delay="500" Duration="0" ShowOnFocus="false" >
-            <MudIconButton Icon="@Icons.Material.Filled.CheckCircle" OnClick="Done" Color="@DoneColor" Size="Size.Large" aria-label="accept" />
-        </MudTooltip>
-    </DialogActions>
 </MudDialog>
-
-@code
-{
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-
-    [Parameter] public string ConfirmationTitle { get; set; }
-
-    [Parameter] public string ConfirmationMessage { get; set; }
-
-    [Parameter] public int CancelColorInt { get; set; }
-
-    [Parameter] public int DoneColorInt { get; set; }
-
-    Color CancelColor { get; set; }
-
-    Color DoneColor { get; set; }
-
-    void Close() => MudDialog.Cancel();
-
-    void Done() => MudDialog.Close(DialogResult.Ok(true));
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (ConfirmationMessage == null || ConfirmationMessage == String.Empty) ConfirmationMessage = "Are you sure you want to?";
-        if (ConfirmationTitle != null && ConfirmationTitle != String.Empty) MudDialog.SetTitle(ConfirmationTitle);
-
-        CancelColor = CancelColorInt == 0 ? Color.Primary : Color.Secondary;
-        DoneColor = DoneColorInt == 0 ? Color.Primary : Color.Secondary;
-
-        StateHasChanged();
-    }
-
-}

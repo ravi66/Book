@@ -5,9 +5,7 @@
 
 <MudTable Elevation="5" Items="@SummaryTypes" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="SelectedSummaryType" SortLabel="Sort By" Class="pa-2" AllowUnsorted="false" >
     <ToolBarContent>
-        <MudTooltip Text="New Summary Type" Delay="500" Duration="0" ShowOnFocus="false">
-            <MudIconButton Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="AddSummaryType" aria-label="create summary" />
-        </MudTooltip>
+        <MudIconButton Icon="@Icons.Material.Filled.Summarize" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddSummaryType" Title="New Summary Type" />
         <MudText Typo="Typo.h4">&nbsp;Summaries</MudText>
     </ToolBarContent>
     <HeaderContent>
@@ -19,14 +17,10 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Tools">
-            <MudTooltip Text="Edit Summary Type" Delay="500" Duration="0" ShowOnFocus="false" >
-                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" aria-label="edit summary type" OnClick="() => EditSType(context.SummaryTypeId)" />
-            </MudTooltip>
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="Edit Summary Type" OnClick="() => EditSType(context.SummaryTypeId)" />
             @if (context.Types.Count > 0)
             {
-                <MudTooltip Text="List Entries for Summary Type" Delay="500" Duration="0" ShowOnFocus="false">
-                    <MudIconButton Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" aria-label="list entries for summary type" OnClick="()=> ListTransactionsSummary(context)" />
-                </MudTooltip>
+                <MudIconButton Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" Title="List Entries for Summary Type" OnClick="()=> ListTransactionsSummary(context)" />
             }
             @if (context.Types.Count == 0 && context.SummaryTypeId != -1)
             {
@@ -54,9 +48,7 @@
                 <td colspan="5" class="pa-5">
                     <MudTable Items="@context.TransactionTypeList" Context="TypeContext" Hover="true" Elevation="5" SortLabel="Sort By" AllowUnsorted="false" >
                         <ToolBarContent>
-                            <MudTooltip Text="New Entry Type" Delay="500" Duration="0" ShowOnFocus="false">
-                                <MudIconButton Icon="@Icons.Material.Filled.AddCircleOutline" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => AddTransactionType(context.SummaryTypeId)" aria-label="create entry type" />
-                            </MudTooltip>
+                            <MudIconButton Icon="fas fa-book" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="() => AddTransactionType(context.SummaryTypeId)" Title="New Entry Type" />
                             <MudText Typo="Typo.h5">&nbsp;<strong>@context.Name</strong> Entry Types</MudText>
                         </ToolBarContent>
                         <HeaderContent>
@@ -69,12 +61,8 @@
                         </NoRecordsContent>
                         <RowTemplate>
                             <MudTd DataLabel="Tools">
-                                <MudTooltip Text="Edit Entry Type" Delay="500" Duration="0" ShowOnFocus="false" >
-                                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" aria-label="edit entry type" OnClick="()=> EditTType(TypeContext.TransactionTypeId)" />
-                                </MudTooltip>
-                                <MudTooltip Text="List Entries for Entry Type" Delay="500" Duration="0" ShowOnFocus="false" >
-                                    <MudIconButton Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" aria-label="list entries for entry type" OnClick="()=> ListTransactionsTType(TypeContext)" />
-                                </MudTooltip>
+                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="Edit Entry Type" OnClick="()=> EditTType(TypeContext.TransactionTypeId)" />
+                                <MudIconButton Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" Title="List Entries for Entry Type" OnClick="()=> ListTransactionsTType(TypeContext)" />
                                 @if (TypeContext.TransactionCount < 1 && TypeContext.TransactionTypeId > -1)
                                 {
                                     <DeleteTTypeBtn TransactionType="@TypeContext" Variant="@Variant.Text" Size="@Size.Small" />
@@ -89,104 +77,3 @@
         }
     </ChildRowContent>
 </MudTable>
-
-@code
-{
-    [Inject] public IDialogService DialogService { get; set; }
-
-    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
-
-    [Inject] internal ISummaryTypeRepository Repo { get; set; }
-
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
-
-    [Inject] public NavigationManager NavigationManager { get; set; }
-
-    [Inject] TransListSvc TransListSvc { get; set; }
-
-    private string BookName { get; set; } = "Book";
-
-    public List<SummaryType> SummaryTypes { get; set; }
-
-    private SummaryType SelectedSummaryType { get; set; }
-
-    protected async override Task OnInitializedAsync()
-    {
-        BookName = await BookSettingSvc.GetBookName();
-
-        NotifierSvc.TransactionsChanged += TransactionsChanged;
-        NotifierSvc.SummaryTypeDeleted += () => LoadSummaryTypes();
-        NotifierSvc.TransactionTypeDeleted += () => LoadSummaryTypes();
-
-        await LoadSummaryTypes();
-    }
-
-    public async Task LoadSummaryTypes()
-    {
-        SummaryTypes = await Repo.GetAllSummaryTypes();
-        StateHasChanged();
-    }
-
-    protected async void ListTransactionsSummary(SummaryType summary)
-    {
-        TransListSvc.Mode = 2;
-        TransListSvc.Name = summary.Name;
-        TransListSvc.Types = summary.Types;
-        TransListSvc.PreviousPage = "/SummaryTypeList";
-
-        NavigationManager.NavigateTo("TransList", false);
-    }
-
-    private async Task AddSummaryType()
-    {
-        var dialog = DialogService.Show<STypeDialog>("New Summary Type");
-        var result = await dialog.Result;
-
-        if (!result.Canceled) await LoadSummaryTypes();
-    }
-
-    private async Task EditSType(int summaryTypeId)
-    {
-        if (!(await DialogService.Show<STypeDialog>("Edit Summary Type", new DialogParameters<STypeDialog> { { x => x.SavedSummaryTypeId, summaryTypeId } }).Result).Canceled) await LoadSummaryTypes();
-    }
-
-    private void ShowTransactionTypeBtnPress(int summaryTypeId)
-    {
-        SummaryType tmpSummaryType = SummaryTypes.First(s => s.SummaryTypeId == summaryTypeId);
-        tmpSummaryType.ShowTransactionTypes = !tmpSummaryType.ShowTransactionTypes;
-    }
-
-    private async Task AddTransactionType(int summaryTypeId)
-    {
-        if (!(await DialogService.Show<TTypeDialog>("New Entry Type", new DialogParameters<TTypeDialog> { { x => x.NewSummaryTypeId, summaryTypeId } }).Result).Canceled) await LoadSummaryTypes();
-    }
-
-    protected async Task ListTransactionsTType(TransactionType transactionType)
-    {
-        TransListSvc.Mode = 3;
-        TransListSvc.Name = transactionType.Name;
-        TransListSvc.TransactionTypeId = transactionType.TransactionTypeId;
-        TransListSvc.PreviousPage = "/SummaryTypeList";
-
-        NavigationManager.NavigateTo("TransList", false);
-    }
-
-    protected async Task EditTType(int transactionTypeId)
-    {
-        if (!(await DialogService.Show<TTypeDialog>("Edit Entry Type", new DialogParameters<TTypeDialog> { { x => x.SavedTransactionTypeId, transactionTypeId }, }).Result).Canceled) await LoadSummaryTypes();
-    }
-
-    private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
-    {
-        // Reload regardless of year
-        LoadSummaryTypes();
-    }
-
-    public void Dispose()
-    {
-        NotifierSvc.TransactionsChanged -= TransactionsChanged;
-        NotifierSvc.SummaryTypeDeleted -= () => LoadSummaryTypes();
-        NotifierSvc.TransactionTypeDeleted -= () => LoadSummaryTypes();
-        GC.SuppressFinalize(this);
-    }
-}

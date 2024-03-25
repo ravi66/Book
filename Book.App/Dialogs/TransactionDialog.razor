@@ -2,16 +2,16 @@
 
 <MudDialog >
     <DialogContent >
-        <MudForm Model="@Transaction" @bind-IsValid="@ValidationOk">
+        <MudForm Model="@Transaction" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0">
             <MudGrid Spacing="1" Justify="Justify.FlexStart" >
                 <MudItem xs="12" sm="6" >
                     <MudPaper Elevation="5" Class="mb-2" >
-                        <MudNumericField Variant="Variant.Outlined" Label="Value" Margin="Margin.Dense" HideSpinButtons="true" Format="F2" @bind-Value=Transaction.Value For="@(() => Transaction.Value)" AutoFocus="true" onFocus="this.select()" />
+                        <MudNumericField Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Format="F2" @bind-Value=Transaction.Value For="@(() => Transaction.Value)" onFocus="this.select()" Required="true"/>
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6" >
                     <MudPaper Elevation="5" Class="mb-2" >
-                        <MudDatePicker Variant="Variant.Outlined" Label="Dated" Required="true" RequiredError="Transactions must be Dated" @bind-Date="SelectedDate" PickerVariant="PickerVariant.Dialog" DisableToolbar="true" Margin="Margin.Dense" Editable="true" />
+                        <MudDatePicker Variant="Variant.Outlined" Label="Dated" Required="true" RequiredError="Transactions must be Dated" @bind-Date="PickerDate" PickerVariant="PickerVariant.Dialog" DisableToolbar="true" Margin="Margin.Dense" Editable="true" />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6" >
@@ -26,10 +26,10 @@
                 </MudItem>
                 <MudItem xs="12" >
                     <MudPaper Elevation="5" Class="mb-2" >
-                        <MudTextField Variant="Variant.Outlined" @bind-Value="Transaction.Notes" Label="Notes" Lines="3" />
+                        <MudTextField Variant="Variant.Outlined" @bind-Value="Transaction.Notes" Lines="3" />
                     </MudPaper>
                 </MudItem>
-                <MudItem>
+                <MudItem xs="12" >
                     <MudPaper Elevation="5" Class="mb-2" >
                         <MudText>Created: @Transaction.CreateDate.ToShortDateString()</MudText>
                     </MudPaper>
@@ -43,107 +43,7 @@
             <CopyTransactionBtn Transaction="@Transaction" Variant="@Variant.Filled" Size="@Size.Medium" />
             <DeleteTransactionBtn Transaction="@Transaction" Variant="@Variant.Filled" Size="@Size.Medium" />
         }
-        <MudTooltip Text="Save Entry" Delay="500" Duration="0" ShowOnFocus="false" >
-            <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" aria-label="save entry" OnClick="Save" />
-        </MudTooltip>
-        <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
-            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
-        </MudTooltip>
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="Save Entry" OnClick="@(async () => await Save())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="Close" OnClick="Close" />
     </DialogActions>
 </MudDialog>
-
-@code
-{
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-
-    [Parameter] public int SavedTransactionId { get; set; }
-
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
-
-    [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
-
-    [Inject] internal ITransactionRepository Repo { get; set; }
-
-    [Inject] IBrowserViewportService BrowserViewportService { get; set; }
-
-    public Transaction Transaction { get; set; }
-
-    private List<TransactionType> TransactionTypes { get; set; }
-
-    private TransactionType SelectedTransactionType { get; set; }
-
-    private DateTime? SelectedDate { get; set; }
-
-    private int OriginalYear { get; set; } = 0;
-
-    private bool ValidationOk { get; set; }
-
-    public void Close() => MudDialog.Cancel();
-
-    protected override async Task OnInitializedAsync()
-    {
-        TransactionTypes = (await TTypeRepo.GetAllTransactionTypes()).ToList();
-
-        if (SavedTransactionId == 0)
-        {
-            Transaction = new Transaction
-                {
-                    Value = 0.00M,
-                    TransactionTypeId = -1,
-                    TransactionDate = DateTime.Today,
-                    CreateDate = DateTime.Today,
-                    TransactionType = TransactionTypes.FirstOrDefault(tt => tt.TransactionTypeId == -1),
-                };
-        }
-        else
-        {
-            Transaction = await Repo.GetTransactionById(SavedTransactionId);
-            OriginalYear = Transaction.TransactionDate.Year;
-        }
-
-        SelectedTransactionType = TransactionTypes.FirstOrDefault(t => t.TransactionTypeId == Transaction.TransactionTypeId);
-        SelectedDate = Transaction.TransactionDate;
-
-        NotifierSvc.TransactionsChanged += TransactionsChanged;
-
-        await HelperMethods.MaximiseIfMobile(BrowserViewportService, MudDialog);
-    }
-
-    async void Save()
-    {
-        if (!ValidationOk) return;
-
-        Transaction.TransactionTypeId = SelectedTransactionType.TransactionTypeId;
-        Transaction.TransactionDate = (DateTime)(SelectedDate is null ? DateTime.Today : SelectedDate);
-
-        _ = SavedTransactionId == 0 ? await Repo.AddTransaction(Transaction) : await Repo.UpdateTransaction(Transaction);
-
-        List<int> years = [Transaction.TransactionDate.Year];
-        if (OriginalYear != 0 && OriginalYear != Transaction.TransactionDate.Year) years.Add(OriginalYear);
-        NotifierSvc.OnTransactionsChanged(this, years);
-
-        MudDialog.Close(DialogResult.Ok(true));
-    }
-
-    private async Task<IEnumerable<TransactionType>> TypeSearch(string searchValue)
-    {
-        await Task.Yield();
-
-        return string.IsNullOrEmpty(searchValue) ? (IEnumerable<TransactionType>)TransactionTypes : TransactionTypes.Where(t => t.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
-    }
-
-    private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
-    {
-        if (sender != this)
-        {
-            // Wasn't me so must have been a delete!
-            Close();
-        }
-    }
-
-    public void Dispose()
-    {
-        NotifierSvc.TransactionsChanged -= TransactionsChanged;
-        GC.SuppressFinalize(this);
-    }
-}

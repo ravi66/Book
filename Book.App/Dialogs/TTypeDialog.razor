@@ -2,16 +2,16 @@
 
 <MudDialog>
     <DialogContent>
-        <MudForm Model="@TransactionType"  @bind-IsValid="@ValidationOk">
+        <MudForm Model="@TransactionType" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0">
             <MudGrid Spacing="1" Justify="Justify.FlexStart" >
                 <MudItem xs="12" sm="6">
                     <MudPaper Elevation="5">
-                        <MudTextField Variant="Variant.Outlined" Label="Name" Margin="Margin.Dense" @bind-Value=TransactionType.Name For="@(() => TransactionType.Name)" AutoFocus="true" onFocus="this.select()" />
+                        <MudTextField Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value=TransactionType.Name For="@(() => TransactionType.Name)" Required="true" />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudPaper Elevation="5">
-                        <MudAutocomplete T="SummaryType" Label="Summary" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="SelectedSummaryType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" ReadOnly="@ReadOnlySummary" />
+                        <MudAutocomplete Label="Summary" T="SummaryType" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="SelectedSummaryType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" ReadOnly="@ReadOnlySummary" />
                     </MudPaper>
                 </MudItem>
                 <MudItem>
@@ -23,103 +23,11 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudTooltip Text="Save Entry Type" Delay="500" Duration="0" ShowOnFocus="false" >
-            <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" aria-label="save entry type" OnClick="Save" />
-        </MudTooltip>
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="Save Entry Type" OnClick="@(async () => await Save())" />
         @if (TransactionType.TransactionCount < 1 && TransactionType.TransactionTypeId > 0)
         {
             <DeleteTTypeBtn TransactionType="@TransactionType" Size="@Size.Medium" Variant="@Variant.Filled" />
         }
-        <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
-            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" aria-label="quit" OnClick="Close" />
-        </MudTooltip>
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="Close" OnClick="Close" />
     </DialogActions>
 </MudDialog>
-
-@code
-{
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
-
-    [Parameter] public int SavedTransactionTypeId { get; set; }
-
-    [Parameter] public int NewSummaryTypeId { get; set; }
-
-    [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
-
-    [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
-
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
-
-    public TransactionType TransactionType { get; set; }
-
-    private List<SummaryType> SummaryTypes { get; set; }
-
-    private SummaryType SelectedSummaryType { get; set; }
-
-    private bool ValidationOk { get; set; }
-
-    private void Close() => MudDialog.Cancel();
-
-    private bool ReadOnlySummary { get; set; } = false;
-
-    protected override async Task OnInitializedAsync()
-    {
-        SummaryTypes = await SummaryRepo.GetAutoCompleteList();
-
-        if (SavedTransactionTypeId == 0)
-        {
-            TransactionType = new TransactionType
-                {
-                    SummaryTypeId = NewSummaryTypeId,
-                    CreateDate = DateTime.Today,
-                    SummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == NewSummaryTypeId),
-                };
-        }
-        else
-        {
-            TransactionType = await TTypeRepo.GetTransactionTypeById(SavedTransactionTypeId);
-
-            if (SavedTransactionTypeId == -1) ReadOnlySummary = true;
-        }
-
-        SelectedSummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == TransactionType.SummaryTypeId);
-
-        NotifierSvc.TransactionTypeDeleted += () => Close();
-    }
-
-    async void Save()
-    {
-        if (!ValidationOk) return;
-
-        TransactionType.SummaryTypeId = SelectedSummaryType.SummaryTypeId;
-
-        if (SavedTransactionTypeId == 0)
-        {
-            await TTypeRepo.AddTransactionType(TransactionType);
-        }
-        else
-        {
-            await TTypeRepo.UpdateTransactionType(TransactionType);
-        }
-
-        MudDialog.Close(DialogResult.Ok(true));
-    }
-
-    private async Task<IEnumerable<SummaryType>> TypeSearch(string searchValue)
-    {
-        await Task.Yield();
-
-        if (string.IsNullOrEmpty(searchValue))
-        {
-            return SummaryTypes;
-        }
-
-        return SummaryTypes.Where(s => s.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
-    }
-
-    public void Dispose()
-    {
-        NotifierSvc.TransactionTypeDeleted -= () => Close();
-        GC.SuppressFinalize(this);
-    }
-}

@@ -1,46 +1,8 @@
 ﻿@if (IsIcon)
 {
-    <MudTooltip Text="@ToolTipText" Delay="500" Duration="0" ShowOnFocus="false" >
-        <MudIconButton Icon="@Icon" Variant="@Variant" Color="Color.Primary" Size="Size.Small" OnClick="CallTransactionDialog" aria-label="@AriaLabel" />
-    </MudTooltip>
+    <MudIconButton Icon="@Icon" Variant="@Variant" Color="Color.Primary" Size="Size.Small" OnClick="CallTransactionDialog" Title="@AriaLabel" />
 }
 else
 {
     <MudButton OnClick="CallTransactionDialog" StartIcon="@Icon" Color="Color.Inherit" Variant="Variant.Outlined" Size="Size.Medium">New Entry</MudButton>
-}
-
-@code
-{
-    [Parameter] public bool IsIcon { get; set; }
-
-    [Parameter] public int TransactionId { get; set; }
-
-    [Parameter] public string Icon { get; set; }
-
-    [Inject] public IDialogService DialogService { get; set; }
-
-    private string DialogTitle = string.Empty;
-
-    private string ToolTipText = string.Empty;
-
-    private Variant Variant = Variant.Text;
-
-    private string AriaLabel = string.Empty;
-
-    protected async override Task OnInitializedAsync()
-    {
-        ToolTipText = TransactionId == 0 ? "Create New Entry" : "Edit Entry";
-        AriaLabel = TransactionId == 0 ? "Create New Entry" : "Edit Entry";
-        Variant = TransactionId == 0 ? Variant.Filled : Variant.Text;
-    }
-
-    private async Task CallTransactionDialog()
-    {
-        var parameters = new DialogParameters<TransactionDialog>();
-        parameters.Add(x => x.SavedTransactionId, TransactionId);
-
-        DialogTitle = TransactionId == 0 ? "New Entry" : "Edit Entry";
-
-        DialogService.Show<TransactionDialog>(DialogTitle, parameters);
-    }
 }

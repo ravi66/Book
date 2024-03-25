@@ -1,4 +1,6 @@
-﻿namespace Book.Models
+﻿using FluentValidation;
+
+namespace Book.Models
 {
     public class Transaction
     {
@@ -9,26 +11,37 @@
         public int? TransactionTypeId { get; set; }
 
         [NotMapped]
-        [Display(Name = "Type")]
+        [Label("Type")]
         public string? TransactionTypeName { get; set; }
 
-        [Required]
-        [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/YYYY}")]
-        [Display(Name = "Dated")]
+        [Label("Dated")]
         public DateTime TransactionDate { get; set; }
 
-        [DataType(DataType.Currency)]
         [Column(TypeName = "money")]
-        [Display(Name = "Value")]
-        [RegularExpression("(.*[1-9].*)|(.*[.].*[1-9].*)", ErrorMessage = "Value can not be zero")]
+        [Label("Value")]
         public decimal Value { get; set; }
 
-        [Display(Name = "Created")]
+        [Label("Date Created")]
         public DateTime CreateDate { get; set; }
 
-        [Display(Name = "Notes")]
+        [Label("Notes")]
         public string? Notes { get; set; }
+    }
 
+    public class TransactionValidator : AbstractValidator<Transaction>
+    {
+        public TransactionValidator()
+        {
+            RuleFor(x => x.Value).NotNull().NotEqual(0);
+            RuleFor(x => x.TransactionDate).NotEmpty();
+            RuleFor(x => x.TransactionTypeId).NotNull().NotEqual(0);
+        }
+
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<Transaction>.CreateWithOptions((Transaction)model, x => x.IncludeProperties(propertyName)));
+            if (result.IsValid) return [];
+            return result.Errors.Select(e => e.ErrorMessage);
+        };
     }
 }
