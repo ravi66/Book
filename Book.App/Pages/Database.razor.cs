@@ -21,7 +21,7 @@ namespace Book.Pages
 
         public string BookDbFileName { get; set; }
 
-        private string BookName { get; set; } = "Book";
+        private string BookName { get; set; } = Constants.BookName;
 
         public string LastBackupDate { get; set; } = string.Empty;
 

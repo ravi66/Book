@@ -20,7 +20,6 @@
 </MudPaper>
 
 <MudStack Class="mb-4">
-
     <MudPaper Class="pa-4" Elevation="5">
         <MudText Typo="Typo.h5" >
             Book enables the recording of Entries via the New Entry button while the Summary (Home)
@@ -29,11 +28,9 @@
             button and then the Types option. This page also lets you create and edit Entry Types.
         </MudText>
     </MudPaper>
-
     <MudPaper Class="pa-4" Elevation="5">
         <MudText Typo="Typo.h4">Credits</MudText>
     </MudPaper>
-
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
             <MudItem xs="3" md="4" Class="d-flex justify-center align-center" >
@@ -53,7 +50,6 @@
             </MudItem>
         </MudGrid>
     </MudPaper>
-
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
             <MudItem xs="3" md="4" Class="d-flex justify-center align-center">
@@ -71,7 +67,24 @@
             </MudItem>
         </MudGrid>
     </MudPaper>
-
+    <MudPaper Class="pa-2" Elevation="5">
+        <MudGrid>
+            <MudItem xs="3" md="4" Class="d-flex justify-center align-center ">
+                <MudImage Src="images/fluent-validation-logo.png" Alt="Fluent Validation Logo" Class="mx-3" Width="150" Height="150" Fluid="true" />
+            </MudItem>
+            <MudItem xs="9" md="8">
+                <MudText Typo="Typo.h5">Fluent Validation</MudText>
+                <MudText>
+                    <MudLink Href="https://github.com/FluentValidation/FluentValidation/" Target="_blank">https://github.com/FluentValidation/FluentValidation/</MudLink>
+                </MudText>
+                <MudDivider Class="mb-3" />
+                <MudText>
+                    A validation library for .NET that uses a fluent interface and lambda expressions 
+                    for building strongly-typed validation rules.
+                </MudText>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
             <MudItem xs="3" md="4" Class="d-flex justify-center align-center">
@@ -89,7 +102,6 @@
             </MudItem>
         </MudGrid>
     </MudPaper>
-
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
             <MudItem xs="3" md="4" Class="d-flex justify-center align-center" >
@@ -107,7 +119,6 @@
             </MudItem>
         </MudGrid>
     </MudPaper>
-
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
             <MudItem xs="3" md="4" Class="d-flex justify-center align-center ">
@@ -126,28 +137,4 @@
             </MudItem>
         </MudGrid>
     </MudPaper>
-
 </MudStack>
-
-@code
-{
-    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
-
-    [Inject] public NavigationManager NavigationManager { get; set; }
-
-    [Inject] HttpClient HttpClient { get; set; }
-
-    private string Version { get; set; } = Constants.BookVersion; 
-
-    private string BookName { get; set; } = "Book";
-
-    private int VisitCount { get; set; }
-
-    protected async override Task OnInitializedAsync()
-    {
-        BookName = await BookSettingSvc.GetBookName();
-
-        VisitsCounter visitsCounter = new(HttpClient, new Uri(NavigationManager.Uri).Host);
-        VisitCount = await visitsCounter.GetVisitsCount();
-    }
-}

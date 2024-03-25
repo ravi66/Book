@@ -14,7 +14,7 @@ namespace Book.Pages
 
         [Inject] TransListSvc TransListSvc { get; set; }
 
-        private string BookName { get; set; } = "Book";
+        private string BookName { get; set; } = Constants.BookName;
 
         public List<SummaryType> SummaryTypes { get; set; }
 

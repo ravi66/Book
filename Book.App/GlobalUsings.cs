@@ -7,3 +7,4 @@ global using MudBlazor;
 global using Book.Models;
 global using Book.Dialogs;
 global using Book.Services;
+global using Book.Shared;

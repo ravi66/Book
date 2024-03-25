@@ -16,7 +16,7 @@ namespace Book.Shared
         private string themeIcon = Icons.Material.Filled.LightMode;
         private string themeText = "Light Mode";
 
-        private string BookName = "Book";
+        private string BookName = Constants.BookName;
 
         private bool drawerOpen = false;
 

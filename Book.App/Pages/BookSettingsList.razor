@@ -49,7 +49,7 @@
 
     [Inject] internal IBookSettingRepository Repo { get; set; }
 
-    private string BookName { get; set; } = "Book";
+    private string BookName { get; set; } = Constants.BookName;
 
     public List<BookSetting> BookSettings { get; set; }
 
