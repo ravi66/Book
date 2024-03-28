@@ -6,28 +6,28 @@
             <MudGrid Spacing="1" Justify="Justify.FlexStart" >
                 <MudItem xs="12" sm="6">
                     <MudPaper Elevation="5">
-                        <MudTextField Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value=TransactionType.Name For="@(() => TransactionType.Name)" Required="true" />
+                        <MudTextField Label="@Localizer["Name"]" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value=TransactionType.Name For="@(() => TransactionType.Name)" Required="true" />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudPaper Elevation="5">
-                        <MudAutocomplete Label="Summary" T="SummaryType" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="SelectedSummaryType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" ReadOnly="@ReadOnlySummary" />
+                        <MudAutocomplete Label="@Localizer["Summary"]" T="SummaryType" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="SelectedSummaryType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" ReadOnly="@ReadOnlySummary" />
                     </MudPaper>
                 </MudItem>
                 <MudItem>
                     <MudPaper Elevation="5">
-                        <MudText>Created: @TransactionType.CreateDate.ToShortDateString()</MudText>
+                        <MudText>@Localizer["Created"]: @TransactionType.CreateDate.ToShortDateString()</MudText>
                     </MudPaper>
                 </MudItem>
             </MudGrid>
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="Save Entry Type" OnClick="@(async () => await Save())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveEntryType"]" OnClick="@(async () => await Save())" />
         @if (TransactionType.TransactionCount < 1 && TransactionType.TransactionTypeId > 0)
         {
             <DeleteTTypeBtn TransactionType="@TransactionType" Size="@Size.Medium" Variant="@Variant.Filled" />
         }
-        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="Close" OnClick="Close" />
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["Close"]" OnClick="Close" />
     </DialogActions>
 </MudDialog>

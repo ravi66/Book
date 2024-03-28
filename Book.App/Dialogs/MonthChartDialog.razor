@@ -3,14 +3,12 @@
         <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
             <MudText Typo="Typo.h5">@DialogTitle</MudText>
             <MudSpacer />
-            <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
-                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
-            </MudTooltip>
+            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" Title="@Localizer["Close"]"/>
         </MudStack>
         <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
             <MudRadioGroup T="int" Value="@SelectedOption" ValueChanged="OnSelectedOptionChanged">
-                <MudRadio Value="@(1)" Color="Color.Primary">Summary</MudRadio>
-                <MudRadio Value="@(2)" Color="Color.Primary">Entry Type</MudRadio>
+                <MudRadio Value="@(1)" Color="Color.Primary">@Localizer["Summary"]</MudRadio>
+                <MudRadio Value="@(2)" Color="Color.Primary">@Localizer["EntryType"]</MudRadio>
             </MudRadioGroup>
         </MudStack>
         <MudPaper >

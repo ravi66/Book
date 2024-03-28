@@ -11,20 +11,15 @@ namespace Book.Models
         public int? TransactionTypeId { get; set; }
 
         [NotMapped]
-        [Label("Type")]
         public string? TransactionTypeName { get; set; }
 
-        [Label("Dated")]
         public DateTime TransactionDate { get; set; }
 
         [Column(TypeName = "money")]
-        [Label("Value")]
         public decimal Value { get; set; }
 
-        [Label("Date Created")]
         public DateTime CreateDate { get; set; }
 
-        [Label("Notes")]
         public string? Notes { get; set; }
     }
 

@@ -3,7 +3,7 @@
         @if (Warning)
         {
             <MudPaper Elevation="5">
-                <MudText Typo="Typo.h3" Color="Color.Warning" Align="Align.Center">WARNING</MudText>
+                <MudText Typo="Typo.h3" Color="Color.Warning" Align="Align.Center">@Localizer["WarningUpp"]</MudText>
             </MudPaper>
             @if (!string.IsNullOrEmpty(WarningMessage))
             {

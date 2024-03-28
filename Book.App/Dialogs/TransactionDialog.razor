@@ -6,32 +6,32 @@
             <MudGrid Spacing="1" Justify="Justify.FlexStart" >
                 <MudItem xs="12" sm="6" >
                     <MudPaper Elevation="5" Class="mb-2" >
-                        <MudNumericField Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Format="F2" @bind-Value=Transaction.Value For="@(() => Transaction.Value)" onFocus="this.select()" Required="true"/>
+                        <MudNumericField Label="@Localizer["Value"]" Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Format="F2" @bind-Value=Transaction.Value For="@(() => Transaction.Value)" onFocus="this.select()" Required="true"/>
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6" >
                     <MudPaper Elevation="5" Class="mb-2" >
-                        <MudDatePicker Variant="Variant.Outlined" Label="Dated" Required="true" RequiredError="Transactions must be Dated" @bind-Date="PickerDate" PickerVariant="PickerVariant.Dialog" DisableToolbar="true" Margin="Margin.Dense" Editable="true" />
+                        <MudDatePicker Variant="Variant.Outlined" Label="@Localizer["Dated"]" Required="true" RequiredError="@Localizer["EntryMustBeDated"]" @bind-Date="PickerDate" PickerVariant="PickerVariant.Dialog" Margin="Margin.Dense" Editable="true" MaxDate="MaxDate" MinDate="MinDate" />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6" >
                     <MudPaper Elevation="5" Class="mb-2" >
-                        <MudAutocomplete T="TransactionType" Label="Type" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="SelectedTransactionType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
+                        <MudAutocomplete Label="@Localizer["Type"]" T="TransactionType" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="SelectedTransactionType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6" >
                     <MudPaper Elevation="5" Class="mb-2" >
-                        <MudTextField Label="Summary" ReadOnly="true" Value="@SelectedTransactionType.SummaryName" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        <MudTextField Label="@Localizer["Summary"]" ReadOnly="true" Value="@SelectedTransactionType.SummaryName" Variant="Variant.Outlined" Margin="Margin.Dense" />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" >
                     <MudPaper Elevation="5" Class="mb-2" >
-                        <MudTextField Variant="Variant.Outlined" @bind-Value="Transaction.Notes" Lines="3" />
+                        <MudTextField Label="@Localizer["Notes"]" Variant="Variant.Outlined" @bind-Value="Transaction.Notes" Lines="3" />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" >
                     <MudPaper Elevation="5" Class="mb-2" >
-                        <MudText>Created: @Transaction.CreateDate.ToShortDateString()</MudText>
+                        <MudText>@Localizer["Created"]: @Transaction.CreateDate.ToShortDateString()</MudText>
                     </MudPaper>
                 </MudItem>
             </MudGrid>
@@ -43,7 +43,7 @@
             <CopyTransactionBtn Transaction="@Transaction" Variant="@Variant.Filled" Size="@Size.Medium" />
             <DeleteTransactionBtn Transaction="@Transaction" Variant="@Variant.Filled" Size="@Size.Medium" />
         }
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="Save Entry" OnClick="@(async () => await Save())" />
-        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="Close" OnClick="Close" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveEntry"]" OnClick="@(async () => await Save())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["Close"]" OnClick="Close" />
     </DialogActions>
 </MudDialog>

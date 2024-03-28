@@ -6,13 +6,10 @@ namespace Book.Models
     {
         public int SummaryTypeId { get; set; }
 
-        [Label("Name")]
         public string Name { get; set; }
 
-        [Label("Order")]
         public int Order { get; set; }
 
-        [Label("Date Created")]
         public DateTime CreateDate { get; set; }
 
         public ICollection<TransactionType>? TransactionTypes { get; set; }

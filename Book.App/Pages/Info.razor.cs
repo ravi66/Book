@@ -10,7 +10,7 @@ namespace Book.Pages
 
         private string Version { get; set; } = Constants.BookVersion;
 
-        private string BookName { get; set; } = Constants.BookName;
+        private string BookName { get; set; } = string.Empty;
 
         private int VisitCount { get; set; }
 
@@ -21,5 +21,7 @@ namespace Book.Pages
             VisitsCounter visitsCounter = new(HttpClient, new Uri(NavigationManager.Uri).Host);
             VisitCount = await visitsCounter.GetVisitsCount();
         }
+
+        private void Back() => NavigationManager.NavigateTo("/", false);
     }
 }

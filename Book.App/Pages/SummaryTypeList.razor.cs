@@ -14,7 +14,7 @@ namespace Book.Pages
 
         [Inject] TransListSvc TransListSvc { get; set; }
 
-        private string BookName { get; set; } = Constants.BookName;
+        private string BookName { get; set; } = string.Empty;
 
         public List<SummaryType> SummaryTypes { get; set; }
 
@@ -49,12 +49,12 @@ namespace Book.Pages
 
         private async Task AddSummaryType()
         {
-            if (!(await DialogService.Show<STypeDialog>("New Summary Type").Result).Canceled) await LoadSummaryTypes();
+            if (!(await DialogService.Show<STypeDialog>(Localizer["NewSummaryType"]).Result).Canceled) await LoadSummaryTypes();
         }
 
         private async Task EditSType(int summaryTypeId)
         {
-            if (!(await DialogService.Show<STypeDialog>("Edit Summary Type", new DialogParameters<STypeDialog> { { x => x.SavedSummaryTypeId, summaryTypeId } }).Result).Canceled) await LoadSummaryTypes();
+            if (!(await DialogService.Show<STypeDialog>(Localizer["EditSummaryType"], new DialogParameters<STypeDialog> { { x => x.SavedSummaryTypeId, summaryTypeId } }).Result).Canceled) await LoadSummaryTypes();
         }
 
         private void ShowTransactionTypeBtnPress(int summaryTypeId)
@@ -65,7 +65,7 @@ namespace Book.Pages
 
         private async Task AddTransactionType(int summaryTypeId)
         {
-            if (!(await DialogService.Show<TTypeDialog>("New Entry Type", new DialogParameters<TTypeDialog> { { x => x.NewSummaryTypeId, summaryTypeId } }).Result).Canceled) await LoadSummaryTypes();
+            if (!(await DialogService.Show<TTypeDialog>(Localizer["NewEntryType"], new DialogParameters<TTypeDialog> { { x => x.NewSummaryTypeId, summaryTypeId } }).Result).Canceled) await LoadSummaryTypes();
         }
 
         protected async Task ListTransactionsTType(TransactionType transactionType)
@@ -80,7 +80,7 @@ namespace Book.Pages
 
         protected async Task EditTType(int transactionTypeId)
         {
-            if (!(await DialogService.Show<TTypeDialog>("Edit Entry Type", new DialogParameters<TTypeDialog> { { x => x.SavedTransactionTypeId, transactionTypeId }, }).Result).Canceled) await LoadSummaryTypes();
+            if (!(await DialogService.Show<TTypeDialog>(Localizer["EditEntryType"], new DialogParameters<TTypeDialog> { { x => x.SavedTransactionTypeId, transactionTypeId }, }).Result).Canceled) await LoadSummaryTypes();
         }
 
         private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)

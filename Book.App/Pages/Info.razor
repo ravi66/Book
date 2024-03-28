@@ -1,19 +1,19 @@
 ﻿@page "/info"
 
-<PageTitle>@BookName - Info</PageTitle>
+<PageTitle>@BookName - @Localizer["Info"]</PageTitle>
 
 <MudPaper Class="pa-2" Elevation="5">
     <MudGrid Class="align-center">
         <MudItem>
-            <MudIcon Icon="@Icons.Material.Filled.Info" Color="Color.Primary" Size="Size.Large" />
+            <MudIconButton Icon="@Icons.Material.Filled.Info" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" OnClick="Back" Title="@Localizer["BackToSummary"]"/>
         </MudItem>
         <MudItem>
-            <MudText Typo="Typo.h4">Book @Version</MudText>
+            <MudText Typo="Typo.h4">@Localizer["Book"] @Version</MudText>
         </MudItem>
         @if (VisitCount > -1)
         {
             <MudItem>
-                <MudText Typo="Typo.h4">Visited @VisitCount times</MudText>
+                <MudText Typo="Typo.h4">@Localizer["Visited"] @VisitCount @Localizer["Times"]</MudText>
             </MudItem>
         }
     </MudGrid>
@@ -22,118 +22,81 @@
 <MudStack Class="mb-4">
     <MudPaper Class="pa-4" Elevation="5">
         <MudText Typo="Typo.h5" >
-            Book enables the recording of Entries via the New Entry button while the Summary (Home)
-            page shows monthly balances. An Entry has a Type, these Types are collated into Summaries
-            that are used as columns on the Summary page. You can add Summaries by pressing the menu
-            button and then the Types option. This page also lets you create and edit Entry Types.
+            @Localizer["MoreInfoText"]
         </MudText>
     </MudPaper>
     <MudPaper Class="pa-4" Elevation="5">
-        <MudText Typo="Typo.h4">Credits</MudText>
+        <MudText Typo="Typo.h4">@Localizer["Credits"]</MudText>
     </MudPaper>
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
-            <MudItem xs="3" md="4" Class="d-flex justify-center align-center" >
-                <MudImage Src="images/blazor_logo.png" Alt="Blazor Logo" Class="mx-3" Width="150" Height="150" Fluid="true" />
+            <MudItem xs="3" Class="d-flex justify-center align-center" Style="max-height: 150px;">
+                <MudImage Src="images/blazor_logo.png" Alt="@Localizer["BlazorLogo"]" Class="mx-3" Width="150" Height="150" Fluid="true" />
             </MudItem>
-            <MudItem xs="9" md="8" >
-                <MudText Typo="Typo.h5" >Blazor WebAssembly (Wasm)</MudText>
-                <MudText>
-                    <MudLink Href="https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor" Target="_blank">https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor</MudLink>
-                </MudText>
-                <MudDivider Class="mb-3" />
-                <MudText>
-                    Blazor lets you build interactive web UIs using C# instead of JavaScript. Blazor apps are
-                    composed of reusable web UI components implemented using C#, HTML, and CSS. Both client and
-                    server code is written in C#, allowing you to share code and libraries.
-                </MudText>
+            <MudItem xs="9" >
+                <MudLink Typo="Typo.h5" Href="https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor" Target="_blank">@Localizer["BlazorWasm"]</MudLink>
+                <MudDivider Class="mt-1 mb-2" />
+                <MudText Typo="Typo.body1">@Localizer["BlazorText"]</MudText>
             </MudItem>
         </MudGrid>
     </MudPaper>
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
-            <MudItem xs="3" md="4" Class="d-flex justify-center align-center">
-                <MudImage Src="images/efcore_logo.png" Alt="EF Core Logo" Class="rounded-lg mx-3" Width="250" Fluid="true" Height="100" />
+            <MudItem xs="3" Class="d-flex justify-center align-center">
+                <MudImage Src="images/efcore_logo.png" Alt="@Localizer["EFCoreLogo"]" Class="rounded-lg mx-3" Width="250" Height="150" />
             </MudItem>
-            <MudItem xs="9" md="8">
-                <MudText Typo="Typo.h5">Entity Framework Core</MudText>
-                <MudText>
-                    <MudLink Href="https://docs.microsoft.com/en-us/ef/core/" Target="_blank">https://docs.microsoft.com/en-us/ef/core/</MudLink>
-                </MudText>
-                <MudDivider Class="mb-3" />
-                <MudText>
-                    Entity Framework (EF) Core is an object-database mapper for .NET.
-                </MudText>
+            <MudItem xs="9" >
+                <MudLink Typo="Typo.h5" Href="https://docs.microsoft.com/en-us/ef/core/" Target="_blank">@Localizer["EFCore"]</MudLink>
+                <MudDivider Class="mt-1 mb-2" />
+                <MudText Typo="Typo.body1">@Localizer["EFCoreText"]</MudText>
             </MudItem>
         </MudGrid>
     </MudPaper>
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
-            <MudItem xs="3" md="4" Class="d-flex justify-center align-center ">
-                <MudImage Src="images/fluent-validation-logo.png" Alt="Fluent Validation Logo" Class="mx-3" Width="150" Height="150" Fluid="true" />
+            <MudItem xs="3" Class="d-flex justify-center align-center " Style="min-height: 120px;">
+                <MudImage  Src="images/fluent-validation-logo.png" Alt="@Localizer["FluentValidationLogo"]" Class="mx-3" Width="250" Height="150" Fluid="true" />
             </MudItem>
-            <MudItem xs="9" md="8">
-                <MudText Typo="Typo.h5">Fluent Validation</MudText>
-                <MudText>
-                    <MudLink Href="https://github.com/FluentValidation/FluentValidation/" Target="_blank">https://github.com/FluentValidation/FluentValidation/</MudLink>
-                </MudText>
-                <MudDivider Class="mb-3" />
-                <MudText>
-                    A validation library for .NET that uses a fluent interface and lambda expressions 
-                    for building strongly-typed validation rules.
-                </MudText>
+            <MudItem xs="9" >
+                <MudLink Typo="Typo.h5" Href="https://github.com/FluentValidation/FluentValidation/" Target="_blank">@Localizer["FluentValidation"]</MudLink>
+                <MudDivider Class="mt-1 mb-2" />
+                <MudText Typo="Typo.body1">@Localizer["FVText"]</MudText>
             </MudItem>
         </MudGrid>
     </MudPaper>
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
-            <MudItem xs="3" md="4" Class="d-flex justify-center align-center">
-                <MudImage Src="images/mudblazor.png" Alt="MudBlazor Logo" Class="mx-3" Fluid="true" Width="250" Height="250" />
+            <MudItem xs="3" Class="d-flex justify-center align-center">
+                <MudImage Src="images/mudblazor.png" Alt="@Localizer["MudBlazorLogo"]" Class="mx-3" Fluid="true" Width="250" Height="150" />
             </MudItem>
-            <MudItem xs="9" md="8">
-                <MudText Typo="Typo.h5">MudBlazor</MudText>
-                <MudText>
-                    <MudLink Href="https://mudblazor.com/" Target="_blank">https://mudblazor.com/</MudLink>
-                </MudText>
-                <MudDivider Class="mb-3" />
-                <MudText>
-                    MudBlazor is a UI component library written from the ground up for Blazor.
-                </MudText>
+            <MudItem xs="9" >
+                <MudLink Typo="Typo.h5" Href="https://mudblazor.com/" Target="_blank">@Localizer["MudBlazor"]</MudLink>
+                <MudDivider Class="mt-1 mb-2" />
+                <MudText Typo="Typo.body1">@Localizer["MudBlazorText"]"</MudText>
             </MudItem>
         </MudGrid>
     </MudPaper>
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
-            <MudItem xs="3" md="4" Class="d-flex justify-center align-center" >
-                <MudImage Src="images/sqlite_logo.gif" Alt="Sqlite Logo" Class="rounded-lg mx-3" Width="250" Height="150" Fluid="true" />
+            <MudItem xs="3" Class="d-flex justify-center align-center" >
+                <MudImage Src="images/sqlite_logo.gif" Alt="@Localizer["SqliteLogo"]" Class="rounded-lg mx-3" Width="250" Height="150" Fluid="true" />
             </MudItem>
-            <MudItem xs="9" md="8">
-                <MudText Typo="Typo.h5">SqliteWasmHelper</MudText>
-                <MudText>
-                    <MudLink Href="https://github.com/JeremyLikness/SqliteWasmHelper" Target="_blank">https://github.com/JeremyLikness/SqliteWasmHelper</MudLink>
-                </MudText>
-                <MudDivider Class="mb-3" />
-                <MudText>
-                    SqliteWasmHelper enables using a EFCore compatible SQLite database that persits in the Browser's cache
-                </MudText>
+            <MudItem xs="9" >
+                <MudLink Typo="Typo.h5" Href="https://github.com/JeremyLikness/SqliteWasmHelper" Target="_blank">@Localizer["SqliteWasmHelper"]</MudLink>
+                <MudDivider Class="mt-1 mb-2" />
+                <MudText Typo="Typo.body1">@Localizer["SqliteWasmHelperText"]"</MudText>
             </MudItem>
         </MudGrid>
     </MudPaper>
     <MudPaper Class="pa-2" Elevation="5">
         <MudGrid>
-            <MudItem xs="3" md="4" Class="d-flex justify-center align-center ">
-                <MudImage Src="images/Trackor.png" Alt="Trackor Logo" Class="mx-3" Width="150" Height="150" Fluid="true" />
+            <MudItem xs="3" Class="d-flex justify-center align-center " >
+                <MudImage Src="images/Trackor.png" Alt="@Localizer["TrackorLogo"]" Class="mx-3" Width="150" Height="150" Fluid="true" />
             </MudItem>
-            <MudItem xs="9" md="8">
-                <MudText Typo="Typo.h5">Trackor</MudText>
-                <MudText>
-                    <MudLink Href="https://github.com/eric-king/trackor/" Target="_blank">https://github.com/eric-king/trackor/</MudLink>
-                </MudText>
-                <MudDivider Class="mb-3" />
-                <MudText>
-                    Trackor is a Blazor WASM application that uses all the above packages. I shamelessly
-                    used it as both an inspiration and direct code source.
-                </MudText>
+            <MudItem xs="9" >
+                <MudLink Typo="Typo.h5" Href="https://github.com/eric-king/trackor/" Target="_blank">@Localizer["Trackor"]</MudLink>
+                <MudDivider Class="mt-1 mb-2" />
+                <MudText Typo="Typo.body1">@Localizer["TrackorText"]</MudText>
             </MudItem>
         </MudGrid>
     </MudPaper>

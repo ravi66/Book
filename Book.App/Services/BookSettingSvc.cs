@@ -1,24 +1,32 @@
 ﻿namespace Book.Services
 {
-    internal class BookSettingSvc(IBookSettingRepository repo) : IBookSettingSvc
+    internal class BookSettingSvc(IBookSettingRepository repo, IStringLocalizer<Resources.Resources> Localizer) : IBookSettingSvc
     {
         private BookSetting? BookSetting { get; set; }
+
+        public async Task EnsureUserAmendableSettingsCreated()
+        {
+            _ = await GetBookName();
+            _ = await GetStartYear();
+            _ = await GetEndYear();
+            _ = await GetDbPrefix();
+        }
 
         // Gets
 
         public async Task<string> GetBookName()
         {
-            return await GetSettingValue(1, "[ALL] Book Name", true, "Book");
+            return await GetSettingValue(1, Localizer["BookName"], true, Localizer["Book"]);
         }
 
         public async Task<bool> GetDarkMode()
         {
-            return await GetSettingValue(2, "[ALL] Dark Mode", false, "true") == "true";
+            return await GetSettingValue(2, Localizer["DarkMode"], false, "true") == "true";
         }
 
         public async Task<int> GetStartYear()
         {
-            string settingValue = await GetSettingValue(3, "[SUMMARY] Start Year", true, "2017");
+            string settingValue = await GetSettingValue(3, Localizer["StartYear"], true, "2017");
 
             if (Int32.TryParse(settingValue, out int numValue))
             {
@@ -26,14 +34,14 @@
             }
             else
             {
-                await SetSettingValue(3, "[SUMMARY] Start Year", true, "2017");
+                await SetSettingValue(3, Localizer["StartYear"], true, "2017");
                 return 2017;
             }
         }
 
         public async Task<int> GetEndYear()
         {
-            string endValue = await GetSettingValue(4, "[SUMMARY] End Year", true, $"{DateTime.Today.Year + 3}");
+            string endValue = await GetSettingValue(4, Localizer["EndYear"], true, $"{DateTime.Today.Year + 3}");
             int startValue = await GetStartYear();
 
             if (Int32.TryParse(endValue, out int numValue))
@@ -41,44 +49,44 @@
                 if (numValue < startValue)
                 {
                     numValue = startValue;
-                    await SetSettingValue(4, "[SUMMARY] End Year", true, $"{numValue}");
+                    await SetSettingValue(4, Localizer["EndYear"], true, $"{numValue}");
                 }
 
                 return (numValue);
             }
             else
             {
-                await SetSettingValue(4, "[SUMMARY] End Year", true, $"{DateTime.Today.Year + 3}");
+                await SetSettingValue(4, Localizer["EndYear"], true, $"{ DateTime.Today.Year + 3}");
                 return DateTime.Today.Year + 3;
             }
         }
 
         public async Task<string> GetLastBackupDate()
         {
-            return await GetSettingValue(5, "[DATABASE] Last backup date", false, "No backup recorded");
+            return await GetSettingValue(5, Localizer["LastBackupDate"], false, Localizer["NoBackupRecorded"]);
         }
 
         public async Task<string> GetDbPrefix()
         {
-            return await GetSettingValue(6, "[DATABASE] Backup Prefix", true, "Book");
+            return await GetSettingValue(6, Localizer["BackupPrefix"], true, Localizer["Book"]);
         }
 
         public async Task<string> GetDbVersion()
         {
-            return await GetSettingValue(7, "[ALL] Database Version", false, "1.0");
+            return await GetSettingValue(7, Localizer["DatabaseVersion"], false, "1.0");
         }
 
         // Sets
 
         public async Task SetDarkMode(bool isDarkMode)
         {
-            await SetSettingValue(2, "[ALL] Dark Mode", false, isDarkMode.ToString().ToLowerInvariant());
+            await SetSettingValue(2, Localizer["DarkMode"], false, isDarkMode.ToString().ToLowerInvariant());
             return;
         }
 
         public async Task SetLastBackupDate(DateTime lastBackupDate)
         {
-            await SetSettingValue(5, "[ALL] Last backup date", false, lastBackupDate.ToString("g"));
+            await SetSettingValue(5, Localizer["LastBackupDate"], false, lastBackupDate.ToString("g"));
             return;
         }
 
@@ -129,6 +137,5 @@
 
             return;
         }
-
     }
 }

@@ -3,9 +3,7 @@
         <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
             <MudText Typo="Typo.h5">@DialogTitle</MudText>
             <MudSpacer />
-            <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false" >
-                <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" aria-label="close" />
-            </MudTooltip>
+            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" Title="@Localizer["Close"]" />
         </MudStack>
         <MudPaper Class="pb-2" >
             <style>.mud-chart-line { overflow: visible; }</style>
@@ -13,7 +11,7 @@
             @if (RemovedSeries.Count > 0)
             {
                 <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
-                    <MudButton Size="Size.Small" Variant="Variant.Outlined" OnClick="Reset">Reset</MudButton>
+                    <MudButton Size="Size.Small" Variant="Variant.Outlined" OnClick="Reset">@Localizer["Reset"]</MudButton>
                 </MudStack>
             }
         </MudPaper>

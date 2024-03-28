@@ -16,11 +16,12 @@ namespace Book.Dialogs
 
         [Inject] IBrowserViewportService BrowserViewportService { get; set; }
 
+        [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+
         private Transaction Transaction { get; set; } = new Transaction
         {
             Value = 0.00M,
             TransactionTypeId = -1,
-            TransactionDate = DateTime.Today,
             CreateDate = DateTime.Today,
         };
 
@@ -34,6 +35,10 @@ namespace Book.Dialogs
 
         private DateTime? PickerDate { get; set; }
 
+        private DateTime MinDate { get; set; }
+
+        private DateTime MaxDate { get; set; }
+
         private int OriginalYear { get; set; } = 0;
 
         public void Close() => MudDialog.Cancel();
@@ -42,11 +47,23 @@ namespace Book.Dialogs
         {
             await Task.Yield();
 
+            MaxDate = new DateTime(await BookSettingSvc.GetEndYear(), 12, 31);
+            MinDate = new DateTime(await BookSettingSvc.GetStartYear(), 1, 1);
+
             TransactionTypes = (await TTypeRepo.GetAllTransactionTypes()).ToList();
 
             if (SavedTransactionId == 0)
             {
                 Transaction.TransactionType = TransactionTypes.FirstOrDefault(tt => tt.TransactionTypeId == -1);
+
+                if (DateTime.Today <= MaxDate && DateTime.Today >= MinDate)
+                {
+                    Transaction.TransactionDate = DateTime.Today;
+                }
+                else
+                {
+                    Transaction.TransactionDate = DateTime.Today > MaxDate ? MaxDate : MinDate;
+                }
             }
             else
             {

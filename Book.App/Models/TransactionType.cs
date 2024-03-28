@@ -11,13 +11,10 @@ namespace Book.Models
         public SummaryType? SummaryType { get; set; }
 
         [NotMapped]
-        [Label("Summary")]
         public string? SummaryName { get; set; }
 
-        [Label("Name")]
         public string Name { get; set; }
 
-        [Label("Date Created")]
         public DateTime CreateDate { get; set; }
 
         public ICollection<Transaction>? Transactions { get; set; }

@@ -1,70 +1,70 @@
 ﻿@page "/database"
 @implements IAsyncDisposable
 
-<PageTitle>@BookName - Database</PageTitle>
+<PageTitle>@BookName - @Localizer["Database"]</PageTitle>
 
 <MudPaper Class="pa-2" Elevation="5">
     <MudGrid Class="align-center">
         <MudItem>
-            <MudIcon Icon="fas fa-database" Color="Color.Primary" Size="Size.Large" />
+            <MudIconButton Icon="fas fa-database" Color="Color.Primary" Size="Size.Large" OnClick="Back" Title="@Localizer["BackToSummary"]" />
         </MudItem>
         <MudItem Class="pa-0">
-            <MudText Typo="Typo.h5">Database</MudText>
+            <MudText Typo="Typo.h5">@Localizer["Database"]</MudText>
         </MudItem>
     </MudGrid>
 </MudPaper>
 <InputFile id="inputFile" OnChange="@UploadDb" accept=".sqlite3" hidden />
 
-<MudAlert Severity="Severity.Error" Class="mt-4 mb-2" Elevation="10">
-    <MudText Typo="Typo.h5">
-        Any changes you make are saved in an SQLite database. It is highly recommended
-        to periodically back this up. Last backup: @LastBackupDate.
-    </MudText>
-</MudAlert>
+<MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mt-4 mb-2" Elevation="10" ContentAlignment="HorizontalAlignment.Start" NoIcon="true">
+    <MudStack AlignItems="AlignItems.Center" Row="true">
+        <MudIcon Icon="@Icons.Material.Filled.Warning" Size="Size.Large" />
+        <MudText Typo="Typo.h5">@Localizer["DatabaseAlertMessage"] @LastBackupDate</MudText>
+    </MudStack>
+</MudAlert> 
 
 <MudContainer Class="ma-0 pa-2">
     <MudGrid >
         <MudItem xs="12" sm="6" md="4" lg="3">
             <MudCard Elevation="5">
                 <MudCardContent Style="min-height: 130px;">
-                    <MudText Typo="Typo.h5">Back up</MudText>
-                    <MudText Typo="Typo.body2">Copy the database to a file</MudText>
+                    <MudText Typo="Typo.h5">@Localizer["Backup"]</MudText>
+                    <MudText Typo="Typo.body2">@Localizer["DatabaseBackupText"]</MudText>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CloudDownload" Href="@BookDownloadUrl" Target="_blank" download="@BookDbFileName" OnClick="SetLastBackupDate">Backup</MudButton>
+                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CloudDownload" Href="@BookDownloadUrl" Target="_blank" download="@BookDbFileName" OnClick="SetLastBackupDate">@Localizer["Backup"]</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
         <MudItem xs="12" sm="6" md="4" lg="3">
             <MudCard Elevation="5">
                 <MudCardContent Style="min-height: 130px;">
-                    <MudText Typo="Typo.h5">Restore</MudText>
-                    <MudText Typo="Typo.body2">Replace the database with a previous backup</MudText>
+                    <MudText Typo="Typo.h5">@Localizer["Restore"]</MudText>
+                    <MudText Typo="Typo.body2">@Localizer["DatabaseRestoreText"]</MudText>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Color="Color.Primary" Variant="Variant.Filled" HtmlTag="label" for="inputFile" StartIcon="@Icons.Material.Filled.CloudUpload">Restore</MudButton>
+                    <MudButton Color="Color.Primary" Variant="Variant.Filled" HtmlTag="label" for="inputFile" StartIcon="@Icons.Material.Filled.CloudUpload">@Localizer["Restore"]</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
         <MudItem xs="12" sm="6" md="4" lg="3">
             <MudCard Elevation="5">
                 <MudCardContent Style="min-height: 130px;">
-                    <MudText Typo="Typo.h5">Load Demo Data</MudText>
-                    <MudText Typo="Typo.body2">Replace the database with demonstration data</MudText>
+                    <MudText Typo="Typo.h5">@Localizer["LoadDemoData"]</MudText>
+                    <MudText Typo="Typo.body2">@Localizer["DatabaseDemoText"]</MudText>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CloudUpload" OnClick="LoadDemoData">Demo Data</MudButton>
+                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CloudUpload" OnClick="LoadDemoData">@Localizer["LoadDemoData"]</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
         <MudItem xs="12" sm="6" md="4" lg="3">
             <MudCard Elevation="5">
                 <MudCardContent Style="min-height: 130px;">
-                    <MudText Typo="Typo.h5">Delete</MudText>
-                    <MudText Typo="Typo.body2">Delete the current database and use one with default Types and no Entries</MudText>
+                    <MudText Typo="Typo.h5">@Localizer["Delete"]</MudText>
+                    <MudText Typo="Typo.body2">@Localizer["DatabaseDeleteText"]</MudText>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Color="Color.Error" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" OnClick="DeleteDatabase">Delete</MudButton>
+                    <MudButton Color="Color.Error" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" OnClick="DeleteDatabase">@Localizer["Delete"]</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>

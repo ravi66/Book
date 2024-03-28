@@ -13,6 +13,8 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
+builder.Services.AddLocalization();
+
 builder.Services.AddSqliteWasmDbContextFactory<BookDbContext>(
   opts => opts.UseSqlite("Data Source=book.sqlite3"));
 

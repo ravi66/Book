@@ -18,13 +18,13 @@ namespace Book.Buttons
 
         protected async override Task OnInitializedAsync()
         {
-            AriaLabel = TransactionId == 0 ? "Create New Entry" : "Edit Entry";
+            AriaLabel = TransactionId == 0 ? Localizer["NewEntry"] : Localizer["EditEntry"];
             Variant = TransactionId == 0 ? Variant.Filled : Variant.Text;
         }
 
         private async Task CallTransactionDialog()
         {
-            DialogTitle = TransactionId == 0 ? "New Entry" : "Edit Entry";
+            DialogTitle = TransactionId == 0 ? Localizer["NewEntry"] : Localizer["EditEntry"];
 
             DialogService.Show<TransactionDialog>(DialogTitle, new DialogParameters<TransactionDialog>{ { x => x.SavedTransactionId, TransactionId } });
         }

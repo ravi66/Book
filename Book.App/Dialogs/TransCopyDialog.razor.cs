@@ -20,20 +20,23 @@ namespace Book.Dialogs
 
         public record Frequency(int FrequencyID, string FrequencyName);
 
-        private List<Frequency> Frequencies { get; set; } = [
+        private List<Frequency> Frequencies { get; set; } =
+            [
                 new Frequency(3, "Yearly"),
-        new Frequency(2, "Quaterly"),
-        new Frequency(5, "Bi-Monthly"),
-        new Frequency(1, "Monthly"),
-        new Frequency(4, "Weekly"),
-        new Frequency(6, "Daily"),
-    ];
+                new Frequency(2, "Quaterly"),
+                new Frequency(5, "Bimonthly"),
+                new Frequency(1, "Monthly"),
+                new Frequency(4, "Weekly"),
+                new Frequency(6, "Daily"),
+            ];
 
         private string DialogTitle { get; set; }
 
         private Frequency SelectedFrequency { get; set; }
 
         private DateTime? EndDate { get; set; }
+
+        private DateTime? MinDate { get; set; }
 
         private DateTime NewDate { get; set; }
 
@@ -49,7 +52,9 @@ namespace Book.Dialogs
 
             SelectedFrequency = Frequencies.First(f => f.FrequencyID == 3);
             EndDate = new DateTime(await BookSettingSvc.GetEndYear(), 12, 31);
-            DialogTitle = $"Copy {TransactionToCopy.Value:C2} {TransactionToCopy.TransactionType.Name} entry";
+            MinDate = new DateTime(await BookSettingSvc.GetStartYear(), 1, 1);
+
+            DialogTitle = $"{Localizer["Copy"]} {TransactionToCopy.Value:C2} {TransactionToCopy.TransactionType.Name} {Localizer["Entry"]}";
 
             await LoadCopiedTransactions();
             StateHasChanged();
@@ -98,11 +103,10 @@ namespace Book.Dialogs
 
             var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
             {
-                { x => x.AcceptLabel, NewTransactions.Count() > 1 ? $"Create {NewTransactions.Count()} Entries?" : $"Create 1 Entry?" },
+                { x => x.AcceptLabel, NewTransactions.Count() > 1 ? $"{Localizer["Create"]} {NewTransactions.Count()} {Localizer["Entries"]}?" : $"{Localizer["Create1Entry"]}?" },
                 { x => x.AcceptColour, Color.Primary },
-                { x => x.AcceptToolTip, "Create Entries" },
+                { x => x.AcceptToolTip, Localizer["CreateEntries"] },
                 { x => x.CancelColour, Color.Default },
-                { x => x.CancelLabel, "Cancel" },
             });
 
             if ((await dialog.Result).Canceled) return;

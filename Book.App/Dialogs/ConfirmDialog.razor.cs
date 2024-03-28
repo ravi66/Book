@@ -4,17 +4,17 @@
     {
         [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
-        [Parameter] public string CancelLabel { get; set; } = "Cancel";
+        [Parameter] public string CancelLabel { get; set; } = string.Empty;
 
         [Parameter] public Color CancelColour { get; set; } = Color.Default;
 
-        [Parameter] public string CancelToolTip { get; set; } = "Cancel";
+        [Parameter] public string CancelToolTip { get; set; } = string.Empty;
 
-        [Parameter] public string AcceptLabel { get; set; } = "Continue";
+        [Parameter] public string AcceptLabel { get; set; } = string.Empty;
 
         [Parameter] public Color AcceptColour { get; set; } = Color.Default;
 
-        [Parameter] public string AcceptToolTip { get; set; } = "Continue";
+        [Parameter] public string AcceptToolTip { get; set; } = string.Empty;
 
         [Parameter] public bool Warning { get; set; }
 
@@ -32,6 +32,11 @@
             MudDialog.SetOptions(MudDialog.Options);
 
             if (Warning) ContentClass = "mud-warning";
+
+            if (string.IsNullOrEmpty(CancelLabel)) CancelLabel = Localizer["Cancel"];
+            if (string.IsNullOrEmpty(CancelToolTip)) CancelToolTip = Localizer["Cancel"];
+            if (string.IsNullOrEmpty(AcceptLabel)) AcceptLabel = Localizer["Continue"];
+            if (string.IsNullOrEmpty(AcceptToolTip)) AcceptToolTip = Localizer["Continue"];
         }
     }
 }

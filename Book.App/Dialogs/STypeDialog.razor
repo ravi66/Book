@@ -6,28 +6,28 @@
             <MudGrid Spacing="1" Justify="Justify.FlexStart" >
                 <MudItem xs="12" sm="6">
                     <MudPaper Elevation="5">
-                        <MudTextField Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="SummaryType.Name" For="@(() => SummaryType.Name)" Required="true" />
+                        <MudTextField Label="@Localizer["Name"]" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="SummaryType.Name" For="@(() => SummaryType.Name)" Required="true" />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudPaper Elevation="5">
-                        <MudNumericField Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="SummaryType.Order" For="@(() => SummaryType.Order)" HideSpinButtons="true" />
+                        <MudNumericField Label="@Localizer["Order"]" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="SummaryType.Order" For="@(() => SummaryType.Order)" HideSpinButtons="true" />
                     </MudPaper>
                 </MudItem>
                 <MudItem>
                     <MudPaper Elevation="5">
-                        <MudText>Created: @SummaryType.CreateDate.ToShortDateString()</MudText>
+                        <MudText>@Localizer["Created"]: @SummaryType.CreateDate.ToShortDateString()</MudText>
                     </MudPaper>
                 </MudItem>
             </MudGrid>
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="Save Summary Type" OnClick="@(async () => await Save())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveSummaryType"]" OnClick="@(async () => await Save())" />
         @if (SummaryType.Types.Count < 1 && SummaryType.SummaryTypeId > 0)
         {
             <DeleteSTypeBtn SummaryType="@SummaryType" Size="@Size.Medium" Variant="@Variant.Filled" />
         }
-        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="quit" OnClick="Close" />
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["Close"]" OnClick="Close" />
     </DialogActions>
 </MudDialog>

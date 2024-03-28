@@ -18,11 +18,11 @@ namespace Book.Buttons
         {
             var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
                 {
-                    { x => x.AcceptLabel, $"Delete {Transaction.TransactionTypeName} Entry for {Transaction.Value:C2}" },
+                    { x => x.AcceptLabel, $"{Localizer["Delete"]} {Transaction.TransactionTypeName} {Localizer["EntryFor"]} {Transaction.Value:C2}" },
                     { x => x.AcceptColour, Color.Error },
-                    { x => x.AcceptToolTip, "Delete Entry" },
+                    { x => x.AcceptToolTip, Localizer["DeleteEntry"] },
                     { x => x.CancelColour, Color.Success },
-                    { x => x.CancelLabel, "No" },
+                    { x => x.CancelLabel, Localizer["No"] },
                 });
 
             if (!(await dialog.Result).Canceled && Transaction.TransactionId != 0)

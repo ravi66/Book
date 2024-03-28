@@ -1,0 +1,537 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Alcohol" xml:space="preserve">
+    <value>Alcohol</value>
+  </data>
+  <data name="BackPage" xml:space="preserve">
+    <value>Return to calling Page</value>
+  </data>
+  <data name="BackToSummary" xml:space="preserve">
+    <value>Back to Summary</value>
+  </data>
+  <data name="Backup" xml:space="preserve">
+    <value>Back up</value>
+  </data>
+  <data name="BackupPrefix" xml:space="preserve">
+    <value>Backup file prefix</value>
+  </data>
+  <data name="Bimonthly" xml:space="preserve">
+    <value>Bimonthly</value>
+  </data>
+  <data name="BlazorLogo" xml:space="preserve">
+    <value>Blazor Logo</value>
+  </data>
+  <data name="BlazorText" xml:space="preserve">
+    <value>Blazor lets you build interactive web UIs using C# instead of JavaScript. Blazor apps are composed of reusable web UI components implemented using C#, HTML, and CSS. Both client and server code is written in C#, allowing you to share code and libraries.</value>
+  </data>
+  <data name="BlazorWasm" xml:space="preserve">
+    <value>Blazor WebAssembly (Wasm)</value>
+  </data>
+  <data name="Book" xml:space="preserve">
+    <value>Book</value>
+  </data>
+  <data name="BookName" xml:space="preserve">
+    <value>Book Name</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Cash" xml:space="preserve">
+    <value>Cash</value>
+  </data>
+  <data name="ChangesLost" xml:space="preserve">
+    <value>All changes will be permanently lost</value>
+  </data>
+  <data name="ChangesLostBU" xml:space="preserve">
+    <value>All changes made after {0} will be permanently lost</value>
+  </data>
+  <data name="Chart" xml:space="preserve">
+    <value>Chart</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="CloseMenu" xml:space="preserve">
+    <value>Close Menu</value>
+  </data>
+  <data name="Clothing" xml:space="preserve">
+    <value>Clothing</value>
+  </data>
+  <data name="Continue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="CopyEntry" xml:space="preserve">
+    <value>Copy Entry</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Create1Entry" xml:space="preserve">
+    <value>Create 1 Entry</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="CreateEntries" xml:space="preserve">
+    <value>Create Entries</value>
+  </data>
+  <data name="Credits" xml:space="preserve">
+    <value>Credits</value>
+  </data>
+  <data name="Daily" xml:space="preserve">
+    <value>Daily</value>
+  </data>
+  <data name="DarkMode" xml:space="preserve">
+    <value>Dark Mode</value>
+  </data>
+  <data name="Database" xml:space="preserve">
+    <value>Database</value>
+  </data>
+  <data name="DatabaseAlertMessage" xml:space="preserve">
+    <value>Any changes you make are saved in an SQLite database. It is highly recommended to periodically back this up. Last backup: </value>
+  </data>
+  <data name="DatabaseBackupText" xml:space="preserve">
+    <value>Copy the database to a file</value>
+  </data>
+  <data name="DatabaseDeleteText" xml:space="preserve">
+    <value>Delete the current database and use one with default Types and no Entries</value>
+  </data>
+  <data name="DatabaseDemoAcptToolTip" xml:space="preserve">
+    <value>Overwrite saved changes with Demonstration data</value>
+  </data>
+  <data name="DatabaseDemoText" xml:space="preserve">
+    <value>Replace the database with demonstration data</value>
+  </data>
+  <data name="DatabaseRestoreText" xml:space="preserve">
+    <value>Replace the database with a previous backup</value>
+  </data>
+  <data name="DatabaseVersion" xml:space="preserve">
+    <value>Database Version</value>
+  </data>
+  <data name="Dated" xml:space="preserve">
+    <value>Dated</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteEntry" xml:space="preserve">
+    <value>Delete Entry</value>
+  </data>
+  <data name="DeleteEntryType" xml:space="preserve">
+    <value>Delete Entry Type</value>
+  </data>
+  <data name="DeleteSavedChanges" xml:space="preserve">
+    <value>Delete Saved Changes</value>
+  </data>
+  <data name="DeleteSummaryType" xml:space="preserve">
+    <value>Delete Summary Type</value>
+  </data>
+  <data name="EditEntry" xml:space="preserve">
+    <value>Edit Entry</value>
+  </data>
+  <data name="EditEntryType" xml:space="preserve">
+    <value>Edit EntryType</value>
+  </data>
+  <data name="EditSummaryType" xml:space="preserve">
+    <value>Edit Summary Type</value>
+  </data>
+  <data name="EFCore" xml:space="preserve">
+    <value>Entity Framework Core</value>
+  </data>
+  <data name="EFCoreLogo" xml:space="preserve">
+    <value>EF Core Logo</value>
+  </data>
+  <data name="EFCoreText" xml:space="preserve">
+    <value>Entity Framework (EF) Core is an object-database mapper for .NET.</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>End Date</value>
+  </data>
+  <data name="EndDateReqd" xml:space="preserve">
+    <value>End Date must be specified</value>
+  </data>
+  <data name="EndYear" xml:space="preserve">
+    <value>End Year</value>
+  </data>
+  <data name="Entertainment" xml:space="preserve">
+    <value>Entertainment</value>
+  </data>
+  <data name="Entries" xml:space="preserve">
+    <value>Entries</value>
+  </data>
+  <data name="EntriesFiltered" xml:space="preserve">
+    <value>Entries Filtered</value>
+  </data>
+  <data name="Entry" xml:space="preserve">
+    <value>Entry</value>
+  </data>
+  <data name="EntryFor" xml:space="preserve">
+    <value>Entry for</value>
+  </data>
+  <data name="EntryMustBeDated" xml:space="preserve">
+    <value>An Entry must have a date</value>
+  </data>
+  <data name="EntryType" xml:space="preserve">
+    <value>Entry Type</value>
+  </data>
+  <data name="EntryTypes" xml:space="preserve">
+    <value>Entry Types</value>
+  </data>
+  <data name="Expenditure" xml:space="preserve">
+    <value>Expenditure</value>
+  </data>
+  <data name="ExpenditureChart" xml:space="preserve">
+    <value>Expenditure Chart</value>
+  </data>
+  <data name="FluentValidation" xml:space="preserve">
+    <value>Fluent Validation</value>
+  </data>
+  <data name="FluentValidationLogo" xml:space="preserve">
+    <value>Fluent Validation Logo</value>
+  </data>
+  <data name="Food" xml:space="preserve">
+    <value>Food</value>
+  </data>
+  <data name="Frequency" xml:space="preserve">
+    <value>Frequency</value>
+  </data>
+  <data name="Fun" xml:space="preserve">
+    <value>Fun</value>
+  </data>
+  <data name="FVText" xml:space="preserve">
+    <value>A validation library for .NET that uses a fluent interface and lambda expressions for building strongly-typed validation rules.</value>
+  </data>
+  <data name="Groceries" xml:space="preserve">
+    <value>Groceries</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Hide</value>
+  </data>
+  <data name="Holiday" xml:space="preserve">
+    <value>Holiday</value>
+  </data>
+  <data name="Household" xml:space="preserve">
+    <value>Household</value>
+  </data>
+  <data name="In" xml:space="preserve">
+    <value>in</value>
+  </data>
+  <data name="Info" xml:space="preserve">
+    <value>More Information</value>
+  </data>
+  <data name="LastBackupDate" xml:space="preserve">
+    <value>Last Backup Date</value>
+  </data>
+  <data name="LightMode" xml:space="preserve">
+    <value>Light Mode</value>
+  </data>
+  <data name="ListEntriesForEntryType" xml:space="preserve">
+    <value>List Entries for EntryType</value>
+  </data>
+  <data name="ListEntriesForSummaryType" xml:space="preserve">
+    <value>List Entries for Summary Type</value>
+  </data>
+  <data name="LoadDemoData" xml:space="preserve">
+    <value>Load Demo Data</value>
+  </data>
+  <data name="LoadingEntries" xml:space="preserve">
+    <value>Loading Entries ...</value>
+  </data>
+  <data name="Monthly" xml:space="preserve">
+    <value>Monthly</value>
+  </data>
+  <data name="MoreInformation" xml:space="preserve">
+    <value>More Information</value>
+  </data>
+  <data name="MoreInfoText" xml:space="preserve">
+    <value>Book enables the recording of Entries via the New Entry button while the Summary (Home) page shows monthly balances. An Entry has a Type, these Types are collated into Summaries that are used as columns on the Summary page. You can add Summaries by pressing the menu button and then the Types option. This page also lets you create and edit Entry Types.</value>
+  </data>
+  <data name="Mortgage" xml:space="preserve">
+    <value>Mortgage</value>
+  </data>
+  <data name="MudBlazor" xml:space="preserve">
+    <value>MudBlazor</value>
+  </data>
+  <data name="MudBlazorLogo" xml:space="preserve">
+    <value>MudBlazor Logo</value>
+  </data>
+  <data name="MudBlazorText" xml:space="preserve">
+    <value>MudBlazor is a UI component library written from the ground up for Blazor.</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="NewEntry" xml:space="preserve">
+    <value>New Entry</value>
+  </data>
+  <data name="NewEntryType" xml:space="preserve">
+    <value>New Entry Type</value>
+  </data>
+  <data name="NewSummaryType" xml:space="preserve">
+    <value>New Summary Type</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="NoBackupRecorded" xml:space="preserve">
+    <value>No backup recorded</value>
+  </data>
+  <data name="NoEntriesFound" xml:space="preserve">
+    <value>No Entries Found</value>
+  </data>
+  <data name="NoEntryTypesFor" xml:space="preserve">
+    <value>No Entry Types for</value>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="OpenMenu" xml:space="preserve">
+    <value>Open Menu</value>
+  </data>
+  <data name="Order" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="Property" xml:space="preserve">
+    <value>Property</value>
+  </data>
+  <data name="Quaterly" xml:space="preserve">
+    <value>Quaterly</value>
+  </data>
+  <data name="Rent" xml:space="preserve">
+    <value>Rent</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Reset</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="SaveEntry" xml:space="preserve">
+    <value>Save Entry</value>
+  </data>
+  <data name="SaveEntryType" xml:space="preserve">
+    <value>Save Entry Type</value>
+  </data>
+  <data name="SaveSettings" xml:space="preserve">
+    <value>Save Settings</value>
+  </data>
+  <data name="SaveSummaryType" xml:space="preserve">
+    <value>Save Summary Type</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SettingValue" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="Show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="SqliteLogo" xml:space="preserve">
+    <value>Sqlite Logo</value>
+  </data>
+  <data name="SqliteWasmHelper" xml:space="preserve">
+    <value>SqliteWasmHelper</value>
+  </data>
+  <data name="SqliteWasmHelperText" xml:space="preserve">
+    <value>SqliteWasmHelper enables using a EFCore compatible SQLite database that persits in the Browser's cache</value>
+  </data>
+  <data name="StartYear" xml:space="preserve">
+    <value>Start Year</value>
+  </data>
+  <data name="Summaries" xml:space="preserve">
+    <value>Summaries</value>
+  </data>
+  <data name="Summary" xml:space="preserve">
+    <value>Summary</value>
+  </data>
+  <data name="SummaryType" xml:space="preserve">
+    <value>Summary Type</value>
+  </data>
+  <data name="Takeaway" xml:space="preserve">
+    <value>Takeaway</value>
+  </data>
+  <data name="Times" xml:space="preserve">
+    <value>times</value>
+  </data>
+  <data name="Tools" xml:space="preserve">
+    <value>Tools</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="Trackor" xml:space="preserve">
+    <value>Trackor</value>
+  </data>
+  <data name="TrackorLogo" xml:space="preserve">
+    <value>Trackor Logo</value>
+  </data>
+  <data name="TrackorText" xml:space="preserve">
+    <value>Trackor is a Blazor WASM application that uses many of the above packages. I shamelessly used it as both an inspiration and direct code source.</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Types" xml:space="preserve">
+    <value>Types</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="Utilities" xml:space="preserve">
+    <value>Utilities</value>
+  </data>
+  <data name="Value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="ViewAnotherYear" xml:space="preserve">
+    <value>View Another Year</value>
+  </data>
+  <data name="Visited" xml:space="preserve">
+    <value>Visited</value>
+  </data>
+  <data name="Wages" xml:space="preserve">
+    <value>Wages</value>
+  </data>
+  <data name="WarningUpp" xml:space="preserve">
+    <value>WARNING</value>
+  </data>
+  <data name="Weekly" xml:space="preserve">
+    <value>Weekly</value>
+  </data>
+  <data name="Work" xml:space="preserve">
+    <value>Work</value>
+  </data>
+  <data name="WorkExpenses" xml:space="preserve">
+    <value>Work Expenses</value>
+  </data>
+  <data name="YearChart" xml:space="preserve">
+    <value>Year Chart</value>
+  </data>
+  <data name="Yearly" xml:space="preserve">
+    <value>Yearly</value>
+  </data>
+</root>

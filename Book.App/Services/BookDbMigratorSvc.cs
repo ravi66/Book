@@ -1,6 +1,6 @@
 ﻿namespace Book.Services
 {
-    public class BookDbMigratorSvc(ISqliteWasmDbContextFactory<BookDbContext> dbContextFactory) : IBookDbMigratorSvc
+    internal class BookDbMigratorSvc(ISqliteWasmDbContextFactory<BookDbContext> dbContextFactory) : IBookDbMigratorSvc
     {
         private const string CurrentDbVersion = "1.00";
 

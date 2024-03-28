@@ -1,41 +1,38 @@
 ﻿<MudDialog>
     <DialogContent>
-        <MudStack AlignItems="AlignItems.Center" Row="true" Class="pa-2" >
-            <MudText Typo="Typo.h6" >@DialogTitle</MudText>
-            <MudSpacer />
-            <MudTooltip Text="Create Entries" Delay="500" Duration="0" ShowOnFocus="false">
-                <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Save" OnClick="HandleSubmit" aria-label="create entries" Size="Size.Small"/>
-            </MudTooltip>
-            <MudTooltip Text="Quit" Delay="500" Duration="0" ShowOnFocus="false">
-                <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Cancel" OnClick="Close" aria-label="quit" Size="Size.Small" />
-            </MudTooltip>
-        </MudStack>
-        <MudPaper Elevation="5" Class="pa-1" >
-            <MudGrid>
-                <MudItem>
-                    <MudSelect Label="Frequency" T="Frequency" Value="SelectedFrequency" AnchorOrigin="Origin.BottomCenter" ValueChanged="@(FrequencyChanged)" Dense="true" Margin="Margin.Dense" Variant="Variant.Outlined">
-                        @foreach (var frequency in Frequencies)
-                        {
-                            <MudSelectItem Value="frequency">@frequency.FrequencyName</MudSelectItem>
-                        }
-                    </MudSelect>
-                </MudItem>
-                <MudItem>
-                    <MudDatePicker Label="End Date" Variant="Variant.Outlined" Required="true" RequiredError="End Date must be specified" Date="EndDate" PickerVariant="PickerVariant.Dialog" DisableToolbar="true" Editable="true" Margin="Margin.Dense" DateChanged="EndDateChanged"/>
-                </MudItem>
-            </MudGrid>
+        <MudPaper Elevation="0" Style="min-height: 75vh;">
+            <MudStack AlignItems="AlignItems.Center" Row="true" Class="pa-2">
+                <MudText Typo="Typo.h6">@DialogTitle</MudText>
+                <MudSpacer />
+                <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Save" OnClick="HandleSubmit" Title="@Localizer["CreateEntries"]" Size="Size.Small" />
+                <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Cancel" OnClick="Close" Title="@Localizer["Close"]" Size="Size.Small" />
+            </MudStack>
+            <MudPaper Elevation="5" Class="pa-1">
+                <MudGrid>
+                    <MudItem>
+                        <MudSelect Label="@Localizer["Frequency"]" T="Frequency" Value="SelectedFrequency" AnchorOrigin="Origin.BottomCenter" ValueChanged="@(FrequencyChanged)" Dense="true" Margin="Margin.Dense" Variant="Variant.Outlined">
+                            @foreach (var frequency in Frequencies)
+                            {
+                                <MudSelectItem Value="frequency">@Localizer[frequency.FrequencyName]</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem>
+                        <MudDatePicker Label="@Localizer["EndDate"]" Variant="Variant.Outlined" Required="true" RequiredError="@Localizer["EndDateReqd"]" Date="EndDate" Editable="true" Margin="Margin.Dense" DateChanged="EndDateChanged" MaxDate="EndDate" MinDate="MinDate" PickerVariant="PickerVariant.Dialog" />
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+            <MudTable Items="@NewTransactions" Hover="true" Dense="true" SortLabel="Sort By" Elevation="5" AllowUnsorted="false" Class="mt-0 mb-2 ms-0 me-0 ps-2 pe-2">
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Transaction, object>(x=>x.TransactionDate)">@Localizer["Dated"]</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel=@Localizer["Dated"]>
+                        @context.TransactionDate.ToShortDateString()
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="() => DeleteTransaction(context.TransactionDate)" Size="Size.Small" Title="@Localizer["DeleteEntry"]" />
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
         </MudPaper>
-        <MudTable Items="@NewTransactions" Hover="true" Dense="true" SortLabel="Sort By" Elevation="5" AllowUnsorted="false" Class="mt-0 mb-2 ms-0 me-0 ps-2 pe-2">
-            <HeaderContent>
-                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Transaction, object>(x=>x.TransactionDate)">Dated</MudTableSortLabel></MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Dated" >@context.TransactionDate.ToShortDateString()
-                    <MudTooltip Text="Delete Entry" Delay="500" Duration="0" ShowOnFocus="false" >
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" aria-label="delete entry" OnClick="() => DeleteTransaction(context.TransactionDate)" Size="Size.Small" />
-                    </MudTooltip>
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
     </DialogContent>
 </MudDialog>

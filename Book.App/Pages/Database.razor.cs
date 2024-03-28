@@ -21,7 +21,7 @@ namespace Book.Pages
 
         public string BookDbFileName { get; set; }
 
-        private string BookName { get; set; } = Constants.BookName;
+        private string BookName { get; set; } = string.Empty;
 
         public string LastBackupDate { get; set; } = string.Empty;
 
@@ -50,10 +50,10 @@ namespace Book.Pages
             var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
             {
                 { x => x.AcceptColour, Color.Error },
-                { x => x.AcceptToolTip, "Delete saved changes" },
+                { x => x.AcceptToolTip, Localizer["DeleteSavedChanges"] },
                 { x => x.CancelColour, Color.Success },
                 { x => x.Warning, true },
-                { x => x.WarningMessage, LastBackupDate != "No backup recorded" ? $"All changes made after {LastBackupDate} will be permanently lost" : "All changes will be permanently lost" },
+                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU"].ToString().Replace("{0}", LastBackupDate) : Localizer["ChangesLost"] },
             });
 
             if (!(await dialog.Result).Canceled)
@@ -75,10 +75,10 @@ namespace Book.Pages
             var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
             {
                 { x => x.AcceptColour, Color.Error },
-                { x => x.AcceptToolTip, "Overwrite saved changes with Demonstration data" },
+                { x => x.AcceptToolTip, Localizer["DatabaseDemoAcptToolTip"] },
                 { x => x.CancelColour, Color.Success },
                 { x => x.Warning, true },
-                { x => x.WarningMessage, LastBackupDate != "No backup recorded" ? $"All changes made after {LastBackupDate} will be permanently lost" : "All changes will be permanently lost" },
+                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU"].ToString().Replace("{0}", LastBackupDate) : Localizer["ChangesLost"] },
             });
 
             if (!(await dialog.Result).Canceled)
@@ -92,6 +92,8 @@ namespace Book.Pages
             }
 
         }
+
+        private void Back() => NavigationManager.NavigateTo("/", false);
 
         async ValueTask IAsyncDisposable.DisposeAsync()
         {

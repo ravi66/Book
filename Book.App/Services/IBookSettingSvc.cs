@@ -1,7 +1,10 @@
-﻿namespace Book.Services
+﻿using System.Runtime.CompilerServices;
+
+namespace Book.Services
 {
     public interface IBookSettingSvc
     {
+        public Task EnsureUserAmendableSettingsCreated();
         public Task<string> GetBookName();
         public Task<bool> GetDarkMode();
         public Task<int> GetStartYear();

@@ -10,6 +10,6 @@ namespace Book.Buttons
 
         [Inject] public IDialogService DialogService { get; set; }
 
-        async Task CopyTransaction() => DialogService.Show<TransCopyDialog>("Copy", new DialogParameters<TransCopyDialog> { { c => c.TransactionToCopyId, Transaction.TransactionId } });
+        async Task CopyTransaction() => DialogService.Show<TransCopyDialog>(Localizer["Copy"], new DialogParameters<TransCopyDialog> { { c => c.TransactionToCopyId, Transaction.TransactionId } });
     }
 }
