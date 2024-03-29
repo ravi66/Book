@@ -17,6 +17,7 @@ namespace Book.Shared
         private bool _isDarkMode = true;
         private string themeIcon = Icons.Material.Filled.LightMode;
         private string themeText = string.Empty;
+        private Color themeColor = Color.Warning;
 
         private string BookName = string.Empty;
 
@@ -59,6 +60,7 @@ namespace Book.Shared
         {
             themeIcon = _isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
             themeText = _isDarkMode ? Localizer["LightMode"] : Localizer["DarkMode"];
+            themeColor = _isDarkMode ? Color.Warning : Color.Dark;
         }
     }
 }

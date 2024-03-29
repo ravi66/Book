@@ -11,6 +11,7 @@
         <TransactionBtn IsIcon="false" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
         <MudSpacer />
         <MudIconButton Class="pa-0" Href="info" Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large" Title="@Localizer["MoreInformation"]"/>
+        <MudIconButton Class="py-0 px-2" OnClick="ToggleThemeMode" Icon="@themeIcon" Color="@themeColor" Size="Size.Large" Title="@themeText" />
     </MudAppBar>
     <MudDrawer @bind-Open="@drawerOpen" Variant="DrawerVariant.Responsive" Elevation="0">
         <MudDrawerHeader Dense="true" >
@@ -39,12 +40,6 @@
                 <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Row="true" >
                     <MudIcon Icon="fas fa-database" />
                     <MudText Typo="Typo.h6">@Localizer["Database"]</MudText>
-                </MudStack>
-            </MudNavLink>
-            <MudNavLink OnClick="ToggleThemeMode">
-                <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Row="true" >
-                    <MudIcon Icon="@themeIcon" />
-                    <MudText Typo="Typo.h6">@themeText</MudText>
                 </MudStack>
             </MudNavLink>
         </MudNavMenu>
