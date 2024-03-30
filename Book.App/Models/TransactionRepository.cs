@@ -1,6 +1,6 @@
 ﻿namespace Book.Models
 {
-    internal sealed class TransactionRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ITransactionRepository
+    internal sealed class TransactionRepository(IDbContextFactory<BookDbContext> db) : ITransactionRepository
     {
         public async Task<Transaction?> GetTransactionById(int transactionId)
         {

@@ -135,6 +135,15 @@
   <data name="Bimonthly" xml:space="preserve">
     <value>Bimonthly</value>
   </data>
+  <data name="BitBesql" xml:space="preserve">
+    <value>Bit.Besql</value>
+  </data>
+  <data name="BitBesqlLogo" xml:space="preserve">
+    <value>Bit Platform Logo</value>
+  </data>
+  <data name="BitBesqlText" xml:space="preserve">
+    <value>Bit.Besql enables using a EFCore compatible SQLite database that persits in the Browser's cache</value>
+  </data>
   <data name="BlazorLogo" xml:space="preserve">
     <value>Blazor Logo</value>
   </data>
@@ -449,15 +458,6 @@
   </data>
   <data name="Show" xml:space="preserve">
     <value>Show</value>
-  </data>
-  <data name="SqliteLogo" xml:space="preserve">
-    <value>Sqlite Logo</value>
-  </data>
-  <data name="SqliteWasmHelper" xml:space="preserve">
-    <value>SqliteWasmHelper</value>
-  </data>
-  <data name="SqliteWasmHelperText" xml:space="preserve">
-    <value>SqliteWasmHelper enables using a EFCore compatible SQLite database that persits in the Browser's cache</value>
   </data>
   <data name="StartYear" xml:space="preserve">
     <value>Start Year</value>

@@ -1,6 +1,6 @@
 ﻿namespace Book.Models
 {
-    internal sealed class SummaryTypeRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ISummaryTypeRepository
+    internal sealed class SummaryTypeRepository(IDbContextFactory<BookDbContext> db) : ISummaryTypeRepository
     {
         public async Task<List<SummaryType>> GetAllSummaryTypes()
         {

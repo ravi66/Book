@@ -1,10 +1,6 @@
 using Book;
-using Book.Models;
-using Book.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.EntityFrameworkCore;
-using SqliteWasmHelper;
 using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -15,8 +11,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddLocalization();
 
-builder.Services.AddSqliteWasmDbContextFactory<BookDbContext>(
-  opts => opts.UseSqlite("Data Source=book.sqlite3"));
+builder.Services.AddBesqlDbContextFactory<BookDbContext>(options => options.UseSqlite("Data Source=book.sqlite3"));
 
 builder.Services.AddMudServices();
 

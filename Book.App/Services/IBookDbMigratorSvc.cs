@@ -2,6 +2,9 @@
 {
     public interface IBookDbMigratorSvc
     {
-        public Task EnsureDbCreated();
+        public Task<string> EnsureDbCreated();
+        public Task<string> EnsureDbMigratedAsync(string dbVersion);
+        public Task ApplyDbVersionAsync(string dbVersion);
+        public Task DeleteDatabase();
     }
 }

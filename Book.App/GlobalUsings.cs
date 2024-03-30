@@ -3,7 +3,6 @@ global using System.ComponentModel.DataAnnotations.Schema;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Components;
 global using Microsoft.Extensions.Localization;
-global using SqliteWasmHelper;
 global using MudBlazor;
 global using Book.Models;
 global using Book.Dialogs;

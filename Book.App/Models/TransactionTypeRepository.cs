@@ -1,6 +1,6 @@
 ﻿namespace Book.Models
 {
-    internal sealed class TransactionTypeRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : ITransactionTypeRepository
+    internal sealed class TransactionTypeRepository(IDbContextFactory<BookDbContext> db) : ITransactionTypeRepository
     {
         public async Task<IEnumerable<TransactionType>> GetAllTransactionTypes()
         {

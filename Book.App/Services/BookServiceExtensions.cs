@@ -4,15 +4,17 @@
     {
         public static IServiceCollection AddBookServices(this IServiceCollection services)
         {
-            services.AddSingleton<IBookDbMigratorSvc, BookDbMigratorSvc>();
-            services.AddSingleton<IBookSettingRepository, BookSettingRepository>();
-            services.AddSingleton<ISummaryTypeRepository, SummaryTypeRepository>();
-            services.AddSingleton<ITransactionTypeRepository, TransactionTypeRepository>();
-            services.AddSingleton<ITransactionRepository, TransactionRepository>();
-            services.AddSingleton<IBookSettingSvc, BookSettingSvc>();
-            services.AddSingleton<INotifierSvc, NotifierSvc>();
-
+            // Scoped
+            services.AddScoped<IBookDbMigratorSvc, BookDbMigratorSvc>();
+            services.AddScoped<IBookSettingRepository, BookSettingRepository>();
+            services.AddScoped<IBookSettingSvc, BookSettingSvc>();
+            services.AddScoped<ISummaryTypeRepository, SummaryTypeRepository>();
+            services.AddScoped<ITransactionTypeRepository, TransactionTypeRepository>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<TransListSvc>();
+
+            // Singletons
+            services.AddSingleton<INotifierSvc, NotifierSvc>();
 
             return services;
         }

@@ -115,6 +115,33 @@ namespace Book.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bit.Besql.
+        /// </summary>
+        internal static string BitBesql {
+            get {
+                return ResourceManager.GetString("BitBesql", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bit Platform Logo.
+        /// </summary>
+        internal static string BitBesqlLogo {
+            get {
+                return ResourceManager.GetString("BitBesqlLogo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bit.Besql enables using a EFCore compatible SQLite database that persits in the Browser&apos;s cache.
+        /// </summary>
+        internal static string BitBesqlText {
+            get {
+                return ResourceManager.GetString("BitBesqlText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Blazor Logo.
         /// </summary>
         internal static string BlazorLogo {
@@ -1056,33 +1083,6 @@ namespace Book.Resources {
         internal static string Show {
             get {
                 return ResourceManager.GetString("Show", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Sqlite Logo.
-        /// </summary>
-        internal static string SqliteLogo {
-            get {
-                return ResourceManager.GetString("SqliteLogo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SqliteWasmHelper.
-        /// </summary>
-        internal static string SqliteWasmHelper {
-            get {
-                return ResourceManager.GetString("SqliteWasmHelper", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SqliteWasmHelper enables using a EFCore compatible SQLite database that persits in the Browser&apos;s cache.
-        /// </summary>
-        internal static string SqliteWasmHelperText {
-            get {
-                return ResourceManager.GetString("SqliteWasmHelperText", resourceCulture);
             }
         }
         

@@ -7,7 +7,7 @@ Book is a project used as a learning experience in various technologies new to m
 - [Blazor WebAssembly](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor)
 - [EF Core](https://docs.microsoft.com/en-us/ef/core/) backed by a SQLite
  database, _in the browser cache_, with the help of
- [SqliteWasmHelper](https://github.com/JeremyLikness/SqliteWasmHelper)
+ [Bit.Besql](https://bitplatform.dev/besql/overview)
 - [MudBlazor](https://www.mudblazor.com/) components and UI styling
 
 It is a browser application that has no back-end services - everything is accomplished 

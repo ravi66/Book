@@ -1,6 +1,6 @@
 ﻿namespace Book.Models
 {
-    internal sealed class BookSettingRepository(ISqliteWasmDbContextFactory<BookDbContext> db) : IBookSettingRepository
+    internal sealed class BookSettingRepository(IDbContextFactory<BookDbContext> db) : IBookSettingRepository
     {
         public async Task<IEnumerable<BookSetting>> GetAllBookSettings()
         {
