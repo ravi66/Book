@@ -5,6 +5,7 @@
         public static IServiceCollection AddBookServices(this IServiceCollection services)
         {
             // Scoped
+            services.AddScoped<IInitialiseSvc, InitialiseSvc>();
             services.AddScoped<IBookDbMigratorSvc, BookDbMigratorSvc>();
             services.AddScoped<IBookSettingRepository, BookSettingRepository>();
             services.AddScoped<IBookSettingSvc, BookSettingSvc>();

@@ -1,12 +1,10 @@
-using Microsoft.Extensions.Localization;
-
 namespace Book.Shared
 {
     public partial class MainLayout
     {
-        [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+        [Inject] internal IInitialiseSvc InitialiseSvc { get; set; }
 
-        [Inject] public IDialogService DialogService { get; set; }
+        [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
         [Inject] public IBookDbMigratorSvc DbMigrator { get; set; }
 
@@ -27,6 +25,9 @@ namespace Book.Shared
 
         protected async override Task OnInitializedAsync()
         {
+            // Hard Refresh to reload Index.html may be required
+            if (!await InitialiseSvc.RefreshRequiredAsync()) NavigationManager.Refresh(true);
+
             await DbMigrator.EnsureDbCreated();
 
             BookName = await BookSettingSvc.GetBookName();
