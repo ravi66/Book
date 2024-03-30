@@ -49,7 +49,7 @@
                 <td colspan="5" class="pa-5">
                     <MudTable Items="@context.TransactionTypeList" Context="TypeContext" Hover="true" Elevation="5" SortLabel="Sort By" AllowUnsorted="false" >
                         <ToolBarContent>
-                            <MudIconButton Icon="fas fa-book" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="() => AddTransactionType(context.SummaryTypeId)" Title="@Localizer["NewEntryType"]" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Receipt" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="() => AddTransactionType(context.SummaryTypeId)" Title="@Localizer["NewEntryType"]" />
                             <MudText Typo="Typo.h5">&nbsp;<strong>@context.Name</strong>&nbsp;@Localizer["EntryTypes"]</MudText>
                         </ToolBarContent>
                         <HeaderContent>
