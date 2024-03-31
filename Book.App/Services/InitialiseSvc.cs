@@ -6,8 +6,8 @@ namespace Book.Services
     {
         public async Task<bool> RefreshRequiredAsync()
         {
-            bool versionRefreshed = await LocalStorage.GetItemAsync<bool>($"{Constants.BookVersion}_Refreshed");
-            if (!versionRefreshed) await LocalStorage.SetItemAsync<bool>($"{Constants.BookVersion}_Refreshed", true);
+            bool versionRefreshed = await LocalStorage.GetItemAsync<bool>($"{Constants.IndexHtmlVersion}_Refreshed");
+            if (!versionRefreshed) await LocalStorage.SetItemAsync<bool>($"{Constants.IndexHtmlVersion}_Refreshed", true);
             return versionRefreshed;
         }
     }
