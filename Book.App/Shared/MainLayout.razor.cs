@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace Book.Shared
 {
     public partial class MainLayout
@@ -29,11 +27,6 @@ namespace Book.Shared
         {
             // Hard Refresh to reload Index.html may be required
             if (!await InitialiseSvc.RefreshRequiredAsync()) NavigationManager.Refresh(true);
-
-            //CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("fr-FR");
-            //CultureInfo cultureInfo = CultureInfo.CreateSpecificCulture("en-US");
-            //CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-            //CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 
             await DbMigrator.EnsureDbCreated();
 

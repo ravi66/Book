@@ -53,7 +53,7 @@ namespace Book.Pages
                 { x => x.AcceptToolTip, Localizer["DeleteSavedChanges"] },
                 { x => x.CancelColour, Color.Success },
                 { x => x.Warning, true },
-                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU", LastBackupDate] : Localizer["ChangesLost"] },
+                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU"].ToString().Replace("{0}", LastBackupDate) : Localizer["ChangesLost"] },
             });
 
             if (!(await dialog.Result).Canceled)
@@ -78,7 +78,7 @@ namespace Book.Pages
                 { x => x.AcceptToolTip, Localizer["DatabaseDemoAcptToolTip"] },
                 { x => x.CancelColour, Color.Success },
                 { x => x.Warning, true },
-                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU", LastBackupDate] : Localizer["ChangesLost"] },
+                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU"].ToString().Replace("{0}", LastBackupDate) : Localizer["ChangesLost"] },
             });
 
             if (!(await dialog.Result).Canceled)
