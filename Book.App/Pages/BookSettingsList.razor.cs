@@ -1,6 +1,3 @@
-using FluentValidation;
-using System.ComponentModel.DataAnnotations;
-
 namespace Book.Pages
 {
     public partial class BookSettingsList

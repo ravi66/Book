@@ -29,6 +29,7 @@ namespace Book.Shared
             if (!await InitialiseSvc.RefreshRequiredAsync()) NavigationManager.Refresh(true);
 
             await DbMigrator.EnsureDbCreated();
+            await Task.Yield();
 
             BookName = await BookSettingSvc.GetBookName();
 

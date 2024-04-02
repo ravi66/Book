@@ -48,7 +48,7 @@
             @foreach (var summary in MonthlySummaries[12].SummaryDetails)
             {
                 <MudTh Style="text-align:center" Class="pt-0 pb-1">
-                    <MudTooltip Text="@($"{summary.SummaryName} {Localizer["YearChart"]}")" Delay="500" Duration="0" ShowOnFocus="false">
+                    <MudTooltip Text="@(Localizer["YearChart", summary.SummaryName])" Delay="500" Duration="0" ShowOnFocus="false">
                         <MudButton Variant="Variant.Outlined" OnClick="@(e => YearChart(summary.SummaryTypeId))" Size="Size.Small" Class="pt-0 pb-0">@summary.SummaryName</MudButton>
                         </MudTooltip>
                     </MudTh>
@@ -56,7 +56,7 @@
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Month" Class="py-1" >
-                <MudTooltip Text="@($"{context.MonthNameFull} {Localizer["ExpenditureChart"]}")" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
+                <MudTooltip Text="@(Localizer["ExpenditureChart", context.MonthNameFull])" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
                     <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="pt-0 pb-0"><MudText>@context.MonthName</MudText></MudButton>
                 </MudTooltip>
             </MudTd>

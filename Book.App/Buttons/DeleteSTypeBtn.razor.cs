@@ -18,7 +18,7 @@ namespace Book.Buttons
         {
             var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
                 {
-                    { x => x.AcceptLabel, $"{Localizer["Delete"]} {SummaryType.Name} {Localizer["SummaryType"]}" },
+                    { x => x.AcceptLabel, Localizer["DeleteSTypeAccLabel", SummaryType.Name] },
                     { x => x.AcceptColour, Color.Error },
                     { x => x.AcceptToolTip, Localizer["DeleteSummaryType"] },
                     { x => x.CancelColour, Color.Success },

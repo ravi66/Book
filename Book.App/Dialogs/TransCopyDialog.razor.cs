@@ -54,7 +54,7 @@ namespace Book.Dialogs
             EndDate = new DateTime(await BookSettingSvc.GetEndYear(), 12, 31);
             MinDate = new DateTime(await BookSettingSvc.GetStartYear(), 1, 1);
 
-            DialogTitle = $"{Localizer["Copy"]} {TransactionToCopy.Value:C2} {TransactionToCopy.TransactionType.Name} {Localizer["Entry"]}";
+            DialogTitle = Localizer["TransCopyTitle", TransactionToCopy.Value.ToString("C2"), TransactionToCopy.TransactionType.Name];
 
             await LoadCopiedTransactions();
             StateHasChanged();
@@ -103,7 +103,7 @@ namespace Book.Dialogs
 
             var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
             {
-                { x => x.AcceptLabel, NewTransactions.Count() > 1 ? $"{Localizer["Create"]} {NewTransactions.Count()} {Localizer["Entries"]}?" : $"{Localizer["Create1Entry"]}?" },
+                { x => x.AcceptLabel, NewTransactions.Count() > 1 ? Localizer["TransCopyAccLabelM", NewTransactions.Count()] : Localizer["TransCopyAccLabelS"] },
                 { x => x.AcceptColour, Color.Primary },
                 { x => x.AcceptToolTip, Localizer["CreateEntries"] },
                 { x => x.CancelColour, Color.Default },

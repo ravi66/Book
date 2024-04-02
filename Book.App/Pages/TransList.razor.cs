@@ -117,32 +117,30 @@ namespace Book.Pages
                 config.HideTransitionDuration = 250;
             });
 
-            await Task.Delay(300); // need this
+            await Task.Yield();
         }
 
         private void SetEntriesTitle()
         {
-            string entryOrEntries = (Transactions.Count() == 1) ? $" {Localizer["Entry"]} " : $" {Localizer["Entries"]} ";
-
-            switch (TransListSvc.Mode)
+            if (TransListSvc.Mode > 1)
             {
-                case 1:
-                    EntriesTitle = TransListSvc.Month > 0 ? $"{TransListSvc.Name} {entryOrEntries} {Localizer["In"]} {new DateTime(2020, TransListSvc.Month, 1):MMMM}, {TransListSvc.Year}" : EntriesTitle = $"{TransListSvc.Name} {entryOrEntries} {Localizer["In"]} {TransListSvc.Year}";
-                    break;
-
-                case 2:
-                    EntriesTitle = $"{TransListSvc.Name} {entryOrEntries}";
-                    break;
-
-                case 3:
-                    EntriesTitle = $"{TransListSvc.Name} {entryOrEntries}";
-                    break;
+                EntriesTitle = Transactions.Count() < 2 ? Localizer["TransListNameS", Transactions.Count(), TransListSvc.Name] : Localizer["TransListNameM", Transactions.Count(), TransListSvc.Name];
+            }
+            else
+            {
+                if (Transactions.Count() < 2)
+                {
+                    EntriesTitle = TransListSvc.Month > 0 ? Localizer["TransListTitleS", Transactions.Count(), TransListSvc.Name, new DateTime(2020, TransListSvc.Month, 1).ToString("MMMM"), TransListSvc.Year] : Localizer["TransListTitleS", Transactions.Count(), TransListSvc.Name, TransListSvc.Year, ""];
+                }
+                else
+                {
+                    EntriesTitle = TransListSvc.Month > 0 ? Localizer["TransListTitleM", Transactions.Count(), TransListSvc.Name, new DateTime(2020, TransListSvc.Month, 1).ToString("MMMM"), TransListSvc.Year] : Localizer["TransListTitleM", Transactions.Count(), TransListSvc.Name, TransListSvc.Year, ""];
+                }
             }
 
-            EntriesTitle = $"{Transactions.Count()} {EntriesTitle}";
             Total = Transactions.Sum(t => t.Value);
 
-            if (totalItems - Transactions.Count() > 0) FilteredItems = $"({totalItems - Transactions.Count()} {Localizer["EntriesFiltered"]})";
+            if (totalItems - Transactions.Count() > 0) FilteredItems = Localizer["EntriesFiltered", totalItems - Transactions.Count()];
 
             StateHasChanged();
             return;

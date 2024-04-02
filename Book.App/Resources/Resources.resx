@@ -172,7 +172,7 @@
     <value>All changes made after {0} will be permanently lost</value>
   </data>
   <data name="Chart" xml:space="preserve">
-    <value>Chart</value>
+    <value>{0} Chart</value>
   </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
@@ -217,7 +217,7 @@
     <value>Database</value>
   </data>
   <data name="DatabaseAlertMessage" xml:space="preserve">
-    <value>Any changes you make are saved in an SQLite database. It is highly recommended to periodically back this up. Last backup: </value>
+    <value>Any changes you make are saved in an SQLite database. It is highly recommended to periodically back this up. Last backup: {0}</value>
   </data>
   <data name="DatabaseBackupText" xml:space="preserve">
     <value>Copy the database to a file</value>
@@ -252,8 +252,17 @@
   <data name="DeleteSavedChanges" xml:space="preserve">
     <value>Delete Saved Changes</value>
   </data>
+  <data name="DeleteSTypeAccLabel" xml:space="preserve">
+    <value>Delete {0} Summary Type</value>
+  </data>
   <data name="DeleteSummaryType" xml:space="preserve">
     <value>Delete Summary Type</value>
+  </data>
+  <data name="DeleteTransAccLabel" xml:space="preserve">
+    <value>Delete {0} Entry for {1}</value>
+  </data>
+  <data name="DeleteTTypeAccLabel" xml:space="preserve">
+    <value>Delete {0} Entry Type</value>
   </data>
   <data name="EditEntry" xml:space="preserve">
     <value>Edit Entry</value>
@@ -289,7 +298,7 @@
     <value>Entries</value>
   </data>
   <data name="EntriesFiltered" xml:space="preserve">
-    <value>Entries Filtered</value>
+    <value>{0} Entries Filtered</value>
   </data>
   <data name="Entry" xml:space="preserve">
     <value>Entry</value>
@@ -307,10 +316,10 @@
     <value>Entry Types</value>
   </data>
   <data name="Expenditure" xml:space="preserve">
-    <value>Expenditure</value>
+    <value>{0} {1} Expenditure</value>
   </data>
   <data name="ExpenditureChart" xml:space="preserve">
-    <value>Expenditure Chart</value>
+    <value>{0} Expenditure Chart</value>
   </data>
   <data name="FluentValidation" xml:space="preserve">
     <value>Fluent Validation</value>
@@ -335,6 +344,9 @@
   </data>
   <data name="Hide" xml:space="preserve">
     <value>Hide</value>
+  </data>
+  <data name="HideEntryTypes" xml:space="preserve">
+    <value>Hide {0} Entry Types</value>
   </data>
   <data name="Holiday" xml:space="preserve">
     <value>Holiday</value>
@@ -459,6 +471,9 @@
   <data name="Show" xml:space="preserve">
     <value>Show</value>
   </data>
+  <data name="ShowEntryTypes" xml:space="preserve">
+    <value>Show {0} Entry Types</value>
+  </data>
   <data name="StartYear" xml:space="preserve">
     <value>Start Year</value>
   </data>
@@ -492,6 +507,27 @@
   <data name="TrackorText" xml:space="preserve">
     <value>Trackor is a Blazor WASM application that uses many of the above packages. I shamelessly used it as both an inspiration and direct code source.</value>
   </data>
+  <data name="TransCopyAccLabelM" xml:space="preserve">
+    <value>Create {0} Entries?</value>
+  </data>
+  <data name="TransCopyAccLabelS" xml:space="preserve">
+    <value>Create 1 Entry?</value>
+  </data>
+  <data name="TransCopyTitle" xml:space="preserve">
+    <value>Copy {0} {1} Entry</value>
+  </data>
+  <data name="TransListNameM" xml:space="preserve">
+    <value>{0} {1} Entries</value>
+  </data>
+  <data name="TransListNameS" xml:space="preserve">
+    <value>{0} {1} Entry</value>
+  </data>
+  <data name="TransListTitleM" xml:space="preserve">
+    <value>{0} {1} Entries in {2} {3}</value>
+  </data>
+  <data name="TransListTitleS" xml:space="preserve">
+    <value>{0} {1} Entry in {2} {3}</value>
+  </data>
   <data name="Type" xml:space="preserve">
     <value>Type</value>
   </data>
@@ -509,6 +545,9 @@
   </data>
   <data name="ViewAnotherYear" xml:space="preserve">
     <value>View Another Year</value>
+  </data>
+  <data name="VisitCount" xml:space="preserve">
+    <value>Visited {0} times</value>
   </data>
   <data name="Visited" xml:space="preserve">
     <value>Visited</value>
@@ -529,9 +568,12 @@
     <value>Work Expenses</value>
   </data>
   <data name="YearChart" xml:space="preserve">
-    <value>Year Chart</value>
+    <value>{0} Year Chart</value>
   </data>
   <data name="Yearly" xml:space="preserve">
     <value>Yearly</value>
+  </data>
+  <data name="YExpenditure" xml:space="preserve">
+    <value>{0} Expenditure</value>
   </data>
 </root>

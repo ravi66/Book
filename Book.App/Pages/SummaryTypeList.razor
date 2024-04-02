@@ -6,7 +6,7 @@
 <MudTable Elevation="5" Items="@SummaryTypes" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="SelectedSummaryType" SortLabel="Sort By" Class="pa-2" AllowUnsorted="false" >
     <ToolBarContent>
         <MudIconButton Icon="@Icons.Material.Filled.Summarize" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddSummaryType" Title="@Localizer["NewSummaryType"]" />
-        <MudText Typo="Typo.h4">&nbsp;@Localizer["Summaries"]</MudText>
+        <MudText Class="ps-2" Typo="Typo.h4">@Localizer["Summaries"]</MudText>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>@Localizer["Tools"]</MudTh>
@@ -33,8 +33,7 @@
         <MudTd>
             @if (@context.TransactionTypeList.Count > 0)
             {
-            <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowTransactionTypeBtnPress(context.SummaryTypeId))">@((context.ShowTransactionTypes == true) ? @Localizer["Hide"] : @Localizer["Show"]) @context.TransactionTypeList.Count @Localizer["EntryTypes"]
-                </MudButton>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowTransactionTypeBtnPress(context.SummaryTypeId))">@((context.ShowTransactionTypes == true) ? @Localizer["HideEntryTypes", @context.TransactionTypeList.Count] : @Localizer["ShowEntryTypes", @context.TransactionTypeList.Count])</MudButton>
             }
             else
             {
@@ -50,7 +49,7 @@
                     <MudTable Items="@context.TransactionTypeList" Context="TypeContext" Hover="true" Elevation="5" SortLabel="Sort By" AllowUnsorted="false" >
                         <ToolBarContent>
                             <MudIconButton Icon="@Icons.Material.Filled.Receipt" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="() => AddTransactionType(context.SummaryTypeId)" Title="@Localizer["NewEntryType"]" />
-                            <MudText Typo="Typo.h5">&nbsp;<strong>@context.Name</strong>&nbsp;@Localizer["EntryTypes"]</MudText>
+                            <MudText Class="ps-2" Typo="Typo.h5"><strong>@context.Name</strong> @Localizer["EntryTypes"]</MudText>
                         </ToolBarContent>
                         <HeaderContent>
                             <MudTh>@Localizer["Tools"]</MudTh>
@@ -58,7 +57,7 @@
                             <MudTh><MudTableSortLabel SortBy="new Func<TransactionType, object>(x=>x.CreateDate)">@Localizer["Created"]</MudTableSortLabel></MudTh>
                         </HeaderContent>
                         <NoRecordsContent>
-                            <MudText>@Localizer["NoEntryTypesFor"]&nbsp;<strong>@context.Name</strong></MudText>
+                            <MudText>@Localizer["NoEntryTypesFor"] <strong>@context.Name</strong></MudText>
                         </NoRecordsContent>
                         <RowTemplate>
                             <MudTd DataLabel="@Localizer["Tools"]">

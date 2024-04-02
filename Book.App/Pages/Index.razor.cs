@@ -158,7 +158,7 @@ namespace Book.Pages
 
             var parameters = new DialogParameters<YearChartDialog>
             {
-                { p => p.DialogTitle, $"{Year} {Localizer["Chart"]}" },
+                { p => p.DialogTitle, Localizer["Chart", Year] },
                 { p => p.Series, summarySeries },
             };
 
@@ -185,7 +185,7 @@ namespace Book.Pages
 
             monthNo = monthNo < 0 ? 12 : monthNo;
 
-            string dialogTitle = monthNo < 12 ? $"{MonthlySummaries[monthNo].MonthNameFull} {Year} {Localizer["Expenditure"]}" : $"{Year} {Localizer["Expenditure"]}";
+            string dialogTitle = monthNo < 12 ? Localizer["Expenditure", MonthlySummaries[monthNo].MonthNameFull, Year] : Localizer["YExpenditure", Year];
 
             var monthlyTransactions = Transactions
                 .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && t.Value > 0)

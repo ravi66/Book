@@ -64,10 +64,16 @@
             return dbVersion;
         }
 
-        public async Task DeleteDatabase()
+        public async Task<bool> DeleteDatabase()
         {
             _dbContext = await dbContextFactory.CreateDbContextAsync();
-            _ = await _dbContext.Database.EnsureDeletedAsync();
+
+            if (await _dbContext.Database.EnsureDeletedAsync())
+            {
+                if (await _dbContext.Database.EnsureCreatedAsync()) return true;
+            }
+
+            return false;
         }
 
         public async Task ApplyDbVersionAsync(string dbVersion)

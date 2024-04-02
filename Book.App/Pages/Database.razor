@@ -18,7 +18,7 @@
 <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mt-4 mb-2" Elevation="10" ContentAlignment="HorizontalAlignment.Start" NoIcon="true">
     <MudStack AlignItems="AlignItems.Center" Row="true">
         <MudIcon Icon="@Icons.Material.Filled.Warning" Size="Size.Large" />
-        <MudText Typo="Typo.h5">@Localizer["DatabaseAlertMessage"] @LastBackupDate</MudText>
+        <MudText Typo="Typo.h5">@Localizer["DatabaseAlertMessage", LastBackupDate]</MudText>
     </MudStack>
 </MudAlert> 
 

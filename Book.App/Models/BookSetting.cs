@@ -12,7 +12,6 @@ namespace Book.Models
         [Required]
         public string SettingName { get; set; }
 
-        [StringLength(255, ErrorMessage = "Value is too long [255].")]
         public string? SettingValue { get; set; }
     }
 

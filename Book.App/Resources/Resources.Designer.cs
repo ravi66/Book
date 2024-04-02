@@ -223,7 +223,7 @@ namespace Book.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Chart.
+        ///   Looks up a localized string similar to {0} Chart.
         /// </summary>
         internal static string Chart {
             get {
@@ -358,7 +358,7 @@ namespace Book.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Any changes you make are saved in an SQLite database. It is highly recommended to periodically back this up. Last backup: .
+        ///   Looks up a localized string similar to Any changes you make are saved in an SQLite database. It is highly recommended to periodically back this up. Last backup: {0}.
         /// </summary>
         internal static string DatabaseAlertMessage {
             get {
@@ -466,11 +466,38 @@ namespace Book.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete {0} Summary Type.
+        /// </summary>
+        internal static string DeleteSTypeAccLabel {
+            get {
+                return ResourceManager.GetString("DeleteSTypeAccLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete Summary Type.
         /// </summary>
         internal static string DeleteSummaryType {
             get {
                 return ResourceManager.GetString("DeleteSummaryType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete {0} Entry for {1}.
+        /// </summary>
+        internal static string DeleteTransAccLabel {
+            get {
+                return ResourceManager.GetString("DeleteTransAccLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete {0} Entry Type.
+        /// </summary>
+        internal static string DeleteTTypeAccLabel {
+            get {
+                return ResourceManager.GetString("DeleteTTypeAccLabel", resourceCulture);
             }
         }
         
@@ -574,7 +601,7 @@ namespace Book.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Entries Filtered.
+        ///   Looks up a localized string similar to {0} Entries Filtered.
         /// </summary>
         internal static string EntriesFiltered {
             get {
@@ -628,7 +655,7 @@ namespace Book.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expenditure.
+        ///   Looks up a localized string similar to {0} {1} Expenditure.
         /// </summary>
         internal static string Expenditure {
             get {
@@ -637,7 +664,7 @@ namespace Book.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Expenditure Chart.
+        ///   Looks up a localized string similar to {0} Expenditure Chart.
         /// </summary>
         internal static string ExpenditureChart {
             get {
@@ -714,6 +741,15 @@ namespace Book.Resources {
         internal static string Hide {
             get {
                 return ResourceManager.GetString("Hide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide {0} Entry Types.
+        /// </summary>
+        internal static string HideEntryTypes {
+            get {
+                return ResourceManager.GetString("HideEntryTypes", resourceCulture);
             }
         }
         
@@ -1087,6 +1123,15 @@ namespace Book.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show {0} Entry Types.
+        /// </summary>
+        internal static string ShowEntryTypes {
+            get {
+                return ResourceManager.GetString("ShowEntryTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Start Year.
         /// </summary>
         internal static string StartYear {
@@ -1186,6 +1231,69 @@ namespace Book.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create {0} Entries?.
+        /// </summary>
+        internal static string TransCopyAccLabelM {
+            get {
+                return ResourceManager.GetString("TransCopyAccLabelM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create 1 Entry?.
+        /// </summary>
+        internal static string TransCopyAccLabelS {
+            get {
+                return ResourceManager.GetString("TransCopyAccLabelS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy {0} {1} Entry.
+        /// </summary>
+        internal static string TransCopyTitle {
+            get {
+                return ResourceManager.GetString("TransCopyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} {1} Entries.
+        /// </summary>
+        internal static string TransListNameM {
+            get {
+                return ResourceManager.GetString("TransListNameM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} {1} Entry.
+        /// </summary>
+        internal static string TransListNameS {
+            get {
+                return ResourceManager.GetString("TransListNameS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} {1} Entries in {2} {3}.
+        /// </summary>
+        internal static string TransListTitleM {
+            get {
+                return ResourceManager.GetString("TransListTitleM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} {1} Entry in {2} {3}.
+        /// </summary>
+        internal static string TransListTitleS {
+            get {
+                return ResourceManager.GetString("TransListTitleS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type.
         /// </summary>
         internal static string Type {
@@ -1236,6 +1344,15 @@ namespace Book.Resources {
         internal static string ViewAnotherYear {
             get {
                 return ResourceManager.GetString("ViewAnotherYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Visited {0} times.
+        /// </summary>
+        internal static string VisitCount {
+            get {
+                return ResourceManager.GetString("VisitCount", resourceCulture);
             }
         }
         
@@ -1294,7 +1411,7 @@ namespace Book.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Year Chart.
+        ///   Looks up a localized string similar to {0} Year Chart.
         /// </summary>
         internal static string YearChart {
             get {
@@ -1308,6 +1425,15 @@ namespace Book.Resources {
         internal static string Yearly {
             get {
                 return ResourceManager.GetString("Yearly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Expenditure.
+        /// </summary>
+        internal static string YExpenditure {
+            get {
+                return ResourceManager.GetString("YExpenditure", resourceCulture);
             }
         }
     }

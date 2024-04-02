@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 
@@ -14,6 +15,8 @@ namespace Book.Pages
         [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
         [Inject] HttpClient HttpClient { get; set; }
+
+        [Inject] public IBookDbMigratorSvc DbMigrator { get; set; }
 
         public IJSObjectReference? jsModule;
 
@@ -53,12 +56,12 @@ namespace Book.Pages
                 { x => x.AcceptToolTip, Localizer["DeleteSavedChanges"] },
                 { x => x.CancelColour, Color.Success },
                 { x => x.Warning, true },
-                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU"].ToString().Replace("{0}", LastBackupDate) : Localizer["ChangesLost"] },
+                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU", LastBackupDate] : Localizer["ChangesLost"] },
             });
 
             if (!(await dialog.Result).Canceled)
             {
-                var success = await jsModule.InvokeAsync<bool>("deleteDatabase");
+                var success = await DbMigrator.DeleteDatabase();
                 if (success) NavigationManager.NavigateTo("/", true);
                 NavigationManager.NavigateTo("refresh/Database");
             }
@@ -78,7 +81,7 @@ namespace Book.Pages
                 { x => x.AcceptToolTip, Localizer["DatabaseDemoAcptToolTip"] },
                 { x => x.CancelColour, Color.Success },
                 { x => x.Warning, true },
-                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU"].ToString().Replace("{0}", LastBackupDate) : Localizer["ChangesLost"] },
+                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU", LastBackupDate] : Localizer["ChangesLost"] },
             });
 
             if (!(await dialog.Result).Canceled)
