@@ -11,12 +11,11 @@
         {
             _dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-            // uncomment the following (and the method) to see the CREATE TABLE scripts in the
-            // browser console when generating a new database - this is useful when creating new
-            // migrations
-            var dbCreationSql = _dbContext.Database.GenerateCreateScript();
-            Console.WriteLine("Db Creation SQL:");
-            Console.WriteLine(dbCreationSql);
+            // uncomment the following to see the CREATE TABLE scripts in the browser console
+            // when generating a new database - this is useful when creating new migrations
+            //var dbCreationSql = _dbContext.Database.GenerateCreateScript();
+            //Console.WriteLine("Db Creation SQL:");
+            //Console.WriteLine(dbCreationSql);
 
             _ = await _dbContext.Database.EnsureCreatedAsync();
             var dbVersionBookSetting = await _dbContext.BookSetting.FirstOrDefaultAsync(x => x.BookSettingId == 7);
@@ -98,13 +97,6 @@
 
             _ = await _dbContext.Database.ExecuteSqlRawAsync(Alter_Table_TransactionTypes);
             await ApplyDbVersion("1.01");
-        }
-
-        private void OutputDbScriptToConsole()
-        {
-            var dbCreationSql = _dbContext.Database.GenerateCreateScript();
-            Console.WriteLine("Db Creation SQL:");
-            Console.WriteLine(dbCreationSql);
         }
 
         */

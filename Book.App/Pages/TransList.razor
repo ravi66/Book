@@ -48,6 +48,6 @@
         <MudText>@Localizer["LoadingEntries"]</MudText>
     </LoadingContent>
     <PagerContent>
-        <MudTablePager PageSizeOptions="new int[] { 10, 50, int.MaxValue }" HorizontalAlignment="HorizontalAlignment.Center" />
+        <MudTablePager RowsPerPageString="@Localizer["RowsPerPage"]" InfoFormat="@Localizer["PagerInfoFormat"]" AllItemsText="@Localizer["AllItemsText"]" PageSizeOptions="new int[] { 10, 50, int.MaxValue }" HorizontalAlignment="HorizontalAlignment.Center" />
     </PagerContent>
 </MudTable>

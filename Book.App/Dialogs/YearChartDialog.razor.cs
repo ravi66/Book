@@ -13,8 +13,8 @@ namespace Book.Dialogs
 
         private List<ChartSeries> RemovedSeries { get; set; } = [];
 
-        private readonly string[] XAxisLabels = new DateTimeFormatInfo().AbbreviatedMonthNames;
-
+        private readonly string[] XAxisLabels = CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedMonthNames;
+        
         private readonly ChartOptions Options = new();
 
         void Close() => MudDialog.Close(DialogResult.Ok(true));

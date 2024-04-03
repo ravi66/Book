@@ -4,7 +4,7 @@
     {
         public const string IndexHtmlVersion = "v1.0";
         public const string BookName = "Book";
-        public const string BookVersion = "v1.0.02";
+        public const string BookVersion = "v1.0.03";
         public const string PositiveValueCssClass = "mud-primary-text ";
         public const string NegativeValueCssClass = "mud-secondary-text ";
         public const string VisitsCountBaseUri = "https://api.counterapi.dev/v1/RavsBook/";

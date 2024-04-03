@@ -25,11 +25,10 @@ namespace Book.Shared
 
         protected async override Task OnInitializedAsync()
         {
+            await DbMigrator.EnsureDbCreated();
+
             // Hard Refresh to reload Index.html may be required
             if (!await InitialiseSvc.RefreshRequiredAsync()) NavigationManager.Refresh(true);
-
-            await DbMigrator.EnsureDbCreated();
-            await Task.Yield();
 
             BookName = await BookSettingSvc.GetBookName();
 

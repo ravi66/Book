@@ -120,6 +120,9 @@
   <data name="Alcohol" xml:space="preserve">
     <value>Alcohol</value>
   </data>
+  <data name="AllItemsText" xml:space="preserve">
+    <value>All</value>
+  </data>
   <data name="BackPage" xml:space="preserve">
     <value>Return to calling Page</value>
   </data>
@@ -432,6 +435,9 @@
   <data name="Order" xml:space="preserve">
     <value>Order</value>
   </data>
+  <data name="PagerInfoFormat" xml:space="preserve">
+    <value>{first_item}-{last_item} of {all_items}</value>
+  </data>
   <data name="Property" xml:space="preserve">
     <value>Property</value>
   </data>
@@ -446,6 +452,9 @@
   </data>
   <data name="Restore" xml:space="preserve">
     <value>Restore</value>
+  </data>
+  <data name="RowsPerPage" xml:space="preserve">
+    <value>Rows per Page:</value>
   </data>
   <data name="SaveEntry" xml:space="preserve">
     <value>Save Entry</value>

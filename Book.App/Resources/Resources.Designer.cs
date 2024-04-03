@@ -70,6 +70,15 @@ namespace Book.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All.
+        /// </summary>
+        internal static string AllItemsText {
+            get {
+                return ResourceManager.GetString("AllItemsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Return to calling Page.
         /// </summary>
         internal static string BackPage {
@@ -1006,6 +1015,15 @@ namespace Book.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {first_item}-{last_item} of {all_items}.
+        /// </summary>
+        internal static string PagerInfoFormat {
+            get {
+                return ResourceManager.GetString("PagerInfoFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Property.
         /// </summary>
         internal static string Property {
@@ -1047,6 +1065,15 @@ namespace Book.Resources {
         internal static string Restore {
             get {
                 return ResourceManager.GetString("Restore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rows per Page:.
+        /// </summary>
+        internal static string RowsPerPage {
+            get {
+                return ResourceManager.GetString("RowsPerPage", resourceCulture);
             }
         }
         

@@ -122,20 +122,15 @@ namespace Book.Pages
 
         private void SetEntriesTitle()
         {
-            if (TransListSvc.Mode > 1)
+            switch (TransListSvc.Mode)
             {
-                EntriesTitle = Transactions.Count() < 2 ? Localizer["TransListNameS", Transactions.Count(), TransListSvc.Name] : Localizer["TransListNameM", Transactions.Count(), TransListSvc.Name];
-            }
-            else
-            {
-                if (Transactions.Count() < 2)
-                {
-                    EntriesTitle = TransListSvc.Month > 0 ? Localizer["TransListTitleS", Transactions.Count(), TransListSvc.Name, new DateTime(2020, TransListSvc.Month, 1).ToString("MMMM"), TransListSvc.Year] : Localizer["TransListTitleS", Transactions.Count(), TransListSvc.Name, TransListSvc.Year, ""];
-                }
-                else
-                {
-                    EntriesTitle = TransListSvc.Month > 0 ? Localizer["TransListTitleM", Transactions.Count(), TransListSvc.Name, new DateTime(2020, TransListSvc.Month, 1).ToString("MMMM"), TransListSvc.Year] : Localizer["TransListTitleM", Transactions.Count(), TransListSvc.Name, TransListSvc.Year, ""];
-                }
+                case > 1:
+                    EntriesTitle = Transactions.Count() < 2 ? Localizer["TransListNameS", Transactions.Count(), TransListSvc.Name] : Localizer["TransListNameM", Transactions.Count(), TransListSvc.Name];
+                    break;
+                default:
+                    _ = Transactions.Count() < 2 ? EntriesTitle = TransListSvc.Month > 0 ? Localizer["TransListTitleS", Transactions.Count(), TransListSvc.Name, new DateTime(2020, TransListSvc.Month, 1).ToString("MMMM"), TransListSvc.Year]
+                            : Localizer["TransListTitleS", Transactions.Count(), TransListSvc.Name, TransListSvc.Year, ""] : EntriesTitle = TransListSvc.Month > 0 ? Localizer["TransListTitleM", Transactions.Count(), TransListSvc.Name, new DateTime(2020, TransListSvc.Month, 1).ToString("MMMM"), TransListSvc.Year] : Localizer["TransListTitleM", Transactions.Count(), TransListSvc.Name, TransListSvc.Year, ""];
+                    break;
             }
 
             Total = Transactions.Sum(t => t.Value);
