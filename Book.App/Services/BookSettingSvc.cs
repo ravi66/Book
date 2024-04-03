@@ -1,6 +1,6 @@
 ﻿namespace Book.Services
 {
-    internal class BookSettingSvc(IBookSettingRepository repo, IStringLocalizer<Resources.Resources> Localizer) : IBookSettingSvc
+    internal class BookSettingSvc(IBookSettingRepository repo, IStringLocalizer<Resources.BookResources> Localizer) : IBookSettingSvc
     {
         private BookSetting? BookSetting { get; set; }
 

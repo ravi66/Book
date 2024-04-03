@@ -2,7 +2,7 @@
 
 namespace Book.Models
 {
-    internal class BookDbContext(DbContextOptions<BookDbContext> options, IStringLocalizer<Resources.Resources> Localizer) : DbContext(options)
+    internal class BookDbContext(DbContextOptions<BookDbContext> options, IStringLocalizer<Resources.BookResources> Localizer) : DbContext(options)
     {
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
