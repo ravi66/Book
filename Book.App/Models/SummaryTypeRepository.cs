@@ -15,7 +15,7 @@
                                     Name = s.Name,
                                     Order = s.Order,
                                     CreateDate = s.CreateDate,
-                                    TransactionTypeList = new List<TransactionType>(s.TransactionTypes
+                                    TransactionTypes = new List<TransactionType>(s.TransactionTypes
                                         .Select(t => new TransactionType
                                         {
                                             TransactionTypeId = t.TransactionTypeId,
@@ -25,10 +25,8 @@
                                             TransactionCount = t.Transactions.Count,
                                         })
                                         .OrderBy(t => t.Name).ToList()),
-                                    Types = new List<int>(s.TransactionTypes.Select(t => t.TransactionTypeId).ToList())
                                 })
-                                .OrderBy(s => s.Order)
-,
+                                .OrderBy(s => s.Order),
             ];
         }
 
@@ -60,7 +58,12 @@
                     Name = s.Name,
                     Order = s.Order,
                     CreateDate = s.CreateDate,
-                    Types = new List<int>(s.TransactionTypes.Select(t => t.TransactionTypeId).ToList())
+                    TransactionTypes = new List<TransactionType>(s.TransactionTypes
+                        .Select(t => new TransactionType
+                            {
+                                TransactionTypeId = t.TransactionTypeId,
+                            })
+                        .ToList()),
                 })
                 .FirstOrDefault(s => s.SummaryTypeId == summaryTypeId);
         }
@@ -107,16 +110,20 @@
             return
             [
                 .. dbContext.SummaryTypes
-                                .Select(s => new SummaryType
+                           .Select(s => new SummaryType
                                 {
                                     SummaryTypeId = s.SummaryTypeId,
                                     Name = s.Name,
                                     Order = s.Order,
-                                    Types = new List<int>(s.TransactionTypes.Select(t => t.TransactionTypeId).ToList())
+                                    TransactionTypes = new List<TransactionType>(s.TransactionTypes
+                                        .Select(t => new TransactionType
+                                        {
+                                            TransactionTypeId = t.TransactionTypeId,
+                                        })
+                                        .ToList()),
                                 })
                                 .OrderBy(s => s.Order)
-                                .AsNoTracking()
-,
+                                .AsNoTracking(),
             ];
         }
 

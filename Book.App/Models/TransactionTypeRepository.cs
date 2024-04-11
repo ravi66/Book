@@ -12,7 +12,8 @@
                     TransactionTypeId = t.TransactionTypeId,
                     SummaryTypeId = t.SummaryTypeId,
                     Name = t.Name,
-                    SummaryName = t.SummaryType.Name,
+                    SummaryType = t.SummaryType,
+                    //SummaryName = t.SummaryType.Name,
                     CreateDate = t.CreateDate,
                 })
                 .OrderBy(t => t.Name)];

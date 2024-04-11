@@ -123,6 +123,17 @@
   <data name="AllItemsText" xml:space="preserve">
     <value>All</value>
   </data>
+  <data name="ApexCharts" xml:space="preserve">
+    <value>Apex Charts</value>
+  </data>
+  <data name="ApexChartsLogo" xml:space="preserve">
+    <value>Apex Charts Logo</value>
+  </data>
+  <data name="ApexChartsText" xml:space="preserve">
+    <value>ApexCharts is a modern charting library that helps developers to create beautiful and interactive visualizations for web pages.
+
+It is an open-source project licensed under MIT and is free to use in commercial applications.</value>
+  </data>
   <data name="BackPage" xml:space="preserve">
     <value>Return to calling Page</value>
   </data>
@@ -146,6 +157,9 @@
   </data>
   <data name="BitBesqlText" xml:space="preserve">
     <value>Bit.Besql enables using a EFCore compatible SQLite database that persits in the Browser's cache</value>
+  </data>
+  <data name="BlazorApexCharts" xml:space="preserve">
+    <value>Blazor Apex Charts</value>
   </data>
   <data name="BlazorLogo" xml:space="preserve">
     <value>Blazor Logo</value>
@@ -319,7 +333,7 @@
     <value>Entry Types</value>
   </data>
   <data name="Expenditure" xml:space="preserve">
-    <value>{0} {1} Expenditure</value>
+    <value>{0} {1} Spend</value>
   </data>
   <data name="ExpenditureChart" xml:space="preserve">
     <value>{0} Expenditure Chart</value>
@@ -381,6 +395,9 @@
   <data name="LoadingEntries" xml:space="preserve">
     <value>Loading Entries ...</value>
   </data>
+  <data name="MonthChart" xml:space="preserve">
+    <value>Expenditure</value>
+  </data>
   <data name="Monthly" xml:space="preserve">
     <value>Monthly</value>
   </data>
@@ -412,7 +429,7 @@
     <value>New Entry Type</value>
   </data>
   <data name="NewSummaryType" xml:space="preserve">
-    <value>New Summary Type</value>
+    <value>Create Summary</value>
   </data>
   <data name="No" xml:space="preserve">
     <value>No</value>
@@ -423,8 +440,11 @@
   <data name="NoEntriesFound" xml:space="preserve">
     <value>No Entries Found</value>
   </data>
-  <data name="NoEntryTypesFor" xml:space="preserve">
-    <value>No Entry Types for</value>
+  <data name="NoEntryTypesFound" xml:space="preserve">
+    <value>No Entry Types found</value>
+  </data>
+  <data name="NoPieData" xml:space="preserve">
+    <value>No Entries to Plot</value>
   </data>
   <data name="Notes" xml:space="preserve">
     <value>Notes</value>
@@ -482,6 +502,9 @@
   </data>
   <data name="ShowEntryTypes" xml:space="preserve">
     <value>Show {0} Entry Types</value>
+  </data>
+  <data name="SortBy" xml:space="preserve">
+    <value>Sort By</value>
   </data>
   <data name="StartYear" xml:space="preserve">
     <value>Start Year</value>
@@ -581,8 +604,5 @@
   </data>
   <data name="Yearly" xml:space="preserve">
     <value>Yearly</value>
-  </data>
-  <data name="YExpenditure" xml:space="preserve">
-    <value>{0} Expenditure</value>
   </data>
 </root>

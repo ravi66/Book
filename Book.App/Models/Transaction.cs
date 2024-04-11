@@ -10,9 +10,6 @@ namespace Book.Models
 
         public int? TransactionTypeId { get; set; }
 
-        [NotMapped]
-        public string? TransactionTypeName { get; set; }
-
         public DateTime TransactionDate { get; set; }
 
         [Column(TypeName = "money")]
@@ -21,6 +18,12 @@ namespace Book.Models
         public DateTime CreateDate { get; set; }
 
         public string? Notes { get; set; }
+
+        [NotMapped]
+        public string? SummaryName { get; set; }
+
+        [NotMapped]
+        public string? TransactionTypeName { get; set; }
     }
 
     public class TransactionValidator : AbstractValidator<Transaction>

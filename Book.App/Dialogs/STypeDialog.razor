@@ -24,7 +24,7 @@
     </DialogContent>
     <DialogActions>
         <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveSummaryType"]" OnClick="@(async () => await Save())" />
-        @if (SummaryType.Types.Count < 1 && SummaryType.SummaryTypeId > 0)
+        @if (!SummaryType.TransactionTypes.Any() && SummaryType.SummaryTypeId > 0)
         {
             <DeleteSTypeBtn SummaryType="@SummaryType" Size="@Size.Medium" Variant="@Variant.Filled" />
         }

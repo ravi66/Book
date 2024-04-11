@@ -14,7 +14,6 @@ namespace Book.Dialogs
             {
                 CreateDate = DateTime.Today,
                 Order = 0,
-                Types = []
             };
 
         private readonly SummaryTypeValidator validator = new();

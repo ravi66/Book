@@ -1,3 +1,6 @@
+using Book.Models;
+using static MudBlazor.CategoryTypes;
+
 namespace Book.Pages
 {
     public partial class SummaryTypeList
@@ -16,9 +19,13 @@ namespace Book.Pages
 
         private string BookName { get; set; } = string.Empty;
 
-        public List<SummaryType> SummaryTypes { get; set; }
+        public List<SummaryType> SummaryTypes { get; set; } = [];
 
-        private SummaryType SelectedSummaryType { get; set; }
+        public List<TransactionType> TransactionTypes { get; set; } = [];
+
+        private int CurrentSummaryTypeId;
+
+        private string CurrentSummaryName = string.Empty;
 
         protected async override Task OnInitializedAsync()
         {
@@ -34,6 +41,14 @@ namespace Book.Pages
         public async Task LoadSummaryTypes()
         {
             SummaryTypes = await Repo.GetAllSummaryTypes();
+            SummaryChanged(SummaryTypes.First());
+        }
+
+        void SummaryChanged(SummaryType summaryType)
+        {
+            CurrentSummaryTypeId = summaryType.SummaryTypeId;
+            CurrentSummaryName = summaryType.Name;
+            TransactionTypes = summaryType.TransactionTypes;
             StateHasChanged();
         }
 
@@ -41,7 +56,7 @@ namespace Book.Pages
         {
             TransListSvc.Mode = 2;
             TransListSvc.Name = summary.Name;
-            TransListSvc.Types = summary.Types;
+            TransListSvc.Types = summary.TransactionTypes.Select(s => s.TransactionTypeId).ToList();
             TransListSvc.PreviousPage = "/SummaryTypeList";
 
             NavigationManager.NavigateTo("TransList", false);
@@ -55,12 +70,6 @@ namespace Book.Pages
         private async Task EditSType(int summaryTypeId)
         {
             if (!(await DialogService.Show<STypeDialog>(Localizer["EditSummaryType"], new DialogParameters<STypeDialog> { { x => x.SavedSummaryTypeId, summaryTypeId } }).Result).Canceled) await LoadSummaryTypes();
-        }
-
-        private void ShowTransactionTypeBtnPress(int summaryTypeId)
-        {
-            SummaryType tmpSummaryType = SummaryTypes.First(s => s.SummaryTypeId == summaryTypeId);
-            tmpSummaryType.ShowTransactionTypes = !tmpSummaryType.ShowTransactionTypes;
         }
 
         private async Task AddTransactionType(int summaryTypeId)

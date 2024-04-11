@@ -9,7 +9,7 @@ namespace Book.Models
             /*
              * Summaries
              */
-            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = -1, Order = 9999, Name = Localizer["Unknown"], CreateDate = DateTime.Today });
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = -1, Order = 99, Name = Localizer["Unknown"], CreateDate = DateTime.Today });
             modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 1, Order = 1, Name = Localizer["Food"], CreateDate = DateTime.Today });
             modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 2, Order = 2, Name = Localizer["Fun"], CreateDate = DateTime.Today });
             modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = 3, Order = 3, Name = Localizer["Property"], CreateDate = DateTime.Today });

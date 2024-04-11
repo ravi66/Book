@@ -14,8 +14,6 @@ namespace Book.Dialogs
 
         [Inject] internal ITransactionRepository Repo { get; set; }
 
-        [Inject] IBrowserViewportService BrowserViewportService { get; set; }
-
         [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
         private Transaction Transaction { get; set; } = new Transaction
@@ -31,7 +29,11 @@ namespace Book.Dialogs
 
         private List<TransactionType> TransactionTypes { get; set; }
 
-        private TransactionType SelectedTransactionType { get; set; } = new();
+        private TransactionType SelectedTransactionType { get; set; } = new TransactionType
+        {
+            Name = string.Empty,
+            SummaryType = new SummaryType { Name = string.Empty },
+        };
 
         private DateTime? PickerDate { get; set; }
 
@@ -75,8 +77,6 @@ namespace Book.Dialogs
             PickerDate = Transaction.TransactionDate;
 
             NotifierSvc.TransactionsChanged += TransactionsChanged;
-
-            await HelperMethods.MaximiseIfMobile(BrowserViewportService, MudDialog);
         }
 
         private async Task Save()

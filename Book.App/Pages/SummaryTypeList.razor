@@ -3,77 +3,65 @@
 
 <PageTitle>@BookName - @Localizer["Types"]</PageTitle>
 
-<MudTable Elevation="5" Items="@SummaryTypes" Dense="true" Hover="true" CanCancelEdit="true" CommitEditIcon="@Icons.Material.Filled.Save" @bind-SelectedItem="SelectedSummaryType" SortLabel="Sort By" Class="pa-2" AllowUnsorted="false" >
-    <ToolBarContent>
-        <MudIconButton Icon="@Icons.Material.Filled.Summarize" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddSummaryType" Title="@Localizer["NewSummaryType"]" />
-        <MudText Class="ps-2" Typo="Typo.h4">@Localizer["Summaries"]</MudText>
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>@Localizer["Tools"]</MudTh>
-        <MudTh><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.Name)">@Localizer["Name"]</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<SummaryType, object>(x=>x.Order)">@Localizer["Order"]</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.CreateDate)">@Localizer["Created"]</MudTableSortLabel></MudTh>
-        <MudTh></MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="@Localizer["Tools"]">
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditSummaryType"]" OnClick="() => EditSType(context.SummaryTypeId)" />
-            @if (context.Types.Count > 0)
-            {
-                <MudIconButton Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" Title="@Localizer["ListEntriesForSummaryType"]" OnClick="()=> ListTransactionsSummary(context)" />
-            }
-            @if (context.Types.Count == 0 && context.SummaryTypeId != -1)
-            {
-                <DeleteSTypeBtn SummaryType="@context" Size="@Size.Small" Variant="@Variant.Text" />
-            }
-        </MudTd>
-        <MudTd DataLabel="@Localizer["Name"]">@context.Name</MudTd>
-        <MudTd DataLabel="@Localizer["Order"]">@context.Order</MudTd>
-        <MudTd DataLabel="@Localizer["Created"]">@context.CreateDate.ToShortDateString()</MudTd>
-        <MudTd>
-            @if (@context.TransactionTypeList.Count > 0)
-            {
-                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowTransactionTypeBtnPress(context.SummaryTypeId))">@((context.ShowTransactionTypes == true) ? @Localizer["HideEntryTypes", @context.TransactionTypeList.Count] : @Localizer["ShowEntryTypes", @context.TransactionTypeList.Count])</MudButton>
-            }
-            else
-            {
-                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="() => AddTransactionType(context.SummaryTypeId)">@Localizer["NewEntryType"]</MudButton>
-            }
-        </MudTd>
-    </RowTemplate>
-    <ChildRowContent>
-        @if (context.ShowTransactionTypes)
-        {
-            <MudTr>
-                <td colspan="5" class="pa-5">
-                    <MudTable Items="@context.TransactionTypeList" Context="TypeContext" Hover="true" Elevation="5" SortLabel="Sort By" AllowUnsorted="false" >
-                        <ToolBarContent>
-                            <MudIconButton Icon="@Icons.Material.Filled.Receipt" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="() => AddTransactionType(context.SummaryTypeId)" Title="@Localizer["NewEntryType"]" />
-                            <MudText Class="ps-2" Typo="Typo.h5"><strong>@context.Name</strong> @Localizer["EntryTypes"]</MudText>
-                        </ToolBarContent>
-                        <HeaderContent>
-                            <MudTh>@Localizer["Tools"]</MudTh>
-                            <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<TransactionType, object>(x=>x.Name)">@Localizer["Name"]</MudTableSortLabel></MudTh>
-                            <MudTh><MudTableSortLabel SortBy="new Func<TransactionType, object>(x=>x.CreateDate)">@Localizer["Created"]</MudTableSortLabel></MudTh>
-                        </HeaderContent>
-                        <NoRecordsContent>
-                            <MudText>@Localizer["NoEntryTypesFor"] <strong>@context.Name</strong></MudText>
-                        </NoRecordsContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="@Localizer["Tools"]">
-                                <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditEntryType"]" OnClick="()=> EditTType(TypeContext.TransactionTypeId)" />
-                                <MudIconButton Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" Title="@Localizer["ListEntriesForEntryType"]" OnClick="()=> ListTransactionsTType(TypeContext)" />
-                                @if (TypeContext.TransactionCount < 1 && TypeContext.TransactionTypeId > -1)
-                                {
-                                    <DeleteTTypeBtn TransactionType="@TypeContext" Variant="@Variant.Text" Size="@Size.Small" />
-                                }
-                            </MudTd>
-                            <MudTd DataLabel="@Localizer["Name"]">@TypeContext.Name</MudTd>
-                            <MudTd DataLabel="@Localizer["Created"]">@TypeContext.CreateDate.ToShortDateString()</MudTd>
-                        </RowTemplate>
-                    </MudTable>
-                </td>
-            </MudTr>
-        }
-    </ChildRowContent>
-</MudTable>
+<MudContainer Class="ma-0 pa-2">
+    <MudGrid>
+        <MudItem xs="12" md="6" Class="px-1">
+            <MudTable Elevation="5" T="SummaryType" Items="@SummaryTypes" Dense="true" Hover="true" SortLabel="@Localizer["SortBy"]" AllowUnsorted="false" SelectedItemChanged="SummaryChanged" Outlined="true">
+                <ToolBarContent>
+                    <MudIconButton Icon="@Icons.Material.Filled.Summarize" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddSummaryType" Title="@Localizer["NewSummaryType"]" />
+                    <MudText Class="ps-2 py-0" Typo="Typo.h5">@Localizer["Summaries"]</MudText>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh Class="py-0"><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.Name)">@Localizer["Name"]</MudTableSortLabel></MudTh>
+                    <MudTh Class="py-0"><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<SummaryType, object>(x=>x.Order)">@Localizer["Order"]</MudTableSortLabel></MudTh>
+                    <MudTh Class="py-0"><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.CreateDate)">@Localizer["Created"]</MudTableSortLabel></MudTh>
+                    <MudTh Class="py-0">@Localizer["Tools"]</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="@Localizer["Name"]">@context.Name</MudTd>
+                    <MudTd DataLabel="@Localizer["Order"]">@context.Order</MudTd>
+                    <MudTd DataLabel="@Localizer["Created"]">@context.CreateDate.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="@Localizer["Tools"]">
+                        <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditSummaryType"]" OnClick="() => EditSType(context.SummaryTypeId)" />
+                        @if (context.TransactionTypes.Any())
+                        {
+                            <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" Title="@Localizer["ListEntriesForSummaryType"]" OnClick="()=> ListTransactionsSummary(context)" />
+                        }
+                        else if (context.SummaryTypeId > 0)
+                        {
+                            <DeleteSTypeBtn SummaryType="@context" Size="@Size.Small" Variant="@Variant.Text" />
+                        }
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
+        <MudItem xs="12" md="6" Class="px-1">
+            <MudTable Items="@TransactionTypes" T="TransactionType" Hover="true" SortLabel="@Localizer["SortBy"]" AllowUnsorted="true" Elevation="5" Outlined="true" Dense="true">
+                <ToolBarContent>
+                    <MudIconButton Icon="@Icons.Material.Filled.Receipt" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="() => AddTransactionType(CurrentSummaryTypeId)" Title="@Localizer["NewEntryType"]" />
+                    <MudText Class="ps-2 py-0" Typo="Typo.h5"><strong>@CurrentSummaryName</strong> @Localizer["EntryTypes"]</MudText>
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh Class="py-0"><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<TransactionType, object>(x=>x.Name)">@Localizer["Name"]</MudTableSortLabel></MudTh>
+                    <MudTh Class="py-0"><MudTableSortLabel SortBy="new Func<TransactionType, object>(x=>x.CreateDate)">@Localizer["Created"]</MudTableSortLabel></MudTh>
+                    <MudTh Class="py-0">@Localizer["Tools"]</MudTh>
+                </HeaderContent>
+                <NoRecordsContent>
+                    <MudText>@Localizer["NoEntryTypesFound"]</MudText>
+                </NoRecordsContent>
+                <RowTemplate>
+                    <MudTd DataLabel="@Localizer["Name"]">@context.Name</MudTd>
+                    <MudTd DataLabel="@Localizer["Created"]">@context.CreateDate.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="@Localizer["Tools"]">
+                        <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditEntryType"]" OnClick="()=> EditTType(context.TransactionTypeId)" />
+                        <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" Title="@Localizer["ListEntriesForEntryType"]" OnClick="()=> ListTransactionsTType(context)" />
+                        @if (context.TransactionCount < 1  && context.TransactionTypeId > -1)
+                        {
+                            <DeleteTTypeBtn TransactionType="@context" Variant="@Variant.Text" Size="@Size.Small" />
+                        }
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
+    </MudGrid>
+</MudContainer>

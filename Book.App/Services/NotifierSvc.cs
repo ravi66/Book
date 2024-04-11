@@ -2,11 +2,18 @@
 {
     public class NotifierSvc : INotifierSvc
     {
+        public event EventHandler<bool>? ThemeChanged;
+
         public event EventHandler<TransactionsChangedEventArgs>? TransactionsChanged;
 
         public event Action? SummaryTypeDeleted;
 
         public event Action? TransactionTypeDeleted;
+
+        public virtual void OnThemeChanged(object sender, bool darkMode)
+        {
+            ThemeChanged?.Invoke(sender, darkMode);
+        }
 
         public virtual void OnTransactionsChanged(object sender, List<int> years)
         {
@@ -23,7 +30,6 @@
         {
             TransactionTypeDeleted?.Invoke();
         }
-
     }
 
     public class TransactionsChangedEventArgs : EventArgs

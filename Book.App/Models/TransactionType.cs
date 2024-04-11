@@ -6,18 +6,15 @@ namespace Book.Models
     {
         public int TransactionTypeId { get; set; }
 
-        public int? SummaryTypeId { get; set; }
+        public int SummaryTypeId { get; set; }
 
-        public SummaryType? SummaryType { get; set; }
+        public SummaryType SummaryType { get; set; }
 
-        [NotMapped]
-        public string? SummaryName { get; set; }
-
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public DateTime CreateDate { get; set; }
 
-        public ICollection<Transaction>? Transactions { get; set; }
+        public List<Transaction> Transactions { get; set; } = [];
 
         [NotMapped]
         public int TransactionCount { get; set; }
@@ -36,5 +33,6 @@ namespace Book.Models
             if (result.IsValid) return [];
             return result.Errors.Select(e => e.ErrorMessage);
         };
+
     }
 }

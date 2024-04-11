@@ -1,19 +1,78 @@
-﻿<MudDialog>
+﻿@using ApexCharts;
+
+<MudDialog @rendermode="RenderMode.InteractiveWebAssembly" Class="my-20">
     <DialogContent>
-        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
-            <MudText Typo="Typo.h5">@DialogTitle</MudText>
-            <MudSpacer />
-            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="Close" Title="@Localizer["Close"]"/>
-        </MudStack>
-        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
-            <MudRadioGroup T="int" Value="@SelectedOption" ValueChanged="OnSelectedOptionChanged">
-                <MudRadio Value="@(1)" Color="Color.Primary">@Localizer["Summary"]</MudRadio>
-                <MudRadio Value="@(2)" Color="Color.Primary">@Localizer["EntryType"]</MudRadio>
-            </MudRadioGroup>
-        </MudStack>
-        <MudPaper >
-            <MudText Class="pt-0 pb-2" Align="Align.Center" >@IndexText</MudText>
-            <MudChart ChartType="ChartType.Pie" InputData="@Data" InputLabels="@Labels" SelectedIndex="@Index" SelectedIndexChanged="OnSelectedIndexChanged" Width="325px" Height="325px" LegendPosition="Position.Right" />
+        <MudPaper Style="min-width:375px;max-width:520px" Elevation=" 5" Class="pa-0">
+            <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
+                <MudText Typo="Typo.h6" Align="MudBlazor.Align.Center">@DialogTitle</MudText>
+                <MudIconButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Icon="@Icons.Material.Filled.Cancel" OnClick="Close" Title="@Localizer["Close"]" Size="MudBlazor.Size.Small" />
+            </MudStack>
+            @if (Transactions.Any())
+            {
+                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
+                    <MudRadioGroup Class="py-2" T="int" Value="@SelectedOption" ValueChanged="OnSelectedOptionChanged">
+                        <MudRadio Class="py-0" Size="MudBlazor.Size.Small" Dense="true" Value="@(1)" Color="MudBlazor.Color.Primary">@Localizer["Summary"]</MudRadio>
+                        <MudRadio Class="py-0" Size="MudBlazor.Size.Small" Dense="true" Value="@(2)" Color="MudBlazor.Color.Primary">@Localizer["EntryType"]</MudRadio>
+                    </MudRadioGroup>
+                </MudStack>
+                <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart">
+                    @if (SelectedOption == 1)
+                    {
+                        <ApexPointSeries XValue="@(e => e.SummaryName)" TItem="Transaction" Items="Transactions" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(e => e.Sum(e => e.Value))" OrderByDescending="e=>e.Y" ShowDataLabels />
+                    }
+                    else
+                    {
+                        <ApexPointSeries XValue="@(e => e.TransactionTypeName)" TItem="Transaction" Items="Transactions" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(e => e.Sum(e => e.Value))" OrderByDescending="e=>e.Y" ShowDataLabels />
+                    }
+                </ApexChart>
+            }
+            else
+            {
+                <MudText Class="py-6" Align="MudBlazor.Align.Center" Typo="Typo.h5">@Localizer["NoPieData"]</MudText>
+            }
         </MudPaper>
     </DialogContent>
 </MudDialog>
+
+@code {
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+
+    [Parameter] public List<Transaction> Transactions { get; set; }
+
+    [Parameter] public string DialogTitle { get; set; }
+
+    private ApexChartOptions<Transaction> ChartOptions;
+
+    private ApexChart<Transaction> ApexChart;
+
+    public int SelectedOption { get; set; } = 1;
+
+    void Close() => MudDialog.Cancel();
+
+    protected async override Task OnInitializedAsync()
+    {
+        MudDialog.Options.MaxWidth = MaxWidth.Small;
+        MudDialog.Options.FullWidth = true;
+        MudDialog.Options.NoHeader = true;
+        MudDialog.SetOptions(MudDialog.Options);
+
+        ChartOptions = new ApexChartOptions<Transaction>();
+        ChartOptions.Theme = new Theme { Mode = await BookSettingSvc.GetDarkMode() ? Mode.Dark : Mode.Light, Palette = PaletteType.Palette8 };
+        ChartOptions.Chart = new Chart { Toolbar = new Toolbar { Show = true } };
+        ChartOptions.Legend = new Legend { Position = LegendPosition.Bottom, FontSize = "14px" };
+        ChartOptions.DataLabels = new DataLabels { Style = new DataLabelsStyle { FontSize = "12px" }, };
+        ChartOptions.NoData = new NoData { Text = @Localizer["NoPieData"] };
+        ChartOptions.Tooltip = new ApexCharts.Tooltip { Y = new TooltipY { Formatter = @$"function(value, opts) {{ if (value === undefined) {{return '';}} return Intl.NumberFormat(undefined, {{ style: 'currency', currency: '{RegionInfo.CurrentRegion.ISOCurrencySymbol}' }} ).format(value);}}" } };
+    }
+
+    private void OnSelectedOptionChanged(int selectedOption)
+    {
+        SelectedOption = selectedOption;
+        ApexChart.ResetSeriesAsync(true, true);
+        ApexChart.UpdateSeriesAsync();
+        ApexChart.RenderAsync();
+    }
+}

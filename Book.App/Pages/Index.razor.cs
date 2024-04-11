@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace Book.Pages
 {
     public partial class Index
@@ -18,7 +16,7 @@ namespace Book.Pages
 
         [Inject] TransListSvc TransListSvc { get; set; }
 
-        public IEnumerable<SummaryType> SummaryTypes { get; set; }
+        private IEnumerable<SummaryType> SummaryTypes { get; set; }
 
         public record MonthlySummary(string MonthName, string MonthNameFull, int MonthNo, List<SummaryDetail> SummaryDetails);
 
@@ -55,7 +53,7 @@ namespace Book.Pages
                 Year = DateTime.Today.Year > Years.Max() ? Years.Max() : Years.Min();
             }
 
-            SummaryTypes = (await SummaryRepo.LoadSummary()).Where(s => s.Types.Count > 0).ToList();
+            SummaryTypes = (await SummaryRepo.LoadSummary()).Where(s => s.TransactionTypes.Count > 0).ToList();
 
             await LoadSummary();
         }
@@ -100,9 +98,9 @@ namespace Book.Pages
             // User defined Summaries
             foreach (SummaryType summaryType in SummaryTypes)
             {
-                total = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.Types.Contains((int)t.TransactionTypeId)).Sum(t => t.Value) * -1;
+                total = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.TransactionTypes.Any(tt => tt.TransactionTypeId == t.TransactionTypeId)).Sum(t => t.Value) * -1;
 
-                summaryDetails.Add(new SummaryDetail(summaryType.SummaryTypeId, summaryType.Name, summaryType.Types, total, total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass, monthNo == 0 && Transactions.Any(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.Types.Contains((int)t.TransactionTypeId))));
+                summaryDetails.Add(new SummaryDetail(summaryType.SummaryTypeId, summaryType.Name, summaryType.TransactionTypes.Select(t => t.TransactionTypeId).ToList(), total, total >= 0 ? Constants.PositiveValueCssClass : Constants.NegativeValueCssClass, monthNo == 0 && Transactions.Any(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.TransactionTypes.Any(tt => tt.TransactionTypeId == t.TransactionTypeId))));
             }
 
             return summaryDetails;
@@ -181,30 +179,31 @@ namespace Book.Pages
 
         private void MonthChart(int monthNo)
         {
-            SetDates(monthNo + 1);
+            string dialogTitle = string.Empty;
+            List<Transaction> transactions = [];
 
-            monthNo = monthNo < 0 ? 12 : monthNo;
+            if (monthNo >= 0)
+            {
+                dialogTitle = Localizer["Expenditure", MonthlySummaries[monthNo].MonthNameFull, Year];
 
-            string dialogTitle = monthNo < 12 ? Localizer["Expenditure", MonthlySummaries[monthNo].MonthNameFull, Year] : Localizer["YExpenditure", Year];
-
-            var monthlyTransactions = Transactions
-                .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && t.Value > 0)
-                .GroupBy(t => t.TransactionTypeName)
-                .Select(g => new { TransactionTypeName = g.Key, Value = g.Sum(t => t.Value) })
-                .ToList();
+                SetDates(++monthNo);
+                transactions = Transactions
+                    .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && t.Value > 0)
+                    .ToList();
+            }
+            else
+            {
+                dialogTitle = Localizer["Expenditure", Year, ""];
+                transactions = Transactions.Where(t => t.Value > 0).ToList();
+            }
 
             var parameters = new DialogParameters<MonthChartDialog>
             {
-                { x => x.DialogTitle, dialogTitle },
-                { x => x.SummaryData, MonthlySummaries[monthNo].SummaryDetails.Where(s => s.Total < 0 && s.SummaryTypeId != 0).Select(s => (double)(s.Total * -1)).ToArray() },
-                { x => x.SummaryLabels, MonthlySummaries[monthNo].SummaryDetails.Where(s => s.Total < 0 && s.SummaryTypeId != 0).Select(s => s.SummaryName).ToArray() },
-                { x => x.TypeData, monthlyTransactions.Select(s => (double)(s.Value)).ToArray() },
-                { x => x.TypeLabels, monthlyTransactions.Select(s => s.TransactionTypeName).ToArray() },
+                { p => p.DialogTitle, dialogTitle },
+                { p => p.Transactions, transactions },
             };
 
-            var options = new DialogOptions() { NoHeader = true, MaxWidth = MaxWidth.ExtraLarge };
-
-            DialogService.Show<MonthChartDialog>("", parameters, options);
+            DialogService.Show<MonthChartDialog>("", parameters);
         }
 
         protected async void TransList(string summaryName, List<int> types, int month)

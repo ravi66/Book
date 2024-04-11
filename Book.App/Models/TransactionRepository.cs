@@ -78,6 +78,7 @@
                         TransactionId = t.TransactionId,
                         TransactionTypeId = t.TransactionTypeId,
                         Value = t.Value,
+                        SummaryName = t.TransactionType.SummaryType.Name,
                         TransactionTypeName = t.TransactionType.Name,
                         TransactionDate = t.TransactionDate,
                         CreateDate = t.CreateDate,

@@ -10,6 +10,8 @@ namespace Book.Shared
 
         [Inject] public NavigationManager NavigationManager { get; set; }
 
+        [Inject] public INotifierSvc NotifierSvc { get; set; }
+
         [Inject] HttpClient HttpClient { get; set; }
 
         private bool _isDarkMode = true;
@@ -55,6 +57,7 @@ namespace Book.Shared
             SetTheme();
 
             await BookSettingSvc.SetDarkMode(_isDarkMode);
+            NotifierSvc.OnThemeChanged(this, _isDarkMode);
         }
 
         private void SetTheme()

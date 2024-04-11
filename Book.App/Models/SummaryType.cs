@@ -6,22 +6,13 @@ namespace Book.Models
     {
         public int SummaryTypeId { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public int Order { get; set; }
 
         public DateTime CreateDate { get; set; }
 
-        public ICollection<TransactionType>? TransactionTypes { get; set; }
-
-        [NotMapped]
-        public List<int>? Types { get; set; }
-
-        [NotMapped]
-        public List<TransactionType>? TransactionTypeList { get; set; }
-
-        [NotMapped]
-        public bool ShowTransactionTypes { get; set; }
+        public List<TransactionType> TransactionTypes { get; set; } = [];
     }
 
     public class SummaryTypeValidator : AbstractValidator<SummaryType>
