@@ -1,0 +1,248 @@
+﻿@page "/linechart"
+@implements IDisposable
+@rendermode RenderMode.InteractiveWebAssembly
+@using ApexCharts
+
+<PageTitle>@BookName - @Localizer["LineChart"]</PageTitle>
+
+<MudContainer Class="d-flex">
+    <MudPaper Elevation="5" Class="flex-grow-1 py-2 px-6" MinWidth="500px" >
+        @if (Series.First().Transactions.Any())
+        {
+            <ApexChart TItem="ChartTransaction" Title="@ChartTitle" XAxisType="XAxisType.Datetime" Options="ChartOptions" @ref="ApexChart" Height="500" OnLegendClicked="OnLegendClicked">
+                @foreach (var series in Series)
+                {
+                    <ApexPointSeries TItem="ChartTransaction" Items="series.Transactions" Name="@series.SummaryName" SeriesType="SeriesType.Line" XValue="@(e => e.Dated.FirstDayOfMonth())" YAggregate="@(e => e.Sum(e => e.Value))" OrderBy="e => e.X" />
+                }
+            </ApexChart>
+        }
+        else
+        {
+            <MudText Class="py-4" Align="MudBlazor.Align.Center" Typo="Typo.h5">@ChartTitle</MudText>
+            <MudText Class="py-4" Align="MudBlazor.Align.Center" Typo="Typo.h5">@Localizer["NoPieData"]</MudText>
+        }
+    </MudPaper>
+</MudContainer>
+
+@code
+{
+    [Inject] public PageParamsSvc PageParamsSvc { get; set; }
+
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+
+    [Inject] public INotifierSvc NotifierSvc { get; set; }
+
+    [Inject] public NavigationManager NavigationManager { get; set; }
+
+    [Inject] internal ITransactionRepository Repo { get; set; }
+
+    private ApexChartOptions<ChartTransaction> ChartOptions { get; set; }
+
+    private ApexChart<ChartTransaction> ApexChart;
+
+    public class ChartTransaction { public DateTimeOffset Dated; public decimal Value; } 
+
+    class YearSeries { public string SummaryName = string.Empty; public List<ChartTransaction> Transactions = new(); }
+
+    private List<YearSeries> Series = new List<YearSeries>() { new YearSeries() };
+
+    private string BookName = string.Empty;
+
+    private string ChartTitle = string.Empty;
+
+    protected async override Task OnInitializedAsync()
+    {
+        BookName = await BookSettingSvc.GetBookName();
+
+        await InitChartOptions();
+
+        switch (PageParamsSvc.Mode)
+        {
+            case 1:
+                await LoadYearChart();
+                break;
+
+            case 2:
+                await LoadSummaryChart();
+                break;
+
+            case 3:
+                await LoadTransactionTypeChart();
+                break;
+
+            default:
+                break;
+        }
+
+        if (Series.First().Transactions.Sum(s => s.Value) < 0) ChartOptions.Yaxis.First().Reversed = true;
+
+        if (PageParamsSvc.Year == DateTime.Today.Year) ChartOptions.ForecastDataPoints = new ForecastDataPoints { Count = 12 - DateTime.Today.Month, DashArray = 4, FillOpacity = 0.75, };
+
+        NotifierSvc.ThemeChanged += ThemeChanged;
+    }
+
+    async Task LoadYearChart()
+    {
+        ChartTitle = Localizer["YearChartTitle", PageParamsSvc.Year, PageParamsSvc.Name];
+
+        if (!PageParamsSvc.Transactions.Any()) return;
+
+        Series.Clear();
+
+        // If Total Summary split into individual summary Types
+        if (PageParamsSvc.SummaryTypeId != 0)
+        {
+            Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, Transactions = GetSeriesTransactions(PageParamsSvc.Transactions), });
+
+            GenerateZeroTransactions(Series.First().Transactions);
+            bool forecastSet = AddForecast(Series.First().Transactions);
+
+            if (forecastSet)
+            {
+                ChartOptions.Subtitle = new Subtitle
+                {
+                    Text = Localizer["YearChartSTitle", Series.First().Transactions.Sum(t => t.Value).ToString("C2")],
+                    OffsetX = 10,
+                    Style = new SubtitleStyle { FontSize = "14px" },
+                };
+            }
+        }
+        else
+        {
+            decimal forecastTotal = 0;
+            bool forecastSet = false;
+
+            foreach (var summary in PageParamsSvc.Transactions.Select(t => new { t.SummaryTypeId, t.SummaryName }).Distinct().ToList())
+            {
+                Series.Add(new YearSeries { SummaryName = summary.SummaryName, Transactions = GetSeriesTransactions(PageParamsSvc.Transactions.Where(t => t.SummaryTypeId == summary.SummaryTypeId).ToList()), });
+
+                GenerateZeroTransactions(Series.Last().Transactions);
+                if (AddForecast(Series.Last().Transactions)) forecastSet = true;
+                forecastTotal += Series.Last().Transactions.Sum(t => t.Value);
+            }
+
+            if (forecastSet)
+            {
+                ChartOptions.Subtitle = new Subtitle
+                {
+                    Text = Localizer["YearChartSTitle", forecastTotal.ToString("C2")],
+                    OffsetX = 10,
+                    Style = new SubtitleStyle { FontSize = "14px" },
+                };
+            }
+        }
+    }
+
+    async Task LoadSummaryChart()
+    {
+        ChartTitle = Localizer["SummaryChartTitle", PageParamsSvc.Name];
+
+        IEnumerable<Transaction> transactions = await Repo.GetTransactionsBySummary(PageParamsSvc.Types);
+
+        if (!transactions.Any()) return;
+
+        Series.Clear();
+        Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, Transactions = GetSeriesTransactions(transactions.ToList()), });
+    }
+
+    async Task LoadTransactionTypeChart()
+    {
+        ChartTitle = Localizer["TransactionTypeChartTitle", PageParamsSvc.Name];
+
+        IEnumerable<Transaction> transactions = await Repo.GetTransactionsByType(PageParamsSvc.TransactionTypeId);
+
+        if (!transactions.Any()) return;
+
+        Series.Clear();
+        Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, Transactions = GetSeriesTransactions(transactions.ToList()), });
+    }
+
+    private async Task InitChartOptions()
+    {
+        ChartOptions = new ApexChartOptions<ChartTransaction>();
+
+        ChartOptions.Stroke = new Stroke { Curve = Curve.Smooth };
+
+        ChartOptions.Theme = new Theme { Mode = await BookSettingSvc.GetDarkMode() ? Mode.Dark : Mode.Light, Palette = PaletteType.Palette5 };
+
+        ChartOptions.Tooltip = new ApexCharts.Tooltip { X = new TooltipX { Format = @"MMMM \ yyyy" } };
+
+        ChartOptions.Xaxis = new XAxis { Type = XAxisType.Datetime, Labels = new XAxisLabels { MinHeight = 40 } };
+
+        ChartOptions.Legend = new Legend { Position = LegendPosition.Bottom, FontSize = "12px", };
+
+        ChartOptions.Yaxis = new List<YAxis>();
+        ChartOptions.Yaxis.Add(new YAxis { 
+            Reversed = false,
+            Labels = new YAxisLabels
+                {
+                Style = new AxisLabelStyle { FontSize = "12px" }, 
+                Formatter = @$"function(value, opts) {{ if (value === undefined) {{return '';}} return Intl.NumberFormat(undefined, {{ style: 'currency', currency: '{RegionInfo.CurrentRegion.ISOCurrencySymbol}' }} ).format(value);}}",
+            },
+        });
+    }
+
+    private List<ChartTransaction> GetSeriesTransactions(List<Transaction> transactions)
+    {
+        return transactions.Select(t => new ChartTransaction { Dated = t.TransactionDate, Value = t.Value }).ToList();
+    }
+
+    private void GenerateZeroTransactions(List<ChartTransaction> chartTransactions)
+    {
+        DateTime startDate = new DateTime(PageParamsSvc.Year, 1, 1);
+
+        while (startDate.Year == PageParamsSvc.Year)
+        {
+            if (!chartTransactions.Where(c => c.Dated >= startDate && c.Dated < startDate.AddMonths(1)).Any())
+            {
+                chartTransactions.Add(new ChartTransaction { Dated = startDate, Value = 0, });
+            }
+
+            startDate = startDate.AddMonths(1);
+        }
+    }
+
+    private bool AddForecast(List<ChartTransaction> chartTransactions)
+    {
+        if (PageParamsSvc.Year != DateTime.Today.Year || DateTime.Today.Month == 12) return false;
+
+        DateTime forecastDate = new DateTime(PageParamsSvc.Year, DateTime.Today.Month + 1, 1);
+        decimal forecastAvg = ((chartTransactions.Where(t => t.Dated < forecastDate).Sum(t => t.Value) / DateTime.Today.Month));
+        //Console.WriteLine($"Forecast: {forecastAvg.ToString("C2")}");
+
+        decimal forecastValue = 0;
+
+        while (forecastDate.Year == PageParamsSvc.Year)
+        {
+            if (forecastAvg > 0)
+            {
+                forecastValue = forecastAvg > chartTransactions.Where(t => t.Dated >= forecastDate && t.Dated < forecastDate.AddMonths(1)).Sum(t => t.Value) ? forecastAvg - chartTransactions.Where(t => t.Dated >= forecastDate && t.Dated < forecastDate.AddMonths(1)).Sum(t => t.Value) : 0;
+            }
+            else
+            {
+                forecastValue = forecastAvg < chartTransactions.Where(t => t.Dated >= forecastDate && t.Dated < forecastDate.AddMonths(1)).Sum(t => t.Value) ? forecastAvg - chartTransactions.Where(t => t.Dated >= forecastDate && t.Dated < forecastDate.AddMonths(1)).Sum(t => t.Value) : 0;
+            }
+
+            chartTransactions.Add(new ChartTransaction { Dated = forecastDate, Value = forecastValue, });
+
+            forecastDate = forecastDate.AddMonths(1);
+        }
+
+        return true;
+    }
+
+    private void OnLegendClicked(LegendClicked<ChartTransaction> _) { }
+
+    public void ThemeChanged(object? sender, bool darkMode)
+    {
+        ChartOptions.Theme.Mode = darkMode ? Mode.Dark : Mode.Light;
+        ApexChart.UpdateOptionsAsync(true, true, true);
+        ApexChart.RenderAsync();
+    }
+
+    public void Dispose()
+    {
+        NotifierSvc.ThemeChanged -= ThemeChanged;
+        GC.SuppressFinalize(this);
+    }
+}

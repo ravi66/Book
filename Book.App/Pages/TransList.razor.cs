@@ -2,7 +2,7 @@ namespace Book.Pages
 {
     public partial class TransList
     {
-        [Inject] TransListSvc TransListSvc { get; set; }
+        [Inject] PageParamsSvc PageParamsSvc { get; set; }
 
         [Inject] internal ITransactionRepository Repo { get; set; }
 
@@ -34,11 +34,11 @@ namespace Book.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            if (TransListSvc.Mode < 1 || TransListSvc.Mode > 3) NavigationManager.NavigateTo("/", false);
+            if (PageParamsSvc.Mode < 1 || PageParamsSvc.Mode > 3) NavigationManager.NavigateTo("/", false);
 
             BookName = await BookSettingSvc.GetBookName();
 
-            if ((TransListSvc.Mode == 1 || TransListSvc.Mode == 2) && TransListSvc.Name == Localizer["Total"]) TransListSvc.Name = "";
+            if ((PageParamsSvc.Mode == 1 || PageParamsSvc.Mode == 2) && PageParamsSvc.Name == Localizer["Total"]) PageParamsSvc.Name = "";
 
             NotifierSvc.TransactionsChanged += TransactionsChanged;
         }
@@ -49,16 +49,16 @@ namespace Book.Pages
 
             Transactions = [];
 
-            switch (TransListSvc.Mode)
+            switch (PageParamsSvc.Mode)
             {
                 case 1:
-                    Transactions = await Repo.GetTransactionsByTypeMonth(TransListSvc.Types, TransListSvc.Year, TransListSvc.Month);
+                    Transactions = await Repo.GetTransactionsByTypeMonth(PageParamsSvc.Types, PageParamsSvc.Year, PageParamsSvc.Month);
                     break;
                 case 2:
-                    Transactions = await Repo.GetTransactionsBySummary(TransListSvc.Types);
+                    Transactions = await Repo.GetTransactionsBySummary(PageParamsSvc.Types);
                     break;
                 case 3:
-                    Transactions = await Repo.GetTransactionsByType(TransListSvc.TransactionTypeId);
+                    Transactions = await Repo.GetTransactionsByType(PageParamsSvc.TransactionTypeId);
                     break;
                 default:
                     break;
@@ -122,14 +122,14 @@ namespace Book.Pages
 
         private void SetEntriesTitle()
         {
-            switch (TransListSvc.Mode)
+            switch (PageParamsSvc.Mode)
             {
                 case > 1:
-                    EntriesTitle = Transactions.Count() < 2 ? Localizer["TransListNameS", Transactions.Count(), TransListSvc.Name] : Localizer["TransListNameM", Transactions.Count(), TransListSvc.Name];
+                    EntriesTitle = Transactions.Count() < 2 ? Localizer["TransListNameS", Transactions.Count(), PageParamsSvc.Name] : Localizer["TransListNameM", Transactions.Count(), PageParamsSvc.Name];
                     break;
                 default:
-                    _ = Transactions.Count() < 2 ? EntriesTitle = TransListSvc.Month > 0 ? Localizer["TransListTitleS", Transactions.Count(), TransListSvc.Name, new DateTime(2020, TransListSvc.Month, 1).ToString("MMMM"), TransListSvc.Year]
-                            : Localizer["TransListTitleS", Transactions.Count(), TransListSvc.Name, TransListSvc.Year, ""] : EntriesTitle = TransListSvc.Month > 0 ? Localizer["TransListTitleM", Transactions.Count(), TransListSvc.Name, new DateTime(2020, TransListSvc.Month, 1).ToString("MMMM"), TransListSvc.Year] : Localizer["TransListTitleM", Transactions.Count(), TransListSvc.Name, TransListSvc.Year, ""];
+                    _ = Transactions.Count() < 2 ? EntriesTitle = PageParamsSvc.Month > 0 ? Localizer["TransListTitleS", Transactions.Count(), PageParamsSvc.Name, new DateTime(2020, PageParamsSvc.Month, 1).ToString("MMMM"), PageParamsSvc.Year]
+                            : Localizer["TransListTitleS", Transactions.Count(), PageParamsSvc.Name, PageParamsSvc.Year, ""] : EntriesTitle = PageParamsSvc.Month > 0 ? Localizer["TransListTitleM", Transactions.Count(), PageParamsSvc.Name, new DateTime(2020, PageParamsSvc.Month, 1).ToString("MMMM"), PageParamsSvc.Year] : Localizer["TransListTitleM", Transactions.Count(), PageParamsSvc.Name, PageParamsSvc.Year, ""];
                     break;
             }
 
@@ -157,8 +157,6 @@ namespace Book.Pages
         {
             return (value <= 0) ? $"{Constants.PositiveValueCssClass} py-0" : $"{Constants.NegativeValueCssClass} py-0";
         }
-
-        void GoBack() => NavigationManager.NavigateTo(TransListSvc.PreviousPage, false);
 
         public void Dispose()
         {

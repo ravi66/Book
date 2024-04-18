@@ -14,7 +14,7 @@ namespace Book.Pages
 
         [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
 
-        [Inject] TransListSvc TransListSvc { get; set; }
+        [Inject] PageParamsSvc PageParamsSvc { get; set; }
 
         private IEnumerable<SummaryType> SummaryTypes { get; set; }
 
@@ -70,7 +70,7 @@ namespace Book.Pages
                 MonthlySummaries.Add(new MonthlySummary(CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i), CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i), i, CreateSummaryDetails(i)));
             }
 
-            // Add Total row
+            // Add Total (Year) row
             MonthlySummaries.Add(new MonthlySummary(Localizer["Total"], Year.ToString(), 0, CreateSummaryDetails(0)));
 
             // Remove Zero Transactions SummaryDetails
@@ -138,43 +138,17 @@ namespace Book.Pages
             }
         }
 
-        private void YearChart(int summaryTypeId)
+        private void YearChart(SummaryDetail summary)
         {
-            List<ChartSeries> summarySeries = [];
+            PageParamsSvc.Init();
+            PageParamsSvc.Mode = 1;
+            PageParamsSvc.Year = Year;
+            PageParamsSvc.Name = summary.SummaryName;
+            PageParamsSvc.SummaryTypeId = summary.SummaryTypeId;
+            PageParamsSvc.Transactions = summary.SummaryTypeId > 0 ? Transactions.Where(t => t.SummaryName == summary.SummaryName).ToList() : Transactions.ToList();
+            PageParamsSvc.PreviousPage = "/";
 
-            if (summaryTypeId > 0)
-            {
-                summarySeries.Add(GetSummarySeries(summaryTypeId));
-            }
-            else
-            {
-                foreach (var summary in MonthlySummaries[12].SummaryDetails)
-                {
-                    summarySeries.Add(GetSummarySeries(summary.SummaryTypeId));
-                }
-            }
-
-            var parameters = new DialogParameters<YearChartDialog>
-            {
-                { p => p.DialogTitle, Localizer["Chart", Year] },
-                { p => p.Series, summarySeries },
-            };
-
-            var options = new DialogOptions() { NoHeader = true, MaxWidth = MaxWidth.ExtraLarge };
-
-            DialogService.Show<YearChartDialog>("", parameters, options);
-        }
-
-        private ChartSeries GetSummarySeries(int summaryTypeId)
-        {
-            List<double> summaryData = [];
-
-            for (int i = 0; i < 12; i++)
-            {
-                summaryData.Add((double)MonthlySummaries[i].SummaryDetails.Single(s => s.SummaryTypeId == summaryTypeId).Total);
-            }
-
-            return new ChartSeries { Name = MonthlySummaries[12].SummaryDetails.Single(s => s.SummaryTypeId == summaryTypeId).SummaryName, Data = [.. summaryData] };
+            NavigationManager.NavigateTo("LineChart", false);
         }
 
         private void MonthChart(int monthNo)
@@ -208,12 +182,13 @@ namespace Book.Pages
 
         protected async void TransList(string summaryName, List<int> types, int month)
         {
-            TransListSvc.Mode = 1;
-            TransListSvc.Name = summaryName;
-            TransListSvc.Types = types;
-            TransListSvc.Year = Year;
-            TransListSvc.Month = month;
-            TransListSvc.PreviousPage = "/";
+            PageParamsSvc.Init();
+            PageParamsSvc.Mode = 1;
+            PageParamsSvc.Name = summaryName;
+            PageParamsSvc.Types = types;
+            PageParamsSvc.Year = Year;
+            PageParamsSvc.Month = month;
+            PageParamsSvc.PreviousPage = "/";
 
             NavigationManager.NavigateTo("TransList", false);
         }

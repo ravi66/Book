@@ -6,11 +6,12 @@
 
 <MudLayout>
     <MudAppBar Elevation="0" Dense="true" >
-        <MudIconButton Class="pa-0" OnClick="@ToggleDrawer" Icon="@menuIcon" Color="Color.Info" Edge="Edge.Start" Size="Size.Large" Title="@menuToolTip" />
+        <MudIconButton Class="pa-0" Edge="Edge.Start" OnClick="@ToggleDrawer" Icon="@menuIcon" Color="Color.Info" Size="Size.Large" Title="@menuToolTip" />
+        <MudIconButton Class="pa-0" Href="/" Icon="@Icons.Material.Filled.Home" Color="Color.Info" Size="Size.Large" Title="@Localizer["Summary"]" />
         <MudSpacer />
         <TransactionBtn IsIcon="false" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
         <MudSpacer />
-        <MudIconButton Class="pa-0" Href="info" Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large" Title="@Localizer["MoreInformation"]"/>
+        <MudIconButton Class="pa-0" Href="info" Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large" Title="@Localizer["MoreInformation"]" />
         <MudIconButton Class="py-0 ps-1 pe-0" OnClick="ToggleThemeMode" Icon="@themeIcon" Color="@themeColor" Size="Size.Large" Title="@themeText" />
     </MudAppBar>
     <MudDrawer @bind-Open="@drawerOpen" Variant="DrawerVariant.Responsive" Elevation="0">
@@ -18,12 +19,6 @@
             <MudText Typo="Typo.h5" Class="pa-0" Color="Color.Info">@BookName</MudText>
         </MudDrawerHeader>
         <MudNavMenu Color="Color.Success" >
-            <MudNavLink Href="/" Match="NavLinkMatch.All">
-                <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Row="true" >
-                    <MudIcon Icon="@Icons.Material.Filled.Home" />
-                    <MudText Typo="Typo.h6">@Localizer["Summary"]</MudText>
-                </MudStack>
-            </MudNavLink>
             <MudNavLink Href="SummaryTypeList">
                 <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Row="true" >
                     <MudIcon Icon="@Icons.Material.Filled.Summarize" />

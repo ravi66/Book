@@ -96,8 +96,6 @@ namespace Book.Pages
 
         }
 
-        private void Back() => NavigationManager.NavigateTo("/", false);
-
         async ValueTask IAsyncDisposable.DisposeAsync()
         {
             if (jsModule is not null)

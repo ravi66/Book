@@ -1,6 +1,3 @@
-using Book.Models;
-using static MudBlazor.CategoryTypes;
-
 namespace Book.Pages
 {
     public partial class SummaryTypeList
@@ -15,7 +12,7 @@ namespace Book.Pages
 
         [Inject] public NavigationManager NavigationManager { get; set; }
 
-        [Inject] TransListSvc TransListSvc { get; set; }
+        [Inject] PageParamsSvc PageParamsSvc { get; set; }
 
         private string BookName { get; set; } = string.Empty;
 
@@ -54,12 +51,25 @@ namespace Book.Pages
 
         protected async void ListTransactionsSummary(SummaryType summary)
         {
-            TransListSvc.Mode = 2;
-            TransListSvc.Name = summary.Name;
-            TransListSvc.Types = summary.TransactionTypes.Select(s => s.TransactionTypeId).ToList();
-            TransListSvc.PreviousPage = "/SummaryTypeList";
+            PageParamsSvc.Init();
+            PageParamsSvc.Mode = 2;
+            PageParamsSvc.Name = summary.Name;
+            PageParamsSvc.Types = summary.TransactionTypes.Select(s => s.TransactionTypeId).ToList();
+            PageParamsSvc.PreviousPage = "/SummaryTypeList";
 
             NavigationManager.NavigateTo("TransList", false);
+        }
+
+        protected async void SummaryTypeChart(SummaryType summary)
+        {
+            PageParamsSvc.Init();
+            PageParamsSvc.Mode = 2;
+            PageParamsSvc.Name = summary.Name;
+            PageParamsSvc.SummaryTypeId = summary.SummaryTypeId;
+            PageParamsSvc.Types = summary.TransactionTypes.Select(s => s.TransactionTypeId).ToList();
+            PageParamsSvc.PreviousPage = "/SummaryTypeList";
+
+            NavigationManager.NavigateTo("LineChart", false);
         }
 
         private async Task AddSummaryType()
@@ -79,12 +89,24 @@ namespace Book.Pages
 
         protected async Task ListTransactionsTType(TransactionType transactionType)
         {
-            TransListSvc.Mode = 3;
-            TransListSvc.Name = transactionType.Name;
-            TransListSvc.TransactionTypeId = transactionType.TransactionTypeId;
-            TransListSvc.PreviousPage = "/SummaryTypeList";
+            PageParamsSvc.Init();
+            PageParamsSvc.Mode = 3;
+            PageParamsSvc.Name = transactionType.Name;
+            PageParamsSvc.TransactionTypeId = transactionType.TransactionTypeId;
+            PageParamsSvc.PreviousPage = "/SummaryTypeList";
 
             NavigationManager.NavigateTo("TransList", false);
+        }
+
+        protected async void EntryTypeChart(TransactionType transactionType)
+        {
+            PageParamsSvc.Init();
+            PageParamsSvc.Mode = 3;
+            PageParamsSvc.Name = transactionType.Name;
+            PageParamsSvc.TransactionTypeId = transactionType.TransactionTypeId;
+            PageParamsSvc.PreviousPage = "/SummaryTypeList";
+
+            NavigationManager.NavigateTo("LineChart", false);
         }
 
         protected async Task EditTType(int transactionTypeId)

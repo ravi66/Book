@@ -21,7 +21,5 @@ namespace Book.Pages
             VisitsCounter visitsCounter = new(HttpClient, new Uri(NavigationManager.Uri).Host);
             VisitCount = await visitsCounter.GetVisitsCount();
         }
-
-        private void Back() => NavigationManager.NavigateTo("/", false);
     }
 }

@@ -329,6 +329,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="EntryType" xml:space="preserve">
     <value>Entry Type</value>
   </data>
+  <data name="EntryTypeChart" xml:space="preserve">
+    <value>Entry Type Line Chart</value>
+  </data>
   <data name="EntryTypes" xml:space="preserve">
     <value>Entry Types</value>
   </data>
@@ -382,6 +385,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="LightMode" xml:space="preserve">
     <value>Light Mode</value>
+  </data>
+  <data name="LineChart" xml:space="preserve">
+    <value>Line Chart</value>
   </data>
   <data name="ListEntriesForEntryType" xml:space="preserve">
     <value>List Entries for EntryType</value>
@@ -515,8 +521,14 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="Summary" xml:space="preserve">
     <value>Summary</value>
   </data>
+  <data name="SummaryChartTitle" xml:space="preserve">
+    <value>Summary: {0} Line Chart</value>
+  </data>
   <data name="SummaryType" xml:space="preserve">
     <value>Summary Type</value>
+  </data>
+  <data name="SummaryTypeChart" xml:space="preserve">
+    <value>Summary Line Chart</value>
   </data>
   <data name="Takeaway" xml:space="preserve">
     <value>Takeaway</value>
@@ -538,6 +550,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="TrackorText" xml:space="preserve">
     <value>Trackor is a Blazor WASM application that uses many of the above packages. I shamelessly used it as both an inspiration and direct code source.</value>
+  </data>
+  <data name="TransactionTypeChartTitle" xml:space="preserve">
+    <value>Entry Type: {0} Line Chart</value>
   </data>
   <data name="TransCopyAccLabelM" xml:space="preserve">
     <value>Create {0} Entries?</value>
@@ -601,6 +616,12 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="YearChart" xml:space="preserve">
     <value>{0} Year Chart</value>
+  </data>
+  <data name="YearChartSTitle" xml:space="preserve">
+    <value>Forecast: {0}</value>
+  </data>
+  <data name="YearChartTitle" xml:space="preserve">
+    <value>{0} {1} Year Chart</value>
   </data>
   <data name="Yearly" xml:space="preserve">
     <value>Yearly</value>

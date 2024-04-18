@@ -23,6 +23,9 @@ namespace Book.Models
         public string? SummaryName { get; set; }
 
         [NotMapped]
+        public int SummaryTypeId { get; set; }
+
+        [NotMapped]
         public string? TransactionTypeName { get; set; }
     }
 

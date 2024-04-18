@@ -17,7 +17,7 @@
             foreach (var summary in MonthlySummaries[12].SummaryDetails)
             {
                 <MudItem>
-                    <MudButton Variant="Variant.Outlined" OnClick="@(e => YearChart(summary.SummaryTypeId))" Size="Size.Small">@summary.SummaryName</MudButton>
+                    <MudButton Variant="Variant.Outlined" OnClick="@(e => YearChart(summary))" Size="Size.Small">@summary.SummaryName</MudButton>
                 </MudItem>
             }
         }
@@ -49,7 +49,7 @@
             {
                 <MudTh Style="text-align:center" Class="pt-0 pb-1">
                     <MudTooltip Text="@(Localizer["YearChart", summary.SummaryName])" Delay="500" Duration="0" ShowOnFocus="false">
-                        <MudButton Variant="Variant.Outlined" OnClick="@(e => YearChart(summary.SummaryTypeId))" Size="Size.Small" Class="pt-0 pb-0">@summary.SummaryName</MudButton>
+                        <MudButton Variant="Variant.Outlined" OnClick="@(e => YearChart(summary))" Size="Size.Small" Class="pt-0 pb-0">@summary.SummaryName</MudButton>
                         </MudTooltip>
                     </MudTh>
             }

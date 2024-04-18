@@ -32,7 +32,5 @@ namespace Book.Pages
             await Repo.UpdateBookSettings(BookSettings);
             NavigationManager.NavigateTo("/", true);
         }
-
-        private void Back() => NavigationManager.NavigateTo("/", false);
     }
 }

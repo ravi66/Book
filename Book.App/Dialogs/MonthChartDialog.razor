@@ -1,22 +1,12 @@
 ﻿@using ApexCharts;
 
-<MudDialog @rendermode="RenderMode.InteractiveWebAssembly" Class="my-20">
+<MudDialog @rendermode="RenderMode.InteractiveWebAssembly" Class="d-flex " Style="width:100%;" DisableSidePadding="true" >
     <DialogContent>
-        <MudPaper Style="min-width:375px;max-width:520px" Elevation=" 5" Class="pa-0">
-            <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true">
-                <MudText Typo="Typo.h6" Align="MudBlazor.Align.Center">@DialogTitle</MudText>
-                <MudIconButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Icon="@Icons.Material.Filled.Cancel" OnClick="Close" Title="@Localizer["Close"]" Size="MudBlazor.Size.Small" />
-            </MudStack>
+        <MudPaper Style="min-width:320px; max-height:500px; " Elevation="5" Class="flex-grow-1">
             @if (Transactions.Any())
             {
-                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
-                    <MudRadioGroup Class="py-2" T="int" Value="@SelectedOption" ValueChanged="OnSelectedOptionChanged">
-                        <MudRadio Class="py-0" Size="MudBlazor.Size.Small" Dense="true" Value="@(1)" Color="MudBlazor.Color.Primary">@Localizer["Summary"]</MudRadio>
-                        <MudRadio Class="py-0" Size="MudBlazor.Size.Small" Dense="true" Value="@(2)" Color="MudBlazor.Color.Primary">@Localizer["EntryType"]</MudRadio>
-                    </MudRadioGroup>
-                </MudStack>
-                <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart">
-                    @if (SelectedOption == 1)
+                <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@DialogTitle" OnDataPointSelection="OnDataPointSelection">
+                    @if (!ShowEntryTypes)
                     {
                         <ApexPointSeries XValue="@(e => e.SummaryName)" TItem="Transaction" Items="Transactions" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(e => e.Sum(e => e.Value))" OrderByDescending="e=>e.Y" ShowDataLabels />
                     }
@@ -28,7 +18,8 @@
             }
             else
             {
-                <MudText Class="py-6" Align="MudBlazor.Align.Center" Typo="Typo.h5">@Localizer["NoPieData"]</MudText>
+                <MudText Class="py-4" Align="MudBlazor.Align.Center" Typo="Typo.h5">@DialogTitle</MudText>
+                <MudText Class="py-4" Align="MudBlazor.Align.Center" Typo="Typo.h5">@Localizer["NoPieData"]</MudText>
             }
         </MudPaper>
     </DialogContent>
@@ -50,12 +41,10 @@
 
     public int SelectedOption { get; set; } = 1;
 
-    void Close() => MudDialog.Cancel();
+    private bool ShowEntryTypes = false;
 
     protected async override Task OnInitializedAsync()
     {
-        MudDialog.Options.MaxWidth = MaxWidth.Small;
-        MudDialog.Options.FullWidth = true;
         MudDialog.Options.NoHeader = true;
         MudDialog.SetOptions(MudDialog.Options);
 
@@ -68,9 +57,9 @@
         ChartOptions.Tooltip = new ApexCharts.Tooltip { Y = new TooltipY { Formatter = @$"function(value, opts) {{ if (value === undefined) {{return '';}} return Intl.NumberFormat(undefined, {{ style: 'currency', currency: '{RegionInfo.CurrentRegion.ISOCurrencySymbol}' }} ).format(value);}}" } };
     }
 
-    private void OnSelectedOptionChanged(int selectedOption)
+    private void OnDataPointSelection(SelectedData<Transaction> data)
     {
-        SelectedOption = selectedOption;
+        ShowEntryTypes = !ShowEntryTypes;
         ApexChart.ResetSeriesAsync(true, true);
         ApexChart.UpdateSeriesAsync();
         ApexChart.RenderAsync();
