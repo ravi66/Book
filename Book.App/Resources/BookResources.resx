@@ -270,16 +270,16 @@ It is an open-source project licensed under MIT and is free to use in commercial
     <value>Delete Saved Changes</value>
   </data>
   <data name="DeleteSTypeAccLabel" xml:space="preserve">
-    <value>Delete {0} Summary Type</value>
+    <value>Delete "{0}"?</value>
   </data>
   <data name="DeleteSummaryType" xml:space="preserve">
     <value>Delete Summary Type</value>
   </data>
   <data name="DeleteTransAccLabel" xml:space="preserve">
-    <value>Delete {0} Entry for {1}</value>
+    <value>Delete "{0}" for {1}?</value>
   </data>
   <data name="DeleteTTypeAccLabel" xml:space="preserve">
-    <value>Delete {0} Entry Type</value>
+    <value>Delete "{0}"?</value>
   </data>
   <data name="EditEntry" xml:space="preserve">
     <value>Edit Entry</value>

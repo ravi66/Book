@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Book.Services
+﻿namespace Book.Services
 {
     public interface IBookSettingSvc
     {
