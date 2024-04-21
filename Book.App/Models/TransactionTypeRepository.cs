@@ -13,7 +13,6 @@
                     SummaryTypeId = t.SummaryTypeId,
                     Name = t.Name,
                     SummaryType = t.SummaryType,
-                    //SummaryName = t.SummaryType.Name,
                     CreateDate = t.CreateDate,
                 })
                 .OrderBy(t => t.Name)];
@@ -30,7 +29,7 @@
                     SummaryTypeId = t.SummaryTypeId,
                     Name = t.Name,
                     CreateDate = t.CreateDate,
-                    TransactionCount = t.Transactions.Count(),
+                    TransactionsFound = t.Transactions.Any(),
                     SummaryType = t.SummaryType
                 })
                 .FirstOrDefault(t => t.TransactionTypeId == transactionTypeId);

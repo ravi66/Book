@@ -57,7 +57,7 @@
                         <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditEntryType"]" OnClick="()=> EditTType(context.TransactionTypeId)" />
                         <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" Title="@Localizer["ListEntriesForEntryType"]" OnClick="()=> ListTransactionsTType(context)" />
                         <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.ShowChart" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EntryTypeChart"]" OnClick="()=> EntryTypeChart(context)" />
-                        @if (context.TransactionCount < 1 && context.TransactionTypeId > -1)
+                        @if (!context.TransactionsFound && context.TransactionTypeId > -1)
                         {
                             <DeleteTTypeBtn TransactionType="@context" Variant="@Variant.Text" Size="@Size.Small" />
                         }

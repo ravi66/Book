@@ -17,7 +17,7 @@ namespace Book.Models
         public List<Transaction> Transactions { get; set; } = [];
 
         [NotMapped]
-        public int TransactionCount { get; set; }
+        public bool TransactionsFound { get; set; }
     }
 
     public class TransactionTypeValidator : AbstractValidator<TransactionType>

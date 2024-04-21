@@ -22,7 +22,7 @@
                                             SummaryTypeId = t.SummaryTypeId,
                                             Name = t.Name,
                                             CreateDate = t.CreateDate,
-                                            TransactionCount = t.Transactions.Count,
+                                            TransactionsFound = t.Transactions.Any(),
                                         })
                                         .OrderBy(t => t.Name).ToList()),
                                 })
