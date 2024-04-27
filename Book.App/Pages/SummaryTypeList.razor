@@ -5,10 +5,9 @@
 
 <MudContainer Class="ma-0 pa-2">
     <MudGrid>
-        <MudItem xs="12" md="6" Class="px-1">
+        <MudItem xs="12" md="6" Class="px-1" Style="position:relative;height:100%;" >
             <MudTable Elevation="5" T="SummaryType" Items="@SummaryTypes" Dense="true" Hover="true" SortLabel="@Localizer["SortBy"]" AllowUnsorted="false" SelectedItemChanged="SummaryChanged" Outlined="true">
                 <ToolBarContent>
-                    <MudIconButton Icon="@Icons.Material.Filled.Summarize" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="AddSummaryType" Title="@Localizer["NewSummaryType"]" />
                     <MudText Class="ps-2 py-0" Typo="Typo.h5">@Localizer["Summaries"]</MudText>
                 </ToolBarContent>
                 <HeaderContent>
@@ -35,11 +34,11 @@
                     </MudTd>
                 </RowTemplate>
             </MudTable>
+            <MudFab StartIcon="@Icons.Material.Filled.Add" Color="Color.Success" Size="Size.Small" OnClick="AddSummaryType" Title="@Localizer["NewSummaryType"]" Class="z-10" Style="position:absolute;right:20px;top:25px;" />
         </MudItem>
-        <MudItem xs="12" md="6" Class="px-1">
+        <MudItem xs="12" md="6" Class="px-1" Style="height:100%;position:relative;" >
             <MudTable Items="@TransactionTypes" T="TransactionType" Hover="true" SortLabel="@Localizer["SortBy"]" AllowUnsorted="true" Elevation="5" Outlined="true" Dense="true">
                 <ToolBarContent>
-                    <MudIconButton Icon="@Icons.Material.Filled.Receipt" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="() => AddTransactionType(CurrentSummaryTypeId)" Title="@Localizer["NewEntryType"]" />
                     <MudText Class="ps-2 py-0" Typo="Typo.h5"><strong>@CurrentSummaryName</strong> @Localizer["EntryTypes"]</MudText>
                 </ToolBarContent>
                 <HeaderContent>
@@ -64,6 +63,7 @@
                     </MudTd>
                 </RowTemplate>
             </MudTable>
+            <MudFab StartIcon="@Icons.Material.Filled.Add" Color="Color.Success" Size="Size.Small" OnClick="() => AddTransactionType(CurrentSummaryTypeId)" Title="@Localizer["NewEntryType"]" Class="z-10" Style="position:absolute;right:20px;top:25px;" />
         </MudItem>
     </MudGrid>
 </MudContainer>

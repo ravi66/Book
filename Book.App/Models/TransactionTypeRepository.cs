@@ -29,7 +29,7 @@
                     SummaryTypeId = t.SummaryTypeId,
                     Name = t.Name,
                     CreateDate = t.CreateDate,
-                    TransactionsFound = t.Transactions.Any(),
+                    TransactionsFound = t.Transactions.Count != 0,
                     SummaryType = t.SummaryType
                 })
                 .FirstOrDefault(t => t.TransactionTypeId == transactionTypeId);
