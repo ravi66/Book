@@ -101,7 +101,7 @@
             {
                 ChartOptions.Subtitle = new Subtitle
                 {
-                    Text = Localizer["YearChartSTitle", Series.First().Transactions.Sum(t => t.Value).ToString("C2")],
+                    Text = Localizer["YearChartSTitle", Series.First().Transactions.Sum(t => t.Value).ToString("C2"), (Series.First().Transactions.Sum(t => t.Value) / 12).ToString("C2") ],
                     OffsetX = 10,
                     Style = new SubtitleStyle { FontSize = "14px" },
                 };
@@ -125,7 +125,7 @@
             {
                 ChartOptions.Subtitle = new Subtitle
                 {
-                    Text = Localizer["YearChartSTitle", forecastTotal.ToString("C2")],
+                        Text = Localizer["YearChartSTitle", forecastTotal.ToString("C2"), (forecastTotal / 12).ToString("C2") ],
                     OffsetX = 10,
                     Style = new SubtitleStyle { FontSize = "14px" },
                 };
