@@ -95,7 +95,7 @@
             Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, Transactions = GetSeriesTransactions(PageParamsSvc.Transactions), });
 
             GenerateZeroTransactions(Series.First().Transactions);
-            bool forecastSet = AddForecast(Series.First().Transactions);
+            bool forecastSet = Forecast(Series.First().Transactions);
 
             if (forecastSet)
             {
@@ -117,7 +117,7 @@
                 Series.Add(new YearSeries { SummaryName = summary.SummaryName, Transactions = GetSeriesTransactions(PageParamsSvc.Transactions.Where(t => t.SummaryTypeId == summary.SummaryTypeId).ToList()), });
 
                 GenerateZeroTransactions(Series.Last().Transactions);
-                if (AddForecast(Series.Last().Transactions)) forecastSet = true;
+                if (Forecast(Series.Last().Transactions)) forecastSet = true;
                 forecastTotal += Series.Last().Transactions.Sum(t => t.Value);
             }
 
@@ -125,7 +125,7 @@
             {
                 ChartOptions.Subtitle = new Subtitle
                 {
-                        Text = Localizer["YearChartSTitle", forecastTotal.ToString("C2"), (forecastTotal / 12).ToString("C2") ],
+                    Text = Localizer["YearChartSTitle", forecastTotal.ToString("C2"), (forecastTotal / 12).ToString("C2") ],
                     OffsetX = 10,
                     Style = new SubtitleStyle { FontSize = "14px" },
                 };
@@ -202,33 +202,61 @@
         }
     }
 
-    private bool AddForecast(List<ChartTransaction> chartTransactions)
+    private bool Forecast(List<ChartTransaction> chartTransactions)
     {
         if (PageParamsSvc.Year != DateTime.Today.Year || DateTime.Today.Month == 12) return false;
-
+        
         DateTime forecastDate = new DateTime(PageParamsSvc.Year, DateTime.Today.Month + 1, 1);
-        decimal forecastAvg = ((chartTransactions.Where(t => t.Dated < forecastDate).Sum(t => t.Value) / DateTime.Today.Month));
-        //Console.WriteLine($"Forecast: {forecastAvg.ToString("C2")}");
 
-        decimal forecastValue = 0;
+        decimal average = (chartTransactions.Sum(t => t.Value) / 12);
+        decimal current = 0;
+        decimal adjustment = 0;
 
         while (forecastDate.Year == PageParamsSvc.Year)
         {
-            if (forecastAvg > 0)
-            {
-                forecastValue = forecastAvg > chartTransactions.Where(t => t.Dated >= forecastDate && t.Dated < forecastDate.AddMonths(1)).Sum(t => t.Value) ? forecastAvg - chartTransactions.Where(t => t.Dated >= forecastDate && t.Dated < forecastDate.AddMonths(1)).Sum(t => t.Value) : 0;
-            }
-            else
-            {
-                forecastValue = forecastAvg < chartTransactions.Where(t => t.Dated >= forecastDate && t.Dated < forecastDate.AddMonths(1)).Sum(t => t.Value) ? forecastAvg - chartTransactions.Where(t => t.Dated >= forecastDate && t.Dated < forecastDate.AddMonths(1)).Sum(t => t.Value) : 0;
-            }
+            current = chartTransactions
+                .Where(t => t.Dated >= forecastDate && t.Dated < forecastDate.AddMonths(1))
+                .Sum(t => t.Value);
 
-            chartTransactions.Add(new ChartTransaction { Dated = forecastDate, Value = forecastValue, });
+            adjustment = CalcAdjustment(average, current);
+
+            if (adjustment != 0) chartTransactions.Add(new ChartTransaction { Dated = forecastDate, Value = adjustment, });
 
             forecastDate = forecastDate.AddMonths(1);
         }
 
         return true;
+    }
+
+    // Long form ifs as my head hurts
+    private decimal CalcAdjustment(decimal prediction, decimal current)
+    {
+        if (prediction == 0 || current == prediction) return 0;
+
+        if (current == 0) return prediction;
+
+        if (current > 0)
+        {
+            if (prediction > 0)
+            {
+                return prediction > current ? prediction - current : 0;
+            }
+            else
+            {
+                return prediction - current;
+            }
+        }
+        else
+        {
+            if (prediction < 0)
+            {
+                return prediction < current ? prediction + current : 0;
+            }
+            else
+            {
+                return prediction + (current * -1);
+            }
+        }
     }
 
     private void OnLegendClicked(LegendClicked<ChartTransaction> _) { }
