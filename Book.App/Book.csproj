@@ -7,6 +7,7 @@
 	<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
     <WasmBuildNative>true</WasmBuildNative>
     <NeutralLanguage>en-GB</NeutralLanguage>
+	  <GHPages>true</GHPages>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,6 +37,15 @@
     <Content Update="wwwroot\Demo.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="wwwroot\service-worker.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>service-worker.js</DependentUpon>
+    </Content>
+    <Content Update="wwwroot\service-worker.js">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>service-worker.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -43,5 +53,17 @@
       <Generator></Generator>
     </EmbeddedResource>
   </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+	<PropertyGroup>
+		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+	</ItemGroup>
 
 </Project>
