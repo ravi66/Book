@@ -8,6 +8,7 @@ Book is a project used as a learning experience in various technologies new to m
 - [EF Core](https://docs.microsoft.com/en-us/ef/core/) backed by a SQLite
  database, _in the browser cache_, with the help of [Bit.Besql](https://bitplatform.dev/besql/overview)
 - [MudBlazor](https://www.mudblazor.com/) components and UI styling
+- [ApexCharts](https://apexcharts.com/) Javascript charts
 
 It is has no back-end services - everything is accomplished on the client.
 
