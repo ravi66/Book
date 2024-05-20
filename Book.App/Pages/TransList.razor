@@ -19,7 +19,7 @@
         </MudItem>
     </MudGrid>
 </MudPaper>
-<MudTable ServerData="@(new Func<TableState, Task<TableData<Transaction>>>(ServerReload))" Dense="true" Hover="true" @ref="table" SortLabel="Sort By" AllowUnsorted="false" Breakpoint="Breakpoint.Sm" Elevation="5">
+<MudTable ServerData="@(new Func<TableState, Task<TableData<Transaction>>>(ServerReload))" Dense="true" Hover="true" @ref="table" SortLabel="Sort By" AllowUnsorted="false" Breakpoint="Breakpoint.Sm" Elevation="5" >
     <HeaderContent>
         <MudTh Class="py-1" ><MudTableSortLabel SortLabel="type_field" T="Transaction">@Localizer["Type"]</MudTableSortLabel></MudTh>
         <MudTh Class="py-1" ><MudTableSortLabel SortLabel="value_field" T="Transaction">@Localizer["Value"]</MudTableSortLabel></MudTh>
@@ -27,16 +27,16 @@
         <MudTh Class="py-1" >@Localizer["Tools"]</MudTh>
         <MudTh Class="py-1" ><MudTableSortLabel SortLabel="notes_field" T="Transaction">@Localizer["Notes"]</MudTableSortLabel></MudTh>
     </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="@Localizer["Type"]" Class="py-0" ><MudText>@context.TransactionTypeName</MudText></MudTd>
-        <MudTd DataLabel="@Localizer["Value"]" Class="@GetValueCSS(context.Value)" ><MudText>@context.Value.ToString("C2")</MudText></MudTd>
-        <MudTd DataLabel="@Localizer["Dated"]" Class="py-0" ><MudText>@context.TransactionDate.ToShortDateString()</MudText></MudTd>
+    <RowTemplate >
+        <MudTd DataLabel="@Localizer["Type"]" Class="py-0" @ondblclick="@(() => OnDblClick(context.TransactionId))"><MudText>@context.TransactionTypeName</MudText></MudTd>
+        <MudTd DataLabel="@Localizer["Value"]" Class="@GetValueCSS(context.Value)" @ondblclick="@(() => OnDblClick(context.TransactionId))"><MudText>@context.Value.ToString("C2")</MudText></MudTd>
+        <MudTd DataLabel="@Localizer["Dated"]" Class="py-0" @ondblclick="@(() => OnDblClick(context.TransactionId))"><MudText>@context.TransactionDate.ToShortDateString()</MudText></MudTd>
         <MudTd DataLabel="@Localizer["Tools"]" Class="py-0" >
             <TransactionBtn IsIcon="true" TransactionId="context.TransactionId" Icon="@Icons.Material.Filled.Edit" />
             <CopyTransactionBtn Transaction="@context" Variant="@Variant.Text" Size="@Size.Small" />
             <DeleteTransactionBtn Transaction="@context" Variant="@Variant.Text" Size="@Size.Small" />
         </MudTd>
-        <MudTd DataLabel="@Localizer["Notes"]" Class="py-0"><MudText>@context.Notes</MudText></MudTd>
+        <MudTd DataLabel="@Localizer["Notes"]" Class="py-0" @ondblclick="@(() => OnDblClick(context.TransactionId))"><MudText>@context.Notes</MudText></MudTd>
     </RowTemplate>
     <NoRecordsContent>
         <MudText>@Localizer["NoEntriesFound"]</MudText>

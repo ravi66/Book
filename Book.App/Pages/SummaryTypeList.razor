@@ -17,9 +17,9 @@
                     <MudTh Class="py-0">@Localizer["Tools"]</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="@Localizer["Name"]">@context.Name</MudTd>
-                    <MudTd DataLabel="@Localizer["Order"]">@context.Order</MudTd>
-                    <MudTd DataLabel="@Localizer["Created"]">@context.CreateDate.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="@Localizer["Name"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))">@context.Name</MudTd>
+                    <MudTd DataLabel="@Localizer["Order"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))">@context.Order</MudTd>
+                    <MudTd DataLabel="@Localizer["Created"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))">@context.CreateDate.ToShortDateString()</MudTd>
                     <MudTd DataLabel="@Localizer["Tools"]">
                         <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditSummaryType"]" OnClick="() => EditSType(context.SummaryTypeId)" />
                         @if (context.TransactionTypes.Any())
@@ -50,8 +50,8 @@
                     <MudText>@Localizer["NoEntryTypesFound"]</MudText>
                 </NoRecordsContent>
                 <RowTemplate>
-                    <MudTd DataLabel="@Localizer["Name"]">@context.Name</MudTd>
-                    <MudTd DataLabel="@Localizer["Created"]">@context.CreateDate.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="@Localizer["Name"]" @ondblclick="@(() => EditTType(context.TransactionTypeId))">@context.Name</MudTd>
+                    <MudTd DataLabel="@Localizer["Created"]" @ondblclick="@(() => EditTType(context.TransactionTypeId))">@context.CreateDate.ToShortDateString()</MudTd>
                     <MudTd DataLabel="@Localizer["Tools"]">
                         <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditEntryType"]" OnClick="()=> EditTType(context.TransactionTypeId)" />
                         <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" Title="@Localizer["ListEntriesForEntryType"]" OnClick="()=> ListTransactionsTType(context)" />

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Components.Web;
+
 namespace Book.Pages
 {
     public partial class TransList
@@ -13,6 +15,8 @@ namespace Book.Pages
         [Inject] public ISnackbar Snackbar { get; set; }
 
         [Inject] public NavigationManager NavigationManager { get; set; }
+
+        [Inject] public IDialogService DialogService { get; set; }
 
         string EntriesTitle { get; set; } = string.Empty;
 
@@ -145,6 +149,11 @@ namespace Book.Pages
         {
             searchString = text;
             table.ReloadServerData();
+        }
+
+        private void OnDblClick(int transactionId)
+        {
+            DialogService.Show<TransactionDialog>(Localizer["EditEntry"], new DialogParameters<TransactionDialog> { { x => x.SavedTransactionId, transactionId } });
         }
 
         private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
