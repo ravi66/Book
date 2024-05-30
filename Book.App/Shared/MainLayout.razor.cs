@@ -12,8 +12,6 @@ namespace Book.Shared
 
         [Inject] public INotifierSvc NotifierSvc { get; set; }
 
-        [Inject] HttpClient HttpClient { get; set; }
-
         private bool _isDarkMode = true;
         private string themeIcon = Icons.Material.Filled.LightMode;
         private string themeText = string.Empty;
@@ -39,9 +37,6 @@ namespace Book.Shared
 
             _isDarkMode = await BookSettingSvc.GetDarkMode();
             SetTheme();
-
-            VisitsCounter visitsCounter = new(HttpClient, new Uri(NavigationManager.Uri).Host);
-            await visitsCounter.UpdateVisitsCount();
         }
 
         void ToggleDrawer()

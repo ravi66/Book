@@ -7,6 +7,5 @@
         public const string BookVersion = "v1.2.00";
         public const string PositiveValueCssClass = "mud-primary-text ";
         public const string NegativeValueCssClass = "mud-secondary-text ";
-        public const string VisitsCountBaseUri = "https://api.counterapi.dev/v1/RavsBook/";
     }
 }
