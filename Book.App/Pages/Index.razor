@@ -49,7 +49,7 @@
             {
                 <MudTh Style="text-align:center" Class="pt-0 pb-1">
                     <MudTooltip Text="@(Localizer["YearChart", summary.SummaryName])" Delay="500" Duration="0" ShowOnFocus="false">
-                        <MudBadge Icon="@Icons.Material.Filled.Timeline" Color="Color.Primary" Overlap="true" Bordered="true" Class="mx-6 my-2">
+                        <MudBadge Icon="@Icons.Material.Filled.Timeline" Color="Color.Primary" Overlap="true" Bordered="true" Class="mx-0 my-1">
                             <MudButton Variant="Variant.Outlined" OnClick="@(e => YearChart(summary))" Size="Size.Small" Class="pt-0 pb-0">@summary.SummaryName</MudButton>
                         </MudBadge>
                     </MudTooltip>
@@ -59,7 +59,7 @@
         <RowTemplate>
             <MudTd DataLabel="Month" Class="py-1" >
                 <MudTooltip Text="@(Localizer["ExpenditureChart", context.MonthNameFull])" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
-                    <MudBadge Icon="@Icons.Material.Filled.PieChart" Color="Color.Primary" Overlap="true" Bordered="true" Class="mx-6 my-0">
+                    <MudBadge Icon="@Icons.Material.Filled.PieChart" Color="Color.Primary" Overlap="true" Bordered="true" Class="mx-0 my-0">
                         <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="pt-0 pb-0"><MudText>@context.MonthName</MudText></MudButton>
                     </MudBadge>
                 </MudTooltip>
