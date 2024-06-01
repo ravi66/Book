@@ -49,9 +49,7 @@
             {
                 <MudTh Style="text-align:center" Class="pt-0 pb-1">
                     <MudTooltip Text="@(Localizer["YearChart", summary.SummaryName])" Delay="500" Duration="0" ShowOnFocus="false">
-                        <MudBadge Icon="@Icons.Material.Outlined.ShowChart" Color="Color.Info" Overlap="true" Class="mb-0 mt-2 my-1" Bordered="true" OnClick="@(e => YearChart(summary))" >
-                            <MudButton Variant="Variant.Outlined" OnClick="@(e => YearChart(summary))" Size="Size.Small" Class="pt-0 pb-0">@summary.SummaryName</MudButton>
-                        </MudBadge>
+                        <MudButton StartIcon="@Icons.Material.Filled.ShowChart" IconClass="ma-0 py-0 ps-0 pe-1"  IconColor="Color.Info" Variant="Variant.Outlined" OnClick="@(e => YearChart(summary))" Size="Size.Small" Class="py-0 px-2">@summary.SummaryName</MudButton>
                     </MudTooltip>
                 </MudTh>
             }
@@ -59,9 +57,7 @@
         <RowTemplate>
             <MudTd DataLabel="Month" Class="py-1" >
                 <MudTooltip Text="@(Localizer["ExpenditureChart", context.MonthNameFull])" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
-                    <MudBadge Icon="@Icons.Material.Filled.PieChart" Color="Color.Info" Overlap="true" Class="mx-0 my-0" Bordered="true" OnClick="@(e => MonthChart(context.MonthNo - 1))">
-                        <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="pt-0 pb-0"><MudText>@context.MonthName</MudText></MudButton>
-                    </MudBadge>
+                    <MudButton StartIcon="@Icons.Material.Filled.PieChart" IconClass="ma-0 py-0 ps-0 pe-1" IconColor="Color.Info" Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="py-0 px-2"><MudText>@context.MonthName</MudText></MudButton>
                 </MudTooltip>
             </MudTd>
             @foreach (var summary in context.SummaryDetails)
