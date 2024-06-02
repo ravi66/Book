@@ -49,7 +49,7 @@
             {
                 <MudTh Style="text-align:center" Class="pt-0 pb-1">
                     <MudTooltip Text="@(Localizer["YearChart", summary.SummaryName])" Delay="500" Duration="0" ShowOnFocus="false">
-                        <MudButton StartIcon="@Icons.Material.Filled.ShowChart" IconClass="ma-0 py-0 ps-0 pe-1"  IconColor="Color.Info" Variant="Variant.Outlined" OnClick="@(e => YearChart(summary))" Size="Size.Small" Class="py-0 px-2">@summary.SummaryName</MudButton>
+                        <MudButton EndIcon="@Icons.Material.Filled.ShowChart" IconClass="ma-0 py-0 ps-1 pe-0"  IconColor="Color.Info" Variant="Variant.Outlined" OnClick="@(e => YearChart(summary))" Size="Size.Small" Class="py-0 px-2">@summary.SummaryName</MudButton>
                     </MudTooltip>
                 </MudTh>
             }
@@ -57,7 +57,7 @@
         <RowTemplate>
             <MudTd DataLabel="Month" Class="py-1" >
                 <MudTooltip Text="@(Localizer["ExpenditureChart", context.MonthNameFull])" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
-                    <MudButton StartIcon="@Icons.Material.Filled.PieChart" IconClass="ma-0 py-0 ps-0 pe-1" IconColor="Color.Info" Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="py-0 px-2"><MudText>@context.MonthName</MudText></MudButton>
+                    <MudButton EndIcon="@Icons.Material.Filled.PieChart" IconClass="ma-0 py-0 ps-1 pe-0" IconColor="Color.Info" Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="py-0 px-2"><MudText>@context.MonthName</MudText></MudButton>
                 </MudTooltip>
             </MudTd>
             @foreach (var summary in context.SummaryDetails)
