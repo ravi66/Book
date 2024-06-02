@@ -44,7 +44,11 @@ namespace Book.Pages
 
             Years = Enumerable.Range(await BookSettingSvc.GetStartYear(), await BookSettingSvc.GetEndYear() - await BookSettingSvc.GetStartYear() + 1).ToArray();
 
-            if (DateTime.Today.Year <= Years.Max() && DateTime.Today.Year >= Years.Min())
+            if (PageParamsSvc.Year != 0)
+            {
+                Year = PageParamsSvc.Year;
+            }
+            else if (DateTime.Today.Year <= Years.Max() && DateTime.Today.Year >= Years.Min())
             {
                 Year = DateTime.Today.Year;
             }
@@ -123,6 +127,7 @@ namespace Book.Pages
         public async void YearChanged(int year)
         {
             Year = year;
+            PageParamsSvc.Year = year;
             await LoadSummary();
         }
 
