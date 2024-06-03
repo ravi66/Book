@@ -49,7 +49,8 @@
         MudDialog.SetOptions(MudDialog.Options);
 
         ChartOptions = new ApexChartOptions<Transaction>();
-        ChartOptions.Theme = new Theme { Mode = await BookSettingSvc.GetDarkMode() ? Mode.Dark : Mode.Light, Palette = PaletteType.Palette8 };
+        ChartOptions.Theme = new Theme { Mode = await BookSettingSvc.GetDarkMode() ? Mode.Dark : Mode.Light, Palette = null };
+        ChartOptions.Colors = Constants.ApexColours;
         ChartOptions.Chart = new Chart { Toolbar = new Toolbar { Show = true } };
         ChartOptions.Legend = new Legend { Position = LegendPosition.Bottom, FontSize = "14px" };
         ChartOptions.DataLabels = new DataLabels { Style = new DataLabelsStyle { FontSize = "12px" }, };

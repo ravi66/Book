@@ -3,7 +3,7 @@
 @rendermode RenderMode.InteractiveWebAssembly
 @using ApexCharts
 
-<PageTitle>@BookName - @Localizer["LineChart"]</PageTitle>
+<PageTitle>@BookName - @ChartTitle</PageTitle>
 
 <MudContainer Class="d-flex">
     <MudPaper Elevation="5" Class="flex-grow-1 py-2 px-6" MinWidth="500px" >
@@ -163,7 +163,9 @@
 
         ChartOptions.Stroke = new Stroke { Curve = Curve.Smooth };
 
-        ChartOptions.Theme = new Theme { Mode = await BookSettingSvc.GetDarkMode() ? Mode.Dark : Mode.Light, Palette = PaletteType.Palette5 };
+        ChartOptions.Theme = new Theme { Mode = await BookSettingSvc.GetDarkMode() ? Mode.Dark : Mode.Light, Palette = null };
+
+        ChartOptions.Colors = Constants.ApexColours;
 
         ChartOptions.Tooltip = new ApexCharts.Tooltip { X = new TooltipX { Format = @"MMMM \ yyyy" } };
 
