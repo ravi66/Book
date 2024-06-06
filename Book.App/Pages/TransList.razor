@@ -9,7 +9,7 @@
             <MudText Typo="Typo.h5">@EntriesTitle</MudText>
         </MudItem>
         <MudItem>
-            <MudText Typo="Typo.h5" Class="@GetValueCSS(@Total)">[@Total.ToString("C2")]</MudText>
+            <MudText Typo="Typo.h5" Style="@Utils.BalanceColour(Total * -1, DarkMode)" >[@Total.ToString("C2")]</MudText>
         </MudItem>
         <MudItem>
             <MudText Typo="Typo.h5">@FilteredItems</MudText>
@@ -29,7 +29,7 @@
     </HeaderContent>
     <RowTemplate >
         <MudTd DataLabel="@Localizer["Type"]" Class="py-0" @ondblclick="@(() => OnDblClick(context.TransactionId))"><MudText>@context.TransactionTypeName</MudText></MudTd>
-        <MudTd DataLabel="@Localizer["Value"]" Class="@GetValueCSS(context.Value)" @ondblclick="@(() => OnDblClick(context.TransactionId))"><MudText>@context.Value.ToString("C2")</MudText></MudTd>
+        <MudTd DataLabel="@Localizer["Value"]" Style="@Utils.BalanceColour(context.Value * -1, DarkMode)" @ondblclick="@(() => OnDblClick(context.TransactionId))"><MudText>@context.Value.ToString("C2")</MudText></MudTd>
         <MudTd DataLabel="@Localizer["Dated"]" Class="py-0" @ondblclick="@(() => OnDblClick(context.TransactionId))"><MudText>@context.TransactionDate.ToShortDateString()</MudText></MudTd>
         <MudTd DataLabel="@Localizer["Tools"]" Class="py-0" >
             <TransactionBtn IsIcon="true" TransactionId="context.TransactionId" Icon="@Icons.Material.Filled.Edit" />
@@ -48,3 +48,182 @@
         <MudTablePager RowsPerPageString="@Localizer["RowsPerPage"]" InfoFormat="@Localizer["PagerInfoFormat"]" AllItemsText="@Localizer["AllItemsText"]" PageSizeOptions="new int[] { 10, 50, int.MaxValue }" HorizontalAlignment="HorizontalAlignment.Center" />
     </PagerContent>
 </MudTable>
+
+@code
+{
+    [Inject] PageParamsSvc PageParamsSvc { get; set; }
+
+    [Inject] internal ITransactionRepository Repo { get; set; }
+
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+
+    [Inject] public INotifierSvc NotifierSvc { get; set; }
+
+    [Inject] public ISnackbar Snackbar { get; set; }
+
+    [Inject] public NavigationManager NavigationManager { get; set; }
+
+    [Inject] public IDialogService DialogService { get; set; }
+
+    string EntriesTitle { get; set; } = string.Empty;
+
+    decimal Total { get; set; }
+
+    string FilteredItems { get; set; } = string.Empty;
+
+    private IEnumerable<Transaction> Transactions { get; set; }
+
+    private IEnumerable<Transaction> pagedData;
+
+    private MudTable<Transaction> table;
+
+    private int totalItems;
+
+    private string searchString = "";
+
+    private string BookName { get; set; } = string.Empty;
+
+    private bool DarkMode { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (PageParamsSvc.Mode < 1 || PageParamsSvc.Mode > 3) NavigationManager.NavigateTo("/", false);
+
+        BookName = await BookSettingSvc.GetBookName();
+        DarkMode = await BookSettingSvc.GetDarkMode();
+
+        if ((PageParamsSvc.Mode == 1 || PageParamsSvc.Mode == 2) && PageParamsSvc.Name == Localizer["Total"]) PageParamsSvc.Name = "";
+
+        NotifierSvc.TransactionsChanged += TransactionsChanged;
+        NotifierSvc.ThemeChanged += ThemeChanged;
+    }
+
+    private async Task<TableData<Transaction>> ServerReload(TableState state)
+    {
+        await Busy();
+
+        Transactions = [];
+
+        switch (PageParamsSvc.Mode)
+        {
+            case 1:
+                Transactions = await Repo.GetTransactionsByTypeMonth(PageParamsSvc.Types, PageParamsSvc.Year, PageParamsSvc.Month);
+                break;
+            case 2:
+                Transactions = await Repo.GetTransactionsBySummary(PageParamsSvc.Types);
+                break;
+            case 3:
+                Transactions = await Repo.GetTransactionsByType(PageParamsSvc.TransactionTypeId);
+                break;
+            default:
+                break;
+        }
+
+        totalItems = Transactions.Count();
+
+        Transactions = Transactions.Where(transaction =>
+        {
+            if (string.IsNullOrWhiteSpace(searchString))
+                return true;
+            if (transaction.TransactionTypeName != null && transaction.TransactionTypeName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (transaction.TransactionDate.ToShortDateString().Contains(searchString))
+                return true;
+            if ($"{transaction.Value}".Contains(searchString))
+                return true;
+            if (transaction.Notes != null && transaction.Notes.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                return true;
+            return false;
+        }).ToArray();
+
+        SetEntriesTitle();
+
+        switch (state.SortLabel)
+        {
+            case "type_field":
+                Transactions = Transactions.OrderByDirection(state.SortDirection, t => t.TransactionTypeName);
+                break;
+            case "value_field":
+                Transactions = Transactions.OrderByDirection(state.SortDirection, t => t.Value);
+                break;
+            case "date_field":
+                Transactions = Transactions.OrderByDirection(state.SortDirection, t => t.TransactionDate);
+                break;
+            case "notes_field":
+                Transactions = Transactions.OrderByDirection(state.SortDirection, t => t.Notes);
+                break;
+            default:
+                break;
+        }
+
+        pagedData = Transactions.Skip(state.Page * state.PageSize).Take(state.PageSize).ToArray();
+        return new TableData<Transaction>() { TotalItems = Transactions.Count(), Items = pagedData };
+    }
+
+    private async Task Busy()
+    {
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomStart;
+        Snackbar.Add(Localizer["LoadingEntries"], Severity.Normal, config =>
+        {
+            config.Icon = Icons.Material.Outlined.HourglassTop;
+            config.ShowCloseIcon = false;
+            config.VisibleStateDuration = 1000;
+            config.ShowTransitionDuration = 250;
+            config.HideTransitionDuration = 250;
+        });
+
+        await Task.Yield();
+    }
+
+    private void SetEntriesTitle()
+    {
+        switch (PageParamsSvc.Mode)
+        {
+            case > 1:
+                EntriesTitle = Transactions.Count() < 2 ? Localizer["TransListNameS", Transactions.Count(), PageParamsSvc.Name] : Localizer["TransListNameM", Transactions.Count(), PageParamsSvc.Name];
+                break;
+            default:
+                _ = Transactions.Count() < 2 ? EntriesTitle = PageParamsSvc.Month > 0 ? Localizer["TransListTitleS", Transactions.Count(), PageParamsSvc.Name, new DateTime(2020, PageParamsSvc.Month, 1).ToString("MMMM"), PageParamsSvc.Year]
+                        : Localizer["TransListTitleS", Transactions.Count(), PageParamsSvc.Name, PageParamsSvc.Year, ""] : EntriesTitle = PageParamsSvc.Month > 0 ? Localizer["TransListTitleM", Transactions.Count(), PageParamsSvc.Name, new DateTime(2020, PageParamsSvc.Month, 1).ToString("MMMM"), PageParamsSvc.Year] : Localizer["TransListTitleM", Transactions.Count(), PageParamsSvc.Name, PageParamsSvc.Year, ""];
+                break;
+        }
+
+        Total = Transactions.Sum(t => t.Value);
+
+        if (totalItems - Transactions.Count() > 0) FilteredItems = Localizer["EntriesFiltered", totalItems - Transactions.Count()];
+
+        StateHasChanged();
+        return;
+    }
+
+    private void OnSearch(string text)
+    {
+        searchString = text;
+        table.ReloadServerData();
+    }
+
+    private void OnDblClick(int transactionId)
+    {
+        DialogService.Show<TransactionDialog>(Localizer["EditEntry"], new DialogParameters<TransactionDialog> { { x => x.SavedTransactionId, transactionId } });
+    }
+
+    private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
+    {
+        // Reload regardless of Year
+        table.ReloadServerData();
+    }
+
+    public async void ThemeChanged(object? sender, bool darkMode)
+    {
+        DarkMode = darkMode;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NotifierSvc.TransactionsChanged -= TransactionsChanged;
+        NotifierSvc.ThemeChanged -= ThemeChanged;
+
+        GC.SuppressFinalize(this);
+    }
+}

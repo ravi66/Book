@@ -5,14 +5,14 @@
 
 <PageTitle>@BookName - @ChartTitle</PageTitle>
 
-<MudContainer Class="d-flex">
-    <MudPaper Elevation="5" Class="flex-grow-1 py-2 px-6" MinWidth="500px" >
+<MudContainer Class="d-flex flex-grow-1 ma-0 pa-0" >
+    <MudPaper Elevation="5" MinWidth="100%" >
         @if (Series.First().Transactions.Any())
         {
-            <ApexChart TItem="ChartTransaction" Title="@ChartTitle" XAxisType="XAxisType.Datetime" Options="ChartOptions" @ref="ApexChart" Height="500" OnLegendClicked="OnLegendClicked">
+            <ApexChart TItem="ChartTransaction" Title="@ChartTitle" XAxisType="XAxisType.Datetime" Options="ChartOptions" @ref="ApexChart" Height="525" OnLegendClicked="OnLegendClicked">
                 @foreach (var series in Series)
                 {
-                    <ApexPointSeries TItem="ChartTransaction" Items="series.Transactions" Name="@series.SummaryName" SeriesType="SeriesType.Line" XValue="@(e => e.Dated.FirstDayOfMonth())" YAggregate="@(e => e.Sum(e => e.Value))" OrderBy="e => e.X" />
+                    <ApexPointSeries Color="@series.ChartColour" TItem="ChartTransaction" Items="series.Transactions" Name="@series.SummaryName" SeriesType="SeriesType.Line" XValue="@(e => e.Dated.FirstDayOfMonth())" YAggregate="@(e => e.Sum(e => e.Value))" OrderBy="e => e.X" />
                 }
             </ApexChart>
         }
@@ -34,7 +34,9 @@
 
     [Inject] public NavigationManager NavigationManager { get; set; }
 
-    [Inject] internal ITransactionRepository Repo { get; set; }
+    [Inject] internal ITransactionRepository TransactionRepo { get; set; }
+
+    [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
 
     private ApexChartOptions<ChartTransaction> ChartOptions { get; set; }
 
@@ -42,7 +44,7 @@
 
     public class ChartTransaction { public DateTimeOffset Dated; public decimal Value; } 
 
-    class YearSeries { public string SummaryName = string.Empty; public List<ChartTransaction> Transactions = new(); }
+    class YearSeries { public string SummaryName = string.Empty; public string ChartColour = string.Empty; public List<ChartTransaction> Transactions = new(); }
 
     private List<YearSeries> Series = new List<YearSeries>() { new YearSeries() };
 
@@ -92,7 +94,7 @@
         // If Total Summary split into individual summary Types
         if (PageParamsSvc.SummaryTypeId != 0)
         {
-            Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, Transactions = GetSeriesTransactions(PageParamsSvc.Transactions), });
+            Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, ChartColour = await GetSeriesColour(PageParamsSvc.SummaryTypeId), Transactions = GetSeriesTransactions(PageParamsSvc.Transactions), });
 
             GenerateZeroTransactions(Series.First().Transactions);
             bool forecastSet = Forecast(Series.First().Transactions);
@@ -114,7 +116,7 @@
 
             foreach (var summary in PageParamsSvc.Transactions.Select(t => new { t.SummaryTypeId, t.SummaryName }).Distinct().ToList())
             {
-                Series.Add(new YearSeries { SummaryName = summary.SummaryName, Transactions = GetSeriesTransactions(PageParamsSvc.Transactions.Where(t => t.SummaryTypeId == summary.SummaryTypeId).ToList()), });
+                Series.Add(new YearSeries { SummaryName = summary.SummaryName, ChartColour = await GetSeriesColour(summary.SummaryTypeId), Transactions = GetSeriesTransactions(PageParamsSvc.Transactions.Where(t => t.SummaryTypeId == summary.SummaryTypeId).ToList()), });
 
                 GenerateZeroTransactions(Series.Last().Transactions);
                 if (Forecast(Series.Last().Transactions)) forecastSet = true;
@@ -127,34 +129,36 @@
                 {
                     Text = Localizer["YearChartSTitle", forecastTotal.ToString("C2"), (forecastTotal / 12).ToString("C2") ],
                     OffsetX = 10,
-                    Style = new SubtitleStyle { FontSize = "14px" },
+                    Style = new SubtitleStyle { FontSize = "16px" },
                 };
             }
         }
     }
 
+    async Task<string> GetSeriesColour(int summaryTypeId) => await SummaryRepo.GetColour(summaryTypeId);
+
     async Task LoadSummaryChart()
     {
         ChartTitle = Localizer["SummaryChartTitle", PageParamsSvc.Name];
 
-        IEnumerable<Transaction> transactions = await Repo.GetTransactionsBySummary(PageParamsSvc.Types);
+        IEnumerable<Transaction> transactions = await TransactionRepo.GetTransactionsBySummary(PageParamsSvc.Types);
 
         if (!transactions.Any()) return;
 
         Series.Clear();
-        Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, Transactions = GetSeriesTransactions(transactions.ToList()), });
+        Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, ChartColour = await GetSeriesColour(PageParamsSvc.SummaryTypeId), Transactions = GetSeriesTransactions(transactions.ToList()), });
     }
 
     async Task LoadTransactionTypeChart()
     {
         ChartTitle = Localizer["TransactionTypeChartTitle", PageParamsSvc.Name];
 
-        IEnumerable<Transaction> transactions = await Repo.GetTransactionsByType(PageParamsSvc.TransactionTypeId);
+        IEnumerable<Transaction> transactions = await TransactionRepo.GetTransactionsByType(PageParamsSvc.TransactionTypeId);
 
         if (!transactions.Any()) return;
 
         Series.Clear();
-        Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, Transactions = GetSeriesTransactions(transactions.ToList()), });
+        Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, ChartColour = await GetSeriesColour(PageParamsSvc.TransactionTypeId), Transactions = GetSeriesTransactions(transactions.ToList()), });
     }
 
     private async Task InitChartOptions()
@@ -165,29 +169,27 @@
 
         ChartOptions.Theme = new Theme { Mode = await BookSettingSvc.GetDarkMode() ? Mode.Dark : Mode.Light, Palette = null };
 
-        ChartOptions.Colors = Constants.ApexColours;
+        ChartOptions.Title = new Title { Style = new TitleStyle { FontSize = "18px" } };
 
         ChartOptions.Tooltip = new ApexCharts.Tooltip { X = new TooltipX { Format = @"MMMM \ yyyy" } };
 
-        ChartOptions.Xaxis = new XAxis { Type = XAxisType.Datetime, Labels = new XAxisLabels { MinHeight = 40 } };
+        ChartOptions.Xaxis = new XAxis { Type = XAxisType.Datetime, Labels = new XAxisLabels { MinHeight = 50, Style = new AxisLabelStyle { FontSize = "14px" } } };
 
-        ChartOptions.Legend = new Legend { Position = LegendPosition.Bottom, FontSize = "12px", };
+        ChartOptions.Legend = new Legend { Position = LegendPosition.Bottom, FontSize = "16px", };
 
         ChartOptions.Yaxis = new List<YAxis>();
-        ChartOptions.Yaxis.Add(new YAxis { 
+        ChartOptions.Yaxis.Add(new YAxis
+        { 
             Reversed = false,
             Labels = new YAxisLabels
-                {
-                Style = new AxisLabelStyle { FontSize = "12px" }, 
+            {
+                Style = new AxisLabelStyle { FontSize = "16px" }, 
                 Formatter = @$"function(value, opts) {{ if (value === undefined) {{return '';}} return Intl.NumberFormat(undefined, {{ style: 'currency', currency: '{RegionInfo.CurrentRegion.ISOCurrencySymbol}' }} ).format(value);}}",
             },
         });
     }
 
-    private List<ChartTransaction> GetSeriesTransactions(List<Transaction> transactions)
-    {
-        return transactions.Select(t => new ChartTransaction { Dated = t.TransactionDate, Value = t.Value }).ToList();
-    }
+    private List<ChartTransaction> GetSeriesTransactions(List<Transaction> transactions) => transactions.Select(t => new ChartTransaction { Dated = t.TransactionDate, Value = t.Value }).ToList();
 
     private void GenerateZeroTransactions(List<ChartTransaction> chartTransactions)
     {

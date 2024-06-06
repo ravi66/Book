@@ -14,6 +14,8 @@ namespace Book.Models
 
         public DateTime CreateDate { get; set; }
 
+        public string? ChartColour { get; set; }
+
         public List<Transaction> Transactions { get; set; } = [];
 
         [NotMapped]

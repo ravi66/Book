@@ -30,7 +30,8 @@
                     Name = t.Name,
                     CreateDate = t.CreateDate,
                     TransactionsFound = t.Transactions.Count != 0,
-                    SummaryType = t.SummaryType
+                    SummaryType = t.SummaryType,
+                    ChartColour = t.ChartColour,
                 })
                 .FirstOrDefault(t => t.TransactionTypeId == transactionTypeId);
         }
@@ -56,6 +57,7 @@
             {
                 foundTransactionType.Name = transactionType.Name;
                 foundTransactionType.SummaryTypeId = transactionType.SummaryTypeId;
+                foundTransactionType.ChartColour = transactionType.ChartColour;
 
                 await dbContext.SaveChangesAsync();
 
@@ -74,6 +76,12 @@
 
             dbContext.TransactionTypes.Remove(foundTransactionType);
             await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<string?> GetColour(int transactionTypeId)
+        {
+            using var dbContext = await db.CreateDbContextAsync();
+            return dbContext.TransactionTypes.Where(s => s.TransactionTypeId == transactionTypeId).Select(s => s.ChartColour).FirstOrDefault() ?? Utils.RandomColour();
         }
 
     }

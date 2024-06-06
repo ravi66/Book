@@ -2,7 +2,7 @@
 {
     internal class BookDbMigratorSvc(IDbContextFactory<BookDbContext> dbContextFactory) : IBookDbMigratorSvc
     {
-        private const string CurrentDbVersion = "1.00";
+        private const string CurrentDbVersion = "2.00";
 
         private BookDbContext _dbContext;
         private readonly IDbContextFactory<BookDbContext> _dbContextFactory = dbContextFactory;
@@ -10,12 +10,6 @@
         public async Task<string> EnsureDbCreated()
         {
             _dbContext = await _dbContextFactory.CreateDbContextAsync();
-
-            // uncomment the following to see the CREATE TABLE scripts in the browser console
-            // when generating a new database - this is useful when creating new migrations
-            //var dbCreationSql = _dbContext.Database.GenerateCreateScript();
-            //Console.WriteLine("Db Creation SQL:");
-            //Console.WriteLine(dbCreationSql);
 
             _ = await _dbContext.Database.EnsureCreatedAsync();
             var dbVersionBookSetting = await _dbContext.BookSetting.FirstOrDefaultAsync(x => x.BookSettingId == 7);
@@ -40,25 +34,11 @@
                 return CurrentDbVersion;
             }
 
-            // Uncomment the following (and the methods) when there are migrations
-
-            /*
-            if (currentDbVersion == "1.00")
+            if (CurrentDbVersion == "2.00")
             {
-                await Migrate_101();
-                await Migrate_102();
+                await M200();
                 dbVersion = CurrentDbVersion;
             }
-
-            if (currentDbVersion == "1.01")
-            {
-                await Migrate_102();
-                dbVersion = CurrentDbVersion;
-            }
-
-            etc...
-
-            */
 
             return dbVersion;
         }
@@ -89,16 +69,15 @@
             await _dbContext.SaveChangesAsync();
         }
 
-        /*
-        
-        private async Task Migrate_101()
+        private async Task M200()
         {
-            const string Alter_Table_TransactionTypes = @"ALTER TABLE ""TransactionTypes"" ADD ""Credit"" INTEGER;";
+            const string M200_1 = @"ALTER TABLE ""SummaryTypes"" ADD ""ChartColour"" STRING;";
+            _ = await _dbContext.Database.ExecuteSqlRawAsync(M200_1);
 
-            _ = await _dbContext.Database.ExecuteSqlRawAsync(Alter_Table_TransactionTypes);
-            await ApplyDbVersion("1.01");
+            const string M200_2 = @"ALTER TABLE ""TransactionTypes"" ADD ""ChartColour"" STRING;";
+            _ = await _dbContext.Database.ExecuteSqlRawAsync(M200_2);
+
+            await ApplyDbVersionAsync("2.00");
         }
-
-        */
     }
 }

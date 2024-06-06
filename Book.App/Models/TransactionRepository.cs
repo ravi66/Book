@@ -80,6 +80,7 @@
                         Value = t.Value,
                         SummaryName = t.TransactionType.SummaryType.Name,
                         SummaryTypeId = t.TransactionType.SummaryTypeId,
+                        Order = t.TransactionType.SummaryType.Order,
                         TransactionTypeName = t.TransactionType.Name,
                         TransactionDate = t.TransactionDate,
                         CreateDate = t.CreateDate,

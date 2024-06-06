@@ -8,11 +8,11 @@
                 <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@DialogTitle" OnDataPointSelection="OnDataPointSelection">
                     @if (!ShowEntryTypes)
                     {
-                        <ApexPointSeries XValue="@(e => e.SummaryName)" TItem="Transaction" Items="Transactions" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(e => e.Sum(e => e.Value))" OrderByDescending="e=>e.Y" ShowDataLabels />
+                        <ApexPointSeries TItem="Transaction" Items="Transactions" XValue="@(t => t.SummaryName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
                     }
                     else
                     {
-                        <ApexPointSeries XValue="@(e => e.TransactionTypeName)" TItem="Transaction" Items="Transactions" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(e => e.Sum(e => e.Value))" OrderByDescending="e=>e.Y" ShowDataLabels />
+                        <ApexPointSeries TItem="Transaction" Items="Transactions" XValue="@(t => t.TransactionTypeName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
                     }
                 </ApexChart>
             }
@@ -35,6 +35,10 @@
 
     [Parameter] public string DialogTitle { get; set; }
 
+    [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
+
+    [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
+
     private ApexChartOptions<Transaction> ChartOptions;
 
     private ApexChart<Transaction> ApexChart;
@@ -43,6 +47,8 @@
 
     private bool ShowEntryTypes = false;
 
+    private class OrderedType { public int TypeId; public decimal Value; public string Colour; }
+
     protected async override Task OnInitializedAsync()
     {
         MudDialog.Options.NoHeader = true;
@@ -50,19 +56,48 @@
 
         ChartOptions = new ApexChartOptions<Transaction>();
         ChartOptions.Theme = new Theme { Mode = await BookSettingSvc.GetDarkMode() ? Mode.Dark : Mode.Light, Palette = null };
-        ChartOptions.Colors = Constants.ApexColours;
         ChartOptions.Chart = new Chart { Toolbar = new Toolbar { Show = true } };
         ChartOptions.Legend = new Legend { Position = LegendPosition.Bottom, FontSize = "14px" };
         ChartOptions.DataLabels = new DataLabels { Style = new DataLabelsStyle { FontSize = "12px" }, };
         ChartOptions.NoData = new NoData { Text = @Localizer["NoPieData"] };
         ChartOptions.Tooltip = new ApexCharts.Tooltip { Y = new TooltipY { Formatter = @$"function(value, opts) {{ if (value === undefined) {{return '';}} return Intl.NumberFormat(undefined, {{ style: 'currency', currency: '{RegionInfo.CurrentRegion.ISOCurrencySymbol}' }} ).format(value);}}" } };
+        ChartOptions.Colors = await GetColours();
     }
 
-    private void OnDataPointSelection(SelectedData<Transaction> data)
+    async Task<List<string>> GetColours()
+    {
+        List<OrderedType> orderedTypes = [];
+
+        if (!ShowEntryTypes)
+        {
+            orderedTypes = Transactions.GroupBy(t => t.SummaryTypeId)
+                .Select(g => new OrderedType { TypeId = g.Key, Value = g.Sum(t => t.Value) })
+                .OrderByDescending(s => s.Value).ToList();
+
+            foreach (OrderedType orderedType in orderedTypes)
+            {
+                orderedType.Colour = await SummaryRepo.GetColour(orderedType.TypeId);
+            }
+        }
+        else
+        {
+            orderedTypes = Transactions.GroupBy(t => t.TransactionTypeId)
+                .Select(g => new OrderedType { TypeId = g.Key ?? 0, Value = g.Sum(t => t.Value) })
+                .OrderByDescending(s => s.Value).ToList();
+
+            foreach (OrderedType orderedType in orderedTypes)
+            {
+                orderedType.Colour = await TTypeRepo.GetColour(orderedType.TypeId) ?? Utils.RandomColour();
+            }
+        }
+
+        return orderedTypes.Select(o => o.Colour).ToList();
+    }
+
+    async void OnDataPointSelection(SelectedData<Transaction> data)
     {
         ShowEntryTypes = !ShowEntryTypes;
-        ApexChart.ResetSeriesAsync(true, true);
-        ApexChart.UpdateSeriesAsync();
-        ApexChart.RenderAsync();
+        ChartOptions.Colors = await GetColours();
+        await ApexChart.UpdateOptionsAsync(true, true, false);
     }
 }

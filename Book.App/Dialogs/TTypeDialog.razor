@@ -2,22 +2,29 @@
 
 <MudDialog>
     <DialogContent>
+        <MudText Typo="Typo.h6" Class="mb-2">@DialogTitle</MudText>
         <MudForm Model="@TransactionType" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0">
-            <MudGrid Spacing="1" Justify="Justify.FlexStart" >
-                <MudItem xs="12" sm="6">
-                    <MudPaper Elevation="5">
+            <MudGrid Spacing="1" Justify="Justify.FlexStart" Class="pa-0" >
+                <MudItem xs="12" sm="5" >
+                    <MudPaper Elevation="5" >
                         <MudTextField Label="@Localizer["Name"]" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value=TransactionType.Name For="@(() => TransactionType.Name)" Required="true" />
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12" sm="6">
-                    <MudPaper Elevation="5">
+                <MudItem xs="12" sm="4" >
+                    <MudPaper Elevation="5" >
                         <MudAutocomplete Label="@Localizer["Summary"]" T="SummaryType" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="SelectedSummaryType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" ReadOnly="@ReadOnlySummary" />
                     </MudPaper>
                 </MudItem>
-                <MudItem>
-                    <MudPaper Elevation="5">
+                <MudItem xs="12" sm="3" >
+                    <MudPaper Elevation="0" >
                         <MudText>@Localizer["Created"]: @TransactionType.CreateDate.ToShortDateString()</MudText>
                     </MudPaper>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudStack>
+                        <MudText Typo="Typo.body1">@Localizer["ChartColour"] @RandomInd</MudText>
+                        <MudColorPicker @bind-Value="@ChartColour" PickerVariant="PickerVariant.Static" Margin="Margin.None" ColorPickerMode="ColorPickerMode.HEX" DisableAlpha="true" DisableModeSwitch="true" DisableInputs="true" />
+                    </MudStack>
                 </MudItem>
             </MudGrid>
         </MudForm>
@@ -31,3 +38,118 @@
         <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["Close"]" OnClick="Close" />
     </DialogActions>
 </MudDialog>
+
+@code 
+{
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public int SavedTransactionTypeId { get; set; }
+
+    [Parameter] public int NewSummaryTypeId { get; set; }
+
+    [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
+
+    [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
+
+    [Inject] public INotifierSvc NotifierSvc { get; set; }
+
+    private string DialogTitle { get; set; } = string.Empty;
+
+    private TransactionType TransactionType { get; set; } = new TransactionType
+        {
+            CreateDate = DateTime.Today,
+        };
+
+    private List<SummaryType> SummaryTypes { get; set; }
+
+    private SummaryType SelectedSummaryType { get; set; }
+
+    private readonly TransactionTypeValidator validator = new();
+
+    private MudForm form;
+
+    private MudColor ChartColour { get; set; }
+
+    private string RandomInd = string.Empty;
+
+    private void Close() => MudDialog.Cancel();
+
+    private bool ReadOnlySummary { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Yield();
+
+        MudDialog.Options.NoHeader = true;
+        MudDialog.SetOptions(MudDialog.Options);
+
+        SummaryTypes = await SummaryRepo.GetAutoCompleteList();
+
+        if (SavedTransactionTypeId == 0)
+        {
+            TransactionType.SummaryTypeId = NewSummaryTypeId;
+            TransactionType.SummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == NewSummaryTypeId);
+            DialogTitle = Localizer["NewEntryType"];
+        }
+        else
+        {
+            TransactionType = await TTypeRepo.GetTransactionTypeById(SavedTransactionTypeId);
+            DialogTitle = Localizer["EditEntryType"];
+
+            if (SavedTransactionTypeId == -1) ReadOnlySummary = true;
+        }
+
+        SelectedSummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == TransactionType.SummaryTypeId);
+
+        if (TransactionType.ChartColour is null)
+        {
+            ChartColour = Utils.RandomColour();
+            RandomInd = Localizer["RandomInd"];
+        }
+        else
+        {
+            ChartColour = TransactionType.ChartColour;
+        }
+
+        NotifierSvc.TransactionTypeDeleted += Close;
+    }
+
+    private async Task Save()
+    {
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            TransactionType.SummaryTypeId = SelectedSummaryType.SummaryTypeId;
+
+            TransactionType.ChartColour = ChartColour.Value;
+
+            switch (SavedTransactionTypeId)
+            {
+                case 0:
+                    await TTypeRepo.AddTransactionType(TransactionType);
+                    break;
+                default:
+                    await TTypeRepo.UpdateTransactionType(TransactionType);
+                    break;
+            }
+
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    private async Task<IEnumerable<SummaryType>> TypeSearch(string searchValue)
+    {
+        await Task.Yield();
+
+        return string.IsNullOrEmpty(searchValue)
+            ? (IEnumerable<SummaryType>)SummaryTypes
+            : SummaryTypes.Where(s => s.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    public void Dispose()
+    {
+        NotifierSvc.TransactionTypeDeleted -= Close;
+        GC.SuppressFinalize(this);
+    }
+}

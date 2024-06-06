@@ -47,9 +47,9 @@
             </MudTh>
             @foreach (var summary in MonthlySummaries[12].SummaryDetails)
             {
-                <MudTh Style="text-align:center" Class="pt-0 pb-1">
+                <MudTh Style="text-align:center" >
                     <MudTooltip Text="@(Localizer["YearChart", summary.SummaryName])" Delay="500" Duration="0" ShowOnFocus="false">
-                        <MudButton EndIcon="@Icons.Material.Filled.ShowChart" IconClass="ma-0 py-0 ps-1 pe-0"  IconColor="Color.Info" Variant="Variant.Outlined" OnClick="@(e => YearChart(summary))" Size="Size.Small" Class="py-0 px-2">@summary.SummaryName</MudButton>
+                        <MudButton Style="@summary.ChartColour" Variant="Variant.Outlined" OnClick="@(e => YearChart(summary))" Size="Size.Small" Class="py-0 px-2">@summary.SummaryName</MudButton>
                     </MudTooltip>
                 </MudTh>
             }
@@ -57,13 +57,13 @@
         <RowTemplate>
             <MudTd DataLabel="Month" Class="py-1" >
                 <MudTooltip Text="@(Localizer["ExpenditureChart", context.MonthNameFull])" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
-                    <MudButton EndIcon="@Icons.Material.Filled.PieChart" IconClass="ma-0 py-0 ps-1 pe-0" IconColor="Color.Info" Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="py-0 px-2"><MudText>@context.MonthName</MudText></MudButton>
+                    <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="py-0 px-2"><MudText>@context.MonthName</MudText></MudButton>
                 </MudTooltip>
             </MudTd>
             @foreach (var summary in context.SummaryDetails)
             {
                 <MudTd Style="text-align:center" DataLabel="@summary.SummaryName" Class="py-0" >
-                    <MudLink OnClick="(e => TransList(summary.SummaryName, summary.Types, context.MonthNo))" Class="@summary.CssClass">@summary.Total.ToString("N2")</MudLink>
+                    <MudLink OnClick="(e => TransList(summary.SummaryName, summary.Types, context.MonthNo))"><MudText Style="@Utils.BalanceColour(summary.Total, DarkMode)">@summary.Total.ToString("N2")</MudText></MudLink>
                 </MudTd>
             }
         </RowTemplate>
@@ -74,4 +74,262 @@ else
     <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
         <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
     </MudStack>
+}
+
+@code
+{
+    [Inject] public NavigationManager NavigationManager { get; set; }
+
+    [Inject] public IDialogService DialogService { get; set; }
+
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+
+    [Inject] public INotifierSvc NotifierSvc { get; set; }
+
+    [Inject] internal ITransactionRepository Repo { get; set; }
+
+    [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
+
+    [Inject] PageParamsSvc PageParamsSvc { get; set; }
+
+    private IEnumerable<SummaryType> SummaryTypes { get; set; }
+
+    public class MonthlySummary
+    {
+        public string MonthName;
+        public string MonthNameFull;
+        public int MonthNo;
+        public List<SummaryDetail> SummaryDetails;
+    };
+
+    public class SummaryDetail
+    {
+        public int SummaryTypeId;
+        public string SummaryName;
+        public List<int> Types;
+        public decimal Total;
+        public bool HasTransactions;
+        public string ChartColour;
+    };
+
+    public List<MonthlySummary> MonthlySummaries { get; set; }
+
+    IEnumerable<Transaction> Transactions { get; set; }
+
+    string BookName { get; set; } = string.Empty;
+
+    public int Year { get; set; }
+
+    public int[] Years { get; set; } = [];
+
+    DateTime StartDate { get; set; }
+
+    DateTime EndDate { get; set; }
+
+    bool DarkMode { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        BookName = await BookSettingSvc.GetBookName();
+        DarkMode = await BookSettingSvc.GetDarkMode();
+
+        NotifierSvc.TransactionsChanged += TransactionsChanged;
+        NotifierSvc.ThemeChanged += ThemeChanged;
+
+        Years = Enumerable.Range(await BookSettingSvc.GetStartYear(), await BookSettingSvc.GetEndYear() - await BookSettingSvc.GetStartYear() + 1).ToArray();
+
+        if (PageParamsSvc.Year != 0)
+        {
+            Year = PageParamsSvc.Year;
+        }
+        else if (DateTime.Today.Year <= Years.Max() && DateTime.Today.Year >= Years.Min())
+        {
+            Year = DateTime.Today.Year;
+        }
+        else
+        {
+            Year = DateTime.Today.Year > Years.Max() ? Years.Max() : Years.Min();
+        }
+
+        SummaryTypes = (await SummaryRepo.LoadSummary()).Where(s => s.TransactionTypes.Count > 0).ToList();
+
+        await LoadSummary();
+    }
+
+    private async Task LoadSummary()
+    {
+        // Get all Transactions for year
+        Transactions = await Repo.GetTransactionsByTypeMonth([], Year, 0);
+
+        MonthlySummaries = [];
+
+        for (int i = 1; i < 13; i++)
+        {
+            MonthlySummaries.Add(new MonthlySummary
+                {
+                    MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i),
+                    MonthNameFull = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
+                    MonthNo = i,
+                    SummaryDetails = CreateSummaryDetails(i),
+                });
+        }
+
+        // Add Total (Year) row
+        MonthlySummaries.Add(new MonthlySummary
+            {
+                MonthName = Localizer["Total"],
+                MonthNameFull = Year.ToString(),
+                MonthNo = 0,
+                SummaryDetails = CreateSummaryDetails(0),
+            });
+
+        // Remove Zero Transactions SummaryDetails
+        List<int> summariesToBeRemoved = MonthlySummaries[12].SummaryDetails.Where(s => !s.HasTransactions).Select(s => s.SummaryTypeId).ToList();
+
+        foreach (MonthlySummary monthlySummary in MonthlySummaries)
+        {
+            monthlySummary.SummaryDetails.RemoveAll(x => summariesToBeRemoved.Contains(x.SummaryTypeId));
+        }
+
+        StateHasChanged();
+    }
+
+    private List<SummaryDetail> CreateSummaryDetails(int monthNo)
+    {
+        List<SummaryDetail> summaryDetails = [];
+
+        SetDates(monthNo);
+
+        // Total Summary (column)
+        var total = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate).Sum(t => t.Value) * -1;
+
+        summaryDetails.Add(new SummaryDetail
+            {
+                SummaryTypeId = 0,
+                SummaryName = Localizer["Total"],
+                Types = [],
+                Total = total,
+                HasTransactions = true,
+                ChartColour = string.Empty,
+            });
+
+        // User defined Summaries
+        foreach (SummaryType summaryType in SummaryTypes)
+        {
+            total = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.TransactionTypes.Any(tt => tt.TransactionTypeId == t.TransactionTypeId)).Sum(t => t.Value) * -1;
+
+            summaryDetails.Add(new SummaryDetail
+                {
+                    SummaryTypeId = summaryType.SummaryTypeId,
+                    SummaryName = summaryType.Name,
+                    Types = summaryType.TransactionTypes.Select(t => t.TransactionTypeId).ToList(),
+                    Total = total,
+                    HasTransactions = monthNo == 0 && Transactions.Any(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.TransactionTypes.Any(tt => tt.TransactionTypeId == t.TransactionTypeId)),
+                    ChartColour = $"color:{summaryType.ChartColour};",
+                });
+        }
+
+        return summaryDetails;
+    }
+
+    private void SetDates(int monthNo)
+    {
+        if (monthNo > 0)
+        {
+            StartDate = new DateTime(Year, monthNo, 1);
+            EndDate = StartDate.AddMonths(1);
+        }
+        else
+        {
+            StartDate = new DateTime(Year, 1, 1);
+            EndDate = new DateTime(Year + 1, 1, 1);
+        }
+    }
+
+    public async void YearChanged(int year)
+    {
+        Year = year;
+        PageParamsSvc.Year = year;
+        await LoadSummary();
+    }
+
+    private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
+    {
+        foreach (int transactionYear in args.Years)
+        {
+            if (transactionYear == Year)
+            {
+                LoadSummary();
+                break;
+            }
+        }
+    }
+
+    private void YearChart(SummaryDetail summary)
+    {
+        PageParamsSvc.Init();
+        PageParamsSvc.Mode = 1;
+        PageParamsSvc.Year = Year;
+        PageParamsSvc.Name = summary.SummaryName;
+        PageParamsSvc.SummaryTypeId = summary.SummaryTypeId;
+        PageParamsSvc.Transactions = summary.SummaryTypeId > 0 ? Transactions.Where(t => t.SummaryName == summary.SummaryName).ToList() : Transactions.OrderBy(t => t.Order).ToList();
+        PageParamsSvc.PreviousPage = "/";
+
+        NavigationManager.NavigateTo("LineChart", false);
+    }
+
+    private void MonthChart(int monthNo)
+    {
+        string dialogTitle = string.Empty;
+        List<Transaction> transactions = [];
+
+        if (monthNo >= 0)
+        {
+            dialogTitle = Localizer["Expenditure", MonthlySummaries[monthNo].MonthNameFull, Year];
+
+            SetDates(++monthNo);
+            transactions = Transactions
+                .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && t.Value > 0)
+                .ToList();
+        }
+        else
+        {
+            dialogTitle = Localizer["Expenditure", Year, ""];
+            transactions = Transactions.Where(t => t.Value > 0).ToList();
+        }
+
+        var parameters = new DialogParameters<MonthChartDialog>
+            {
+                { p => p.DialogTitle, dialogTitle },
+                { p => p.Transactions, transactions },
+            };
+
+        DialogService.Show<MonthChartDialog>("", parameters);
+    }
+
+    protected async void TransList(string summaryName, List<int> types, int month)
+    {
+        PageParamsSvc.Init();
+        PageParamsSvc.Mode = 1;
+        PageParamsSvc.Name = summaryName;
+        PageParamsSvc.Types = types;
+        PageParamsSvc.Year = Year;
+        PageParamsSvc.Month = month;
+        PageParamsSvc.PreviousPage = "/";
+
+        NavigationManager.NavigateTo("TransList", false);
+    }
+
+    public async void ThemeChanged(object? sender, bool darkMode)
+    {
+        DarkMode = darkMode;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NotifierSvc.TransactionsChanged -= TransactionsChanged;
+        NotifierSvc.ThemeChanged -= ThemeChanged;
+        GC.SuppressFinalize(this);
+    }
 }

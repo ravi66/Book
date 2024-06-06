@@ -58,11 +58,12 @@
                     Name = s.Name,
                     Order = s.Order,
                     CreateDate = s.CreateDate,
+                    ChartColour = s.ChartColour,
                     TransactionTypes = new List<TransactionType>(s.TransactionTypes
                         .Select(t => new TransactionType
-                            {
-                                TransactionTypeId = t.TransactionTypeId,
-                            })
+                        {
+                            TransactionTypeId = t.TransactionTypeId,
+                        })
                         .ToList()),
                 })
                 .FirstOrDefault(s => s.SummaryTypeId == summaryTypeId);
@@ -85,6 +86,7 @@
             {
                 foundSummaryType.Name = summaryType.Name;
                 foundSummaryType.Order = summaryType.Order;
+                foundSummaryType.ChartColour = summaryType.ChartColour;
 
                 await dbContext.SaveChangesAsync();
 
@@ -115,6 +117,7 @@
                                     SummaryTypeId = s.SummaryTypeId,
                                     Name = s.Name,
                                     Order = s.Order,
+                                    ChartColour = s.ChartColour,
                                     TransactionTypes = new List<TransactionType>(s.TransactionTypes
                                         .Select(t => new TransactionType
                                         {
@@ -125,6 +128,12 @@
                                 .OrderBy(s => s.Order)
                                 .AsNoTracking(),
             ];
+        }
+
+        public async Task<string> GetColour(int summaryTypeId)
+        {
+            using var dbContext = await db.CreateDbContextAsync();
+            return dbContext.SummaryTypes.Where(s => s.SummaryTypeId == summaryTypeId).Select(s => s.ChartColour).FirstOrDefault() ?? Utils.RandomColour();
         }
 
     }

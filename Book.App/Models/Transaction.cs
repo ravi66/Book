@@ -27,6 +27,9 @@ namespace Book.Models
 
         [NotMapped]
         public string? TransactionTypeName { get; set; }
+
+        [NotMapped]
+        public int Order { get; set; }
     }
 
     public class TransactionValidator : AbstractValidator<Transaction>

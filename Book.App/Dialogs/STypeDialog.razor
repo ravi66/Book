@@ -2,22 +2,29 @@
 
 <MudDialog >
     <DialogContent>
+        <MudText Typo="Typo.h6" Class="mb-2" >@DialogTitle</MudText>
         <MudForm Model="@SummaryType" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0">
-            <MudGrid Spacing="1" Justify="Justify.FlexStart" >
-                <MudItem xs="12" sm="6">
+            <MudGrid Spacing="1" Justify="Justify.FlexStart" Class="pa-0" >
+                <MudItem xs="12" sm="7">
                     <MudPaper Elevation="5">
                         <MudTextField Label="@Localizer["Name"]" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="SummaryType.Name" For="@(() => SummaryType.Name)" Required="true" />
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12" sm="6">
+                <MudItem xs="12" sm="2">
                     <MudPaper Elevation="5">
-                        <MudNumericField Label="@Localizer["Order"]" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="SummaryType.Order" For="@(() => SummaryType.Order)" HideSpinButtons="true" />
+                        <MudNumericField Label="@Localizer["Order"]" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="SummaryType.Order" For="@(() => SummaryType.Order)" />
                     </MudPaper>
                 </MudItem>
-                <MudItem>
-                    <MudPaper Elevation="5">
+                <MudItem xs="12" sm="3">
+                    <MudPaper Elevation="0">
                         <MudText>@Localizer["Created"]: @SummaryType.CreateDate.ToShortDateString()</MudText>
                     </MudPaper>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudStack >
+                        <MudText Typo="Typo.body1">@Localizer["ChartColour"] @RandomInd</MudText>
+                        <MudColorPicker @bind-Value="@ChartColour" PickerVariant="PickerVariant.Static" Margin="Margin.None" ColorPickerMode="ColorPickerMode.HEX" DisableAlpha="true" DisableModeSwitch="true" DisableInputs="true" />
+                    </MudStack>
                 </MudItem>
             </MudGrid>
         </MudForm>
@@ -31,3 +38,90 @@
         <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["Close"]" OnClick="Close" />
     </DialogActions>
 </MudDialog>
+
+@code
+{
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public int SavedSummaryTypeId { get; set; }
+
+    [Inject] internal ISummaryTypeRepository Repo { get; set; }
+
+    [Inject] public INotifierSvc NotifierSvc { get; set; }
+
+    private string DialogTitle { get; set; } = string.Empty;
+
+    private SummaryType SummaryType { get; set; } = new SummaryType
+        {
+            CreateDate = DateTime.Today,
+            Order = 0,
+        };
+
+    private readonly SummaryTypeValidator validator = new();
+
+    private MudForm form;
+
+    private MudColor ChartColour { get; set; }
+
+    private string RandomInd = string.Empty;
+
+    void Close() => MudDialog.Cancel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Yield();
+
+        MudDialog.Options.NoHeader = true;
+        MudDialog.SetOptions(MudDialog.Options);
+
+        if (SavedSummaryTypeId != 0)
+        {
+            SummaryType = await Repo.GetSummaryTypeById(SavedSummaryTypeId);
+            DialogTitle = Localizer["EditSummaryType"];
+        }
+        else
+        {
+            DialogTitle = Localizer["NewSummaryType"];
+        }
+
+        if (SummaryType.ChartColour is null)
+        {
+            ChartColour = Utils.RandomColour();
+            RandomInd = Localizer["RandomInd"];
+        }
+        else
+        {
+            ChartColour = SummaryType.ChartColour;
+        }
+
+        NotifierSvc.SummaryTypeDeleted += Close;
+    }
+
+    private async Task Save()
+    {
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            SummaryType.ChartColour = ChartColour.Value;
+
+            switch (SavedSummaryTypeId)
+            {
+                case 0:
+                    await Repo.AddSummaryType(SummaryType);
+                    break;
+                default:
+                    await Repo.UpdateSummaryType(SummaryType);
+                    break;
+            }
+
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    public void Dispose()
+    {
+        NotifierSvc.SummaryTypeDeleted -= () => Close();
+        GC.SuppressFinalize(this);
+    }
+}

@@ -9,5 +9,6 @@
         public Task<SummaryType?> UpdateSummaryType(SummaryType summaryType);
         public Task DeleteSummaryType(int summaryTypeId);
         public Task<List<SummaryType>> LoadSummary();
+        public Task<string> GetColour(int summaryTypeId);
     }
 }

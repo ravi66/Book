@@ -146,6 +146,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="BackupPrefix" xml:space="preserve">
     <value>Backup file prefix</value>
   </data>
+  <data name="Balance" xml:space="preserve">
+    <value>Balance</value>
+  </data>
   <data name="Bimonthly" xml:space="preserve">
     <value>Bimonthly</value>
   </data>
@@ -190,6 +193,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="Chart" xml:space="preserve">
     <value>{0} Chart</value>
+  </data>
+  <data name="ChartColour" xml:space="preserve">
+    <value>Chart Colour</value>
   </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
@@ -435,7 +441,7 @@ It is an open-source project licensed under MIT and is free to use in commercial
     <value>New Entry Type</value>
   </data>
   <data name="NewSummaryType" xml:space="preserve">
-    <value>Create Summary</value>
+    <value>Create Summary Type</value>
   </data>
   <data name="No" xml:space="preserve">
     <value>No</value>
@@ -469,6 +475,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="Quaterly" xml:space="preserve">
     <value>Quaterly</value>
+  </data>
+  <data name="RandomInd" xml:space="preserve">
+    <value>(Random)</value>
   </data>
   <data name="Rent" xml:space="preserve">
     <value>Rent</value>
