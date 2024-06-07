@@ -59,8 +59,6 @@
 
     [Inject] public INotifierSvc NotifierSvc { get; set; }
 
-    [Inject] public ISnackbar Snackbar { get; set; }
-
     [Inject] public NavigationManager NavigationManager { get; set; }
 
     [Inject] public IDialogService DialogService { get; set; }
@@ -71,19 +69,19 @@
 
     string FilteredItems { get; set; } = string.Empty;
 
-    private IEnumerable<Transaction> Transactions { get; set; }
+    IEnumerable<Transaction> Transactions { get; set; }
 
-    private IEnumerable<Transaction> pagedData;
+    IEnumerable<Transaction> pagedData;
 
-    private MudTable<Transaction> table;
+    MudTable<Transaction> table;
 
-    private int totalItems;
+    int totalItems;
 
-    private string searchString = "";
+    string searchString = "";
 
-    private string BookName { get; set; } = string.Empty;
+    string BookName { get; set; } = string.Empty;
 
-    private bool DarkMode { get; set; }
+    bool DarkMode { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -98,10 +96,8 @@
         NotifierSvc.ThemeChanged += ThemeChanged;
     }
 
-    private async Task<TableData<Transaction>> ServerReload(TableState state)
+    async Task<TableData<Transaction>> ServerReload(TableState state)
     {
-        await Busy();
-
         Transactions = [];
 
         switch (PageParamsSvc.Mode)
@@ -160,22 +156,7 @@
         return new TableData<Transaction>() { TotalItems = Transactions.Count(), Items = pagedData };
     }
 
-    private async Task Busy()
-    {
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomStart;
-        Snackbar.Add(Localizer["LoadingEntries"], Severity.Normal, config =>
-        {
-            config.Icon = Icons.Material.Outlined.HourglassTop;
-            config.ShowCloseIcon = false;
-            config.VisibleStateDuration = 1000;
-            config.ShowTransitionDuration = 250;
-            config.HideTransitionDuration = 250;
-        });
-
-        await Task.Yield();
-    }
-
-    private void SetEntriesTitle()
+    void SetEntriesTitle()
     {
         switch (PageParamsSvc.Mode)
         {
@@ -196,24 +177,24 @@
         return;
     }
 
-    private void OnSearch(string text)
+    void OnSearch(string text)
     {
         searchString = text;
         table.ReloadServerData();
     }
 
-    private void OnDblClick(int transactionId)
+    void OnDblClick(int transactionId)
     {
         DialogService.Show<TransactionDialog>(Localizer["EditEntry"], new DialogParameters<TransactionDialog> { { x => x.SavedTransactionId, transactionId } });
     }
 
-    private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
+    void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
     {
         // Reload regardless of Year
         table.ReloadServerData();
     }
 
-    public async void ThemeChanged(object? sender, bool darkMode)
+    void ThemeChanged(object? sender, bool darkMode)
     {
         DarkMode = darkMode;
         StateHasChanged();
@@ -223,7 +204,6 @@
     {
         NotifierSvc.TransactionsChanged -= TransactionsChanged;
         NotifierSvc.ThemeChanged -= ThemeChanged;
-
         GC.SuppressFinalize(this);
     }
 }

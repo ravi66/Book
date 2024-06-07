@@ -63,7 +63,7 @@
             @foreach (var summary in context.SummaryDetails)
             {
                 <MudTd Style="text-align:center" DataLabel="@summary.SummaryName" Class="py-0" >
-                    <MudLink OnClick="(e => TransList(summary.SummaryName, summary.Types, context.MonthNo))"><MudText Style="@Utils.BalanceColour(summary.Total, DarkMode)">@summary.Total.ToString("N2")</MudText></MudLink>
+                    <MudLink Color="Color.Inherit" OnClick="(e => TransList(summary.SummaryName, summary.Types, context.MonthNo))"><MudText Style="@Utils.BalanceColour(summary.Total, DarkMode)">@summary.Total.ToString("N2")</MudText></MudLink>
                 </MudTd>
             }
         </RowTemplate>
@@ -92,35 +92,21 @@ else
 
     [Inject] PageParamsSvc PageParamsSvc { get; set; }
 
-    private IEnumerable<SummaryType> SummaryTypes { get; set; }
+    List<SummaryType> SummaryTypes { get; set; } = [];
 
-    public class MonthlySummary
-    {
-        public string MonthName;
-        public string MonthNameFull;
-        public int MonthNo;
-        public List<SummaryDetail> SummaryDetails;
-    };
+    record MonthlySummary(string MonthName, string MonthNameFull, int MonthNo, List<SummaryDetail> SummaryDetails);
 
-    public class SummaryDetail
-    {
-        public int SummaryTypeId;
-        public string SummaryName;
-        public List<int> Types;
-        public decimal Total;
-        public bool HasTransactions;
-        public string ChartColour;
-    };
+    record SummaryDetail(int SummaryTypeId, string SummaryName, List<int> Types, decimal Total, bool HasTransactions, string ChartColour);
 
-    public List<MonthlySummary> MonthlySummaries { get; set; }
+    List<MonthlySummary> MonthlySummaries { get; set; }
 
-    IEnumerable<Transaction> Transactions { get; set; }
+    List<Transaction> Transactions { get; set; }
 
     string BookName { get; set; } = string.Empty;
 
-    public int Year { get; set; }
+    int Year { get; set; }
 
-    public int[] Years { get; set; } = [];
+    int[] Years { get; set; } = [];
 
     DateTime StartDate { get; set; }
 
@@ -156,32 +142,32 @@ else
         await LoadSummary();
     }
 
-    private async Task LoadSummary()
+    async Task LoadSummary()
     {
         // Get all Transactions for year
-        Transactions = await Repo.GetTransactionsByTypeMonth([], Year, 0);
+        Transactions = (await Repo.GetTransactionsByTypeMonth([], Year, 0)).ToList();
 
         MonthlySummaries = [];
 
         for (int i = 1; i < 13; i++)
         {
             MonthlySummaries.Add(new MonthlySummary
-                {
-                    MonthName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i),
-                    MonthNameFull = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
-                    MonthNo = i,
-                    SummaryDetails = CreateSummaryDetails(i),
-                });
+            (
+                CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i),
+                CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
+                i,
+                CreateSummaryDetails(i)
+            ));
         }
 
         // Add Total (Year) row
         MonthlySummaries.Add(new MonthlySummary
-            {
-                MonthName = Localizer["Total"],
-                MonthNameFull = Year.ToString(),
-                MonthNo = 0,
-                SummaryDetails = CreateSummaryDetails(0),
-            });
+        (
+            Localizer["Total"],
+            Year.ToString(),
+            0,
+            CreateSummaryDetails(0)
+        ));
 
         // Remove Zero Transactions SummaryDetails
         List<int> summariesToBeRemoved = MonthlySummaries[12].SummaryDetails.Where(s => !s.HasTransactions).Select(s => s.SummaryTypeId).ToList();
@@ -194,7 +180,7 @@ else
         StateHasChanged();
     }
 
-    private List<SummaryDetail> CreateSummaryDetails(int monthNo)
+    List<SummaryDetail> CreateSummaryDetails(int monthNo)
     {
         List<SummaryDetail> summaryDetails = [];
 
@@ -204,14 +190,14 @@ else
         var total = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate).Sum(t => t.Value) * -1;
 
         summaryDetails.Add(new SummaryDetail
-            {
-                SummaryTypeId = 0,
-                SummaryName = Localizer["Total"],
-                Types = [],
-                Total = total,
-                HasTransactions = true,
-                ChartColour = string.Empty,
-            });
+        (
+            0,
+            Localizer["Total"],
+            [],
+            total,
+            true,
+            string.Empty
+        ));
 
         // User defined Summaries
         foreach (SummaryType summaryType in SummaryTypes)
@@ -219,20 +205,20 @@ else
             total = Transactions.Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.TransactionTypes.Any(tt => tt.TransactionTypeId == t.TransactionTypeId)).Sum(t => t.Value) * -1;
 
             summaryDetails.Add(new SummaryDetail
-                {
-                    SummaryTypeId = summaryType.SummaryTypeId,
-                    SummaryName = summaryType.Name,
-                    Types = summaryType.TransactionTypes.Select(t => t.TransactionTypeId).ToList(),
-                    Total = total,
-                    HasTransactions = monthNo == 0 && Transactions.Any(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.TransactionTypes.Any(tt => tt.TransactionTypeId == t.TransactionTypeId)),
-                    ChartColour = $"color:{summaryType.ChartColour};",
-                });
+            (
+                summaryType.SummaryTypeId,
+                summaryType.Name,
+                summaryType.TransactionTypes.Select(t => t.TransactionTypeId).ToList(),
+                total,
+                monthNo == 0 && Transactions.Any(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && summaryType.TransactionTypes.Any(tt => tt.TransactionTypeId == t.TransactionTypeId)),
+                $"color:{summaryType.ChartColour};"
+            ));
         }
 
         return summaryDetails;
     }
 
-    private void SetDates(int monthNo)
+    void SetDates(int monthNo)
     {
         if (monthNo > 0)
         {
@@ -246,26 +232,14 @@ else
         }
     }
 
-    public async void YearChanged(int year)
+    async void YearChanged(int year)
     {
         Year = year;
         PageParamsSvc.Year = year;
         await LoadSummary();
     }
 
-    private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
-    {
-        foreach (int transactionYear in args.Years)
-        {
-            if (transactionYear == Year)
-            {
-                LoadSummary();
-                break;
-            }
-        }
-    }
-
-    private void YearChart(SummaryDetail summary)
+    void YearChart(SummaryDetail summary)
     {
         PageParamsSvc.Init();
         PageParamsSvc.Mode = 1;
@@ -273,12 +247,11 @@ else
         PageParamsSvc.Name = summary.SummaryName;
         PageParamsSvc.SummaryTypeId = summary.SummaryTypeId;
         PageParamsSvc.Transactions = summary.SummaryTypeId > 0 ? Transactions.Where(t => t.SummaryName == summary.SummaryName).ToList() : Transactions.OrderBy(t => t.Order).ToList();
-        PageParamsSvc.PreviousPage = "/";
 
         NavigationManager.NavigateTo("LineChart", false);
     }
 
-    private void MonthChart(int monthNo)
+    void MonthChart(int monthNo)
     {
         string dialogTitle = string.Empty;
         List<Transaction> transactions = [];
@@ -307,7 +280,7 @@ else
         DialogService.Show<MonthChartDialog>("", parameters);
     }
 
-    protected async void TransList(string summaryName, List<int> types, int month)
+    void TransList(string summaryName, List<int> types, int month)
     {
         PageParamsSvc.Init();
         PageParamsSvc.Mode = 1;
@@ -315,12 +288,23 @@ else
         PageParamsSvc.Types = types;
         PageParamsSvc.Year = Year;
         PageParamsSvc.Month = month;
-        PageParamsSvc.PreviousPage = "/";
 
         NavigationManager.NavigateTo("TransList", false);
     }
 
-    public async void ThemeChanged(object? sender, bool darkMode)
+    void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
+    {
+        foreach (int transactionYear in args.Years)
+        {
+            if (transactionYear == Year)
+            {
+                LoadSummary();
+                break;
+            }
+        }
+    }
+
+    async void ThemeChanged(object? sender, bool darkMode)
     {
         DarkMode = darkMode;
         StateHasChanged();

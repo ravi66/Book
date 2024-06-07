@@ -82,15 +82,15 @@
 
     [Inject] PageParamsSvc PageParamsSvc { get; set; }
 
-    private string BookName { get; set; } = string.Empty;
+    string BookName { get; set; } = string.Empty;
 
-    public List<SummaryType> SummaryTypes { get; set; } = [];
+    List<SummaryType> SummaryTypes { get; set; } = [];
 
-    public List<TransactionType> TransactionTypes { get; set; } = [];
+    List<TransactionType> TransactionTypes { get; set; } = [];
 
-    private int CurrentSummaryTypeId;
+    int CurrentSummaryTypeId;
 
-    private string CurrentSummaryName = string.Empty;
+    string CurrentSummaryName = string.Empty;
 
     protected async override Task OnInitializedAsync()
     {
@@ -100,10 +100,10 @@
         NotifierSvc.SummaryTypeDeleted += () => LoadSummaryTypes();
         NotifierSvc.TransactionTypeDeleted += () => LoadSummaryTypes();
 
-        await LoadSummaryTypes();
+        LoadSummaryTypes();
     }
 
-    public async Task LoadSummaryTypes()
+    async void LoadSummaryTypes()
     {
         SummaryTypes = await Repo.GetAllSummaryTypes();
         SummaryChanged(SummaryTypes.First());
@@ -117,72 +117,68 @@
         StateHasChanged();
     }
 
-    protected async void ListTransactionsSummary(SummaryType summary)
+    void ListTransactionsSummary(SummaryType summary)
     {
         PageParamsSvc.Init();
         PageParamsSvc.Mode = 2;
         PageParamsSvc.Name = summary.Name;
         PageParamsSvc.Types = summary.TransactionTypes.Select(s => s.TransactionTypeId).ToList();
-        PageParamsSvc.PreviousPage = "/SummaryTypeList";
 
         NavigationManager.NavigateTo("TransList", false);
     }
 
-    protected async void SummaryTypeChart(SummaryType summary)
+    void SummaryTypeChart(SummaryType summary)
     {
         PageParamsSvc.Init();
         PageParamsSvc.Mode = 2;
         PageParamsSvc.Name = summary.Name;
         PageParamsSvc.SummaryTypeId = summary.SummaryTypeId;
         PageParamsSvc.Types = summary.TransactionTypes.Select(s => s.TransactionTypeId).ToList();
-        PageParamsSvc.PreviousPage = "/SummaryTypeList";
 
         NavigationManager.NavigateTo("LineChart", false);
     }
 
-    private async Task AddSummaryType()
+    async void AddSummaryType()
     {
-        if (!(await DialogService.Show<STypeDialog>("").Result).Canceled) await LoadSummaryTypes();
+        if (!(await DialogService.Show<STypeDialog>("").Result).Canceled) LoadSummaryTypes();
     }
 
-    private async Task EditSType(int summaryTypeId)
+    async void EditSType(int summaryTypeId)
     {
-        if (!(await DialogService.Show<STypeDialog>("", new DialogParameters<STypeDialog> { { x => x.SavedSummaryTypeId, summaryTypeId } }).Result).Canceled) await LoadSummaryTypes();
+        if (!(await DialogService.Show<STypeDialog>("", new DialogParameters<STypeDialog> { { x => x.SavedSummaryTypeId, summaryTypeId } }).Result).Canceled) LoadSummaryTypes();
     }
 
-    protected async Task ListTransactionsTType(TransactionType transactionType)
+    void ListTransactionsTType(TransactionType transactionType)
     {
         PageParamsSvc.Init();
         PageParamsSvc.Mode = 3;
         PageParamsSvc.Name = transactionType.Name;
         PageParamsSvc.TransactionTypeId = transactionType.TransactionTypeId;
-        PageParamsSvc.PreviousPage = "/SummaryTypeList";
 
         NavigationManager.NavigateTo("TransList", false);
     }
 
-    protected async void EntryTypeChart(TransactionType transactionType)
+    void EntryTypeChart(TransactionType transactionType)
     {
         PageParamsSvc.Init();
         PageParamsSvc.Mode = 3;
         PageParamsSvc.Name = transactionType.Name;
         PageParamsSvc.TransactionTypeId = transactionType.TransactionTypeId;
-        PageParamsSvc.PreviousPage = "/SummaryTypeList";
 
         NavigationManager.NavigateTo("LineChart", false);
     }
 
-    private async Task AddTType(int summaryTypeId)
+    async void AddTType(int summaryTypeId)
     {
-        if (!(await DialogService.Show<TTypeDialog>("", new DialogParameters<TTypeDialog> { { x => x.NewSummaryTypeId, summaryTypeId } }).Result).Canceled) await LoadSummaryTypes();
+        if (!(await DialogService.Show<TTypeDialog>("", new DialogParameters<TTypeDialog> { { x => x.NewSummaryTypeId, summaryTypeId } }).Result).Canceled) LoadSummaryTypes();
     }
 
-    protected async Task EditTType(int transactionTypeId)
+    async void EditTType(int transactionTypeId)
     {
-        if (!(await DialogService.Show<TTypeDialog>("", new DialogParameters<TTypeDialog> { { x => x.SavedTransactionTypeId, transactionTypeId }, }).Result).Canceled) await LoadSummaryTypes();
+        if (!(await DialogService.Show<TTypeDialog>("", new DialogParameters<TTypeDialog> { { x => x.SavedTransactionTypeId, transactionTypeId }, }).Result).Canceled) LoadSummaryTypes();
     }
 
-    private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
+    void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
     {
         // Reload regardless of year
         LoadSummaryTypes();
@@ -191,8 +187,7 @@
     public void Dispose()
     {
         NotifierSvc.TransactionsChanged -= TransactionsChanged;
-        NotifierSvc.SummaryTypeDeleted -= () => LoadSummaryTypes();
-        NotifierSvc.TransactionTypeDeleted -= () => LoadSummaryTypes();
+        NotifierSvc.SummaryTypeDeleted -= LoadSummaryTypes;
         GC.SuppressFinalize(this);
     }
 }

@@ -4,7 +4,6 @@ namespace Book.Services
 {
     public class PageParamsSvc
     {
-        public string PreviousPage { get; set; }
         public string Name { get; set; }
         public int Year { get; set; }
         public int Mode { get; set; }
@@ -16,7 +15,6 @@ namespace Book.Services
 
         public void Init()
         {
-            PreviousPage = string.Empty;
             Name = string.Empty;
             Year = 0;
             Mode = 0;
