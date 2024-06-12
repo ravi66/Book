@@ -17,11 +17,9 @@ else
 
     [Inject] public IDialogService DialogService { get; set; }
 
-    private string DialogTitle = string.Empty;
+    Variant Variant = Variant.Text;
 
-    private Variant Variant = Variant.Text;
-
-    private string AriaLabel = string.Empty;
+    string AriaLabel = string.Empty;
 
     protected async override Task OnInitializedAsync()
     {
@@ -29,10 +27,5 @@ else
         Variant = TransactionId == 0 ? Variant.Filled : Variant.Text;
     }
 
-    private async Task CallTransactionDialog()
-    {
-        DialogTitle = TransactionId == 0 ? Localizer["NewEntry"] : Localizer["EditEntry"];
-
-        DialogService.Show<TransactionDialog>(DialogTitle, new DialogParameters<TransactionDialog> { { x => x.SavedTransactionId, TransactionId } });
-    }
+    void CallTransactionDialog() => DialogService.Show<TransactionDialog>(TransactionId == 0 ? Localizer["NewEntry"] : Localizer["EditEntry"], new DialogParameters<TransactionDialog> { { x => x.SavedTransactionId, TransactionId } });
 }

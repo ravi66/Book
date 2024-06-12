@@ -81,7 +81,9 @@
                         SummaryName = t.TransactionType.SummaryType.Name,
                         SummaryTypeId = t.TransactionType.SummaryTypeId,
                         Order = t.TransactionType.SummaryType.Order,
+                        SummaryColour = t.TransactionType.SummaryType.ChartColour,
                         TransactionTypeName = t.TransactionType.Name,
+                        TypeColour = t.TransactionType.ChartColour,
                         TransactionDate = t.TransactionDate,
                         CreateDate = t.CreateDate,
                         Notes = t.Notes

@@ -8,7 +8,7 @@ namespace Book.Models
 
         public TransactionType? TransactionType { get; set; }
 
-        public int? TransactionTypeId { get; set; }
+        public int TransactionTypeId { get; set; }
 
         public DateTime TransactionDate { get; set; }
 
@@ -30,6 +30,12 @@ namespace Book.Models
 
         [NotMapped]
         public int Order { get; set; }
+
+        [NotMapped]
+        public string? SummaryColour { get; set; }
+
+        [NotMapped]
+        public string? TypeColour { get; set; }
     }
 
     public class TransactionValidator : AbstractValidator<Transaction>

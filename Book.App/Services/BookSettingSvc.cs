@@ -108,6 +108,14 @@
 
                 BookSetting = await repo.AddBookSetting(BookSetting);
             }
+            else
+            {
+                if (BookSetting.SettingName != settingName)
+                {
+                    BookSetting.SettingName = settingName;
+                    BookSetting = await repo.UpdateBookSetting(BookSetting);
+                }
+            }
 
             return BookSetting.SettingValue;
         }

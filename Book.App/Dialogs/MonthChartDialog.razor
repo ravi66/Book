@@ -35,19 +35,11 @@
 
     [Parameter] public string DialogTitle { get; set; }
 
-    [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
+    ApexChartOptions<Transaction> ChartOptions;
 
-    [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
+    ApexChart<Transaction> ApexChart;
 
-    private ApexChartOptions<Transaction> ChartOptions;
-
-    private ApexChart<Transaction> ApexChart;
-
-    public int SelectedOption { get; set; } = 1;
-
-    private bool ShowEntryTypes = false;
-
-    private class OrderedType { public int TypeId; public decimal Value; public string Colour; }
+    bool ShowEntryTypes = false;
 
     protected async override Task OnInitializedAsync()
     {
@@ -61,43 +53,31 @@
         ChartOptions.DataLabels = new DataLabels { Style = new DataLabelsStyle { FontSize = "12px" }, };
         ChartOptions.NoData = new NoData { Text = @Localizer["NoPieData"] };
         ChartOptions.Tooltip = new ApexCharts.Tooltip { Y = new TooltipY { Formatter = @$"function(value, opts) {{ if (value === undefined) {{return '';}} return Intl.NumberFormat(undefined, {{ style: 'currency', currency: '{RegionInfo.CurrentRegion.ISOCurrencySymbol}' }} ).format(value);}}" } };
-        ChartOptions.Colors = await GetColours();
+        ChartOptions.Colors = GetColours();
     }
 
-    async Task<List<string>> GetColours()
+    List<string> GetColours()
     {
-        List<OrderedType> orderedTypes = [];
-
         if (!ShowEntryTypes)
         {
-            orderedTypes = Transactions.GroupBy(t => t.SummaryTypeId)
-                .Select(g => new OrderedType { TypeId = g.Key, Value = g.Sum(t => t.Value) })
-                .OrderByDescending(s => s.Value).ToList();
-
-            foreach (OrderedType orderedType in orderedTypes)
-            {
-                orderedType.Colour = await SummaryRepo.GetColour(orderedType.TypeId);
-            }
+            return Transactions.GroupBy(t => t.SummaryTypeId)
+                .Select(g => new { Value = g.Sum(t => t.Value), Colour = g.Select(c => c.SummaryColour).FirstOrDefault() ?? Utils.RandomColour() })
+                .OrderByDescending(o => o.Value).ToList()
+                .Select(o => o.Colour).ToList();
         }
         else
         {
-            orderedTypes = Transactions.GroupBy(t => t.TransactionTypeId)
-                .Select(g => new OrderedType { TypeId = g.Key ?? 0, Value = g.Sum(t => t.Value) })
-                .OrderByDescending(s => s.Value).ToList();
-
-            foreach (OrderedType orderedType in orderedTypes)
-            {
-                orderedType.Colour = await TTypeRepo.GetColour(orderedType.TypeId) ?? Utils.RandomColour();
-            }
+            return Transactions.GroupBy(t => t.TransactionTypeId)
+                .Select(g => new { Value = g.Sum(t => t.Value), Colour = g.Select(c => c.TypeColour).FirstOrDefault() ?? Utils.RandomColour() })
+                .OrderByDescending(o => o.Value).ToList()
+                .Select(o => o.Colour).ToList();
         }
-
-        return orderedTypes.Select(o => o.Colour).ToList();
     }
 
     async void OnDataPointSelection(SelectedData<Transaction> data)
     {
         ShowEntryTypes = !ShowEntryTypes;
-        ChartOptions.Colors = await GetColours();
+        ChartOptions.Colors = GetColours();
         await ApexChart.UpdateOptionsAsync(true, true, false);
     }
 }

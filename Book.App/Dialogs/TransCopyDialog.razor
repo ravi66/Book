@@ -51,13 +51,13 @@
 
     [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
-    private Transaction TransactionToCopy { get; set; }
+    Transaction TransactionToCopy { get; set; }
 
-    private IEnumerable<Transaction> NewTransactions { get; set; } = [];
+    IEnumerable<Transaction> NewTransactions { get; set; } = [];
 
     public record Frequency(int FrequencyID, string FrequencyName);
 
-    private List<Frequency> Frequencies { get; set; } =
+    List<Frequency> Frequencies { get; set; } =
         [
             new Frequency(3, "Yearly"),
             new Frequency(2, "Quaterly"),
@@ -67,15 +67,15 @@
             new Frequency(6, "Daily"),
         ];
 
-    private string DialogTitle { get; set; }
+    string DialogTitle { get; set; }
 
-    private Frequency SelectedFrequency { get; set; }
+    Frequency SelectedFrequency { get; set; }
 
-    private DateTime? EndDate { get; set; }
+    DateTime? EndDate { get; set; }
 
-    private DateTime? MinDate { get; set; }
+    DateTime? MinDate { get; set; }
 
-    private DateTime NewDate { get; set; }
+    DateTime NewDate { get; set; }
 
     void Close() => MudDialog.Cancel();
 
@@ -93,25 +93,25 @@
 
         DialogTitle = Localizer["TransCopyTitle", TransactionToCopy.Value.ToString("C2"), TransactionToCopy.TransactionType.Name];
 
-        await LoadCopiedTransactions();
+        LoadCopiedTransactions();
         StateHasChanged();
     }
 
-    public async void FrequencyChanged(Frequency selectedFrequency)
+    void FrequencyChanged(Frequency selectedFrequency)
     {
         SelectedFrequency = selectedFrequency;
-        await LoadCopiedTransactions();
+        LoadCopiedTransactions();
         StateHasChanged();
     }
 
-    public async Task EndDateChanged(DateTime? newEndDate)
+    void EndDateChanged(DateTime? newEndDate)
     {
         EndDate = newEndDate;
-        await LoadCopiedTransactions();
+        LoadCopiedTransactions();
         StateHasChanged();
     }
 
-    private async Task LoadCopiedTransactions()
+    void LoadCopiedTransactions()
     {
         NewTransactions = [];
 
@@ -134,7 +134,7 @@
         }
     }
 
-    protected async Task HandleSubmit()
+    async Task HandleSubmit()
     {
         if (!NewTransactions.Any()) return;
 
@@ -162,14 +162,14 @@
         Close();
     }
 
-    async Task DeleteTransaction(DateTime transDate)
+    void DeleteTransaction(DateTime transDate)
     {
         NewTransactions = NewTransactions.Where(ct => ct.TransactionDate != transDate);
 
         if (!NewTransactions.Any()) MudDialog.Cancel();
     }
 
-    private void SetNewDate()
+    void SetNewDate()
     {
         NewDate = SelectedFrequency.FrequencyID switch
         {
