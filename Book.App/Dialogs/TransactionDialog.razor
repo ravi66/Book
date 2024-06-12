@@ -43,7 +43,7 @@
             <CopyTransactionBtn Transaction="@Transaction" Variant="@Variant.Filled" Size="@Size.Medium" />
             <DeleteTransactionBtn Transaction="@Transaction" Variant="@Variant.Filled" Size="@Size.Medium" />
         }
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveEntry"]" OnClick="@(async () => await Save())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveEntry"]" OnClick="Save" />
         <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["Close"]" OnClick="Close" />
     </DialogActions>
 </MudDialog>
@@ -62,34 +62,34 @@
 
     [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
-    private Transaction Transaction { get; set; } = new Transaction
+    Transaction Transaction { get; set; } = new Transaction
         {
             Value = 0.00M,
             TransactionTypeId = -1,
             CreateDate = DateTime.Today,
         };
 
-    private readonly TransactionValidator validator = new();
+    readonly TransactionValidator validator = new();
 
-    private MudForm form;
+    MudForm form;
 
-    private List<TransactionType> TransactionTypes { get; set; }
+    List<TransactionType> TransactionTypes { get; set; }
 
-    private TransactionType SelectedTransactionType { get; set; } = new TransactionType
+    TransactionType SelectedTransactionType { get; set; } = new TransactionType
         {
             Name = string.Empty,
             SummaryType = new SummaryType { Name = string.Empty },
         };
 
-    private DateTime? PickerDate { get; set; }
+    DateTime? PickerDate { get; set; }
 
-    private DateTime MinDate { get; set; }
+    DateTime MinDate { get; set; }
 
-    private DateTime MaxDate { get; set; }
+    DateTime MaxDate { get; set; }
 
-    private int OriginalYear { get; set; } = 0;
+    int OriginalYear { get; set; } = 0;
 
-    public void Close() => MudDialog.Cancel();
+    void Close() => MudDialog.Cancel();
 
     protected override async Task OnInitializedAsync()
     {
@@ -125,7 +125,7 @@
         NotifierSvc.TransactionsChanged += TransactionsChanged;
     }
 
-    private async Task Save()
+    async void Save()
     {
         await form.Validate();
 
@@ -143,14 +143,14 @@
         MudDialog.Close(DialogResult.Ok(true));
     }
 
-    private async Task<IEnumerable<TransactionType>> TypeSearch(string searchValue)
+    async Task<IEnumerable<TransactionType>> TypeSearch(string searchValue)
     {
         await Task.Yield();
 
         return string.IsNullOrEmpty(searchValue) ? (IEnumerable<TransactionType>)TransactionTypes : TransactionTypes.Where(t => t.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
     }
 
-    private void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
+    void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
     {
         if (sender != this)
         {

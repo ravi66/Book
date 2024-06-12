@@ -49,21 +49,21 @@
 
     [Inject] public INotifierSvc NotifierSvc { get; set; }
 
-    private string DialogTitle { get; set; } = string.Empty;
+    string DialogTitle { get; set; } = string.Empty;
 
-    private SummaryType SummaryType { get; set; } = new SummaryType
+    SummaryType SummaryType { get; set; } = new SummaryType
         {
             CreateDate = DateTime.Today,
             Order = 0,
         };
 
-    private readonly SummaryTypeValidator validator = new();
+    readonly SummaryTypeValidator validator = new();
 
-    private MudForm form;
+    MudForm form;
 
-    private MudColor ChartColour { get; set; }
+    MudColor ChartColour { get; set; }
 
-    private string RandomInd = string.Empty;
+    string RandomInd = string.Empty;
 
     void Close() => MudDialog.Cancel();
 
@@ -97,7 +97,7 @@
         NotifierSvc.SummaryTypeDeleted += Close;
     }
 
-    private async Task Save()
+    async Task Save()
     {
         await form.Validate();
 

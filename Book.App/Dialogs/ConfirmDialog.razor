@@ -37,7 +37,7 @@
 
     [Parameter] public string WarningMessage { get; set; } = string.Empty;
 
-    private string ContentClass { get; set; } = string.Empty;
+    string ContentClass { get; set; } = string.Empty;
 
     void Close() => MudDialog.Cancel();
 

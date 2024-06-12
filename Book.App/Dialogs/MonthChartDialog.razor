@@ -5,7 +5,7 @@
         <MudPaper Style="min-width:320px; max-height:500px; " Elevation="5" Class="flex-grow-1">
             @if (Transactions.Any())
             {
-                <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@DialogTitle" OnDataPointSelection="OnDataPointSelection">
+                <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@DialogTitle" OnDataPointSelection="OnDataPointSelection" FormatYAxisLabel="GetYAxisLabel">
                     @if (!ShowEntryTypes)
                     {
                         <ApexPointSeries TItem="Transaction" Items="Transactions" XValue="@(t => t.SummaryName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
@@ -52,7 +52,6 @@
         ChartOptions.Legend = new Legend { Position = LegendPosition.Bottom, FontSize = "14px" };
         ChartOptions.DataLabels = new DataLabels { Style = new DataLabelsStyle { FontSize = "12px" }, };
         ChartOptions.NoData = new NoData { Text = @Localizer["NoPieData"] };
-        ChartOptions.Tooltip = new ApexCharts.Tooltip { Y = new TooltipY { Formatter = @$"function(value, opts) {{ if (value === undefined) {{return '';}} return Intl.NumberFormat(undefined, {{ style: 'currency', currency: '{RegionInfo.CurrentRegion.ISOCurrencySymbol}' }} ).format(value);}}" } };
         ChartOptions.Colors = GetColours();
     }
 
@@ -80,4 +79,6 @@
         ChartOptions.Colors = GetColours();
         await ApexChart.UpdateOptionsAsync(true, true, false);
     }
+
+    string GetYAxisLabel(decimal value) => value.ToString("C2");
 }

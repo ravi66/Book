@@ -30,7 +30,7 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveEntryType"]" OnClick="@(async () => await Save())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveEntryType"]" OnClick="Save" />
         @if (!TransactionType.TransactionsFound && TransactionType.TransactionTypeId > 0)
         {
             <DeleteTTypeBtn TransactionType="@TransactionType" Size="@Size.Medium" Variant="@Variant.Filled" />
@@ -53,28 +53,28 @@
 
     [Inject] public INotifierSvc NotifierSvc { get; set; }
 
-    private string DialogTitle { get; set; } = string.Empty;
+    string DialogTitle { get; set; } = string.Empty;
 
-    private TransactionType TransactionType { get; set; } = new TransactionType
+    TransactionType TransactionType { get; set; } = new TransactionType
         {
             CreateDate = DateTime.Today,
         };
 
-    private List<SummaryType> SummaryTypes { get; set; }
+    List<SummaryType> SummaryTypes { get; set; }
 
-    private SummaryType SelectedSummaryType { get; set; }
+    SummaryType SelectedSummaryType { get; set; }
 
-    private readonly TransactionTypeValidator validator = new();
+    readonly TransactionTypeValidator validator = new();
 
-    private MudForm form;
+    MudForm form;
 
-    private MudColor ChartColour { get; set; }
+    MudColor ChartColour { get; set; }
 
-    private string RandomInd = string.Empty;
+    string RandomInd = string.Empty;
 
-    private void Close() => MudDialog.Cancel();
+    void Close() => MudDialog.Cancel();
 
-    private bool ReadOnlySummary { get; set; } = false;
+    bool ReadOnlySummary { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -114,7 +114,7 @@
         NotifierSvc.TransactionTypeDeleted += Close;
     }
 
-    private async Task Save()
+    async void Save()
     {
         await form.Validate();
 
@@ -138,7 +138,7 @@
         }
     }
 
-    private async Task<IEnumerable<SummaryType>> TypeSearch(string searchValue)
+    async Task<IEnumerable<SummaryType>> TypeSearch(string searchValue)
     {
         await Task.Yield();
 
