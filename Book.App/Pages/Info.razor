@@ -117,9 +117,9 @@
 
     [Inject] public NavigationManager NavigationManager { get; set; }
 
-    private string Version { get; set; } = Constants.BookVersion;
+    string Version { get; set; } = Constants.BookVersion;
 
-    private string BookName { get; set; } = string.Empty;
+    string BookName { get; set; } = string.Empty;
 
     protected async override Task OnInitializedAsync()
     {

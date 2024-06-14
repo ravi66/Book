@@ -85,15 +85,15 @@
 
     [Inject] public IBookDbMigratorSvc DbMigrator { get; set; }
 
-    public IJSObjectReference? jsModule;
+    IJSObjectReference? jsModule;
 
-    public string BookDownloadUrl { get; set; } = string.Empty;
+    string BookDownloadUrl { get; set; } = string.Empty;
 
-    public string BookDbFileName { get; set; }
+    string BookDbFileName { get; set; }
 
-    private string BookName { get; set; } = string.Empty;
+    string BookName { get; set; } = string.Empty;
 
-    public string LastBackupDate { get; set; } = string.Empty;
+    string LastBackupDate { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -105,9 +105,9 @@
         BookDownloadUrl = await GetDownloadUrl();
     }
 
-    public async ValueTask<string?> GetDownloadUrl() => jsModule is not null ? await jsModule.InvokeAsync<string>("generateDownloadUrl") : null;
+    async ValueTask<string?> GetDownloadUrl() => jsModule is not null ? await jsModule.InvokeAsync<string>("generateDownloadUrl") : null;
 
-    private async void UploadDb(InputFileChangeEventArgs e)
+    async void UploadDb(InputFileChangeEventArgs e)
     {
         var fileContent = new byte[e.File.Size];
         await e.File.OpenReadStream().ReadAsync(fileContent);
@@ -115,7 +115,7 @@
         NavigationManager.NavigateTo("/", true);
     }
 
-    private async void DeleteDatabase()
+    async void DeleteDatabase()
     {
         var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
             {
@@ -134,13 +134,13 @@
         }
     }
 
-    private async void SetLastBackupDate()
+    async void SetLastBackupDate()
     {
         await BookSettingSvc.SetLastBackupDate(DateTime.Now);
         NavigationManager.NavigateTo("refresh/Database");
     }
 
-    private async void LoadDemoData()
+    async void LoadDemoData()
     {
         var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
             {

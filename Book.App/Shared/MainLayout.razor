@@ -19,6 +19,12 @@
             <MudText Typo="Typo.h5" Class="pa-0" Color="Color.Info">@BookName</MudText>
         </MudDrawerHeader>
         <MudNavMenu Color="Color.Success" >
+            <MudNavLink Href="Database">
+                <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Row="true">
+                    <MudIcon Icon="@SvgIcons.Database" />
+                    <MudText Typo="Typo.h6">@Localizer["Database"]</MudText>
+                </MudStack>
+            </MudNavLink>
             <MudNavLink Href="SummaryTypeList">
                 <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Row="true" >
                     <MudIcon Icon="@Icons.Material.Filled.Summarize" />
@@ -29,12 +35,6 @@
                 <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Row="true" >
                     <MudIcon Icon="@Icons.Material.Filled.Settings" />
                     <MudText Typo="Typo.h6">@Localizer["Settings"]</MudText>
-                </MudStack>
-            </MudNavLink>
-            <MudNavLink Href="Database">
-                <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Row="true" >
-                    <MudIcon Icon="@SvgIcons.Database" />
-                    <MudText Typo="Typo.h6">@Localizer["Database"]</MudText>
                 </MudStack>
             </MudNavLink>
         </MudNavMenu>
@@ -61,16 +61,16 @@
 
     [Inject] public INotifierSvc NotifierSvc { get; set; }
 
-    private bool _isDarkMode = true;
-    private string themeIcon = Icons.Material.Filled.LightMode;
-    private string themeText = string.Empty;
-    private Color themeColor = Color.Warning;
+    bool _isDarkMode = true;
+    string themeIcon = Icons.Material.Filled.LightMode;
+    string themeText = string.Empty;
+    Color themeColor = Color.Warning;
 
-    private string BookName = string.Empty;
+    string BookName = string.Empty;
 
-    private bool drawerOpen = false;
-    private string menuIcon = @Icons.Material.Filled.Menu;
-    private string menuToolTip = string.Empty;
+    bool drawerOpen = false;
+    string menuIcon = @Icons.Material.Filled.Menu;
+    string menuToolTip = string.Empty;
 
     protected async override Task OnInitializedAsync()
     {
@@ -95,7 +95,7 @@
         menuToolTip = drawerOpen ? Localizer["CloseMenu"] : Localizer["OpenMenu"];
     }
 
-    private async void ToggleThemeMode()
+    async void ToggleThemeMode()
     {
         _isDarkMode = !_isDarkMode;
         SetTheme();
@@ -104,7 +104,7 @@
         NotifierSvc.OnThemeChanged(this, _isDarkMode);
     }
 
-    private void SetTheme()
+    void SetTheme()
     {
         themeIcon = _isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
         themeText = _isDarkMode ? Localizer["LightMode"] : Localizer["DarkMode"];

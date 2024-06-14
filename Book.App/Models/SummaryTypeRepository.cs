@@ -15,6 +15,7 @@
                                     Name = s.Name,
                                     Order = s.Order,
                                     CreateDate = s.CreateDate,
+                                    ChartColour = s.ChartColour,
                                     TransactionTypes = new List<TransactionType>(s.TransactionTypes
                                         .Select(t => new TransactionType
                                         {
@@ -22,6 +23,7 @@
                                             SummaryTypeId = t.SummaryTypeId,
                                             Name = t.Name,
                                             CreateDate = t.CreateDate,
+                                            ChartColour = t.ChartColour,
                                             TransactionsFound = t.Transactions.Count != 0,
                                         })
                                         .OrderBy(t => t.Name).ToList()),

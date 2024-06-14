@@ -92,7 +92,7 @@
 
         // Privates
 
-        private async Task<string> GetSettingValue (int settingId, string settingName, bool userAmendable, string defaultValue)
+        async Task<string> GetSettingValue (int settingId, string settingName, bool userAmendable, string defaultValue)
         {
             BookSetting = await repo.GetBookSettingById(settingId);
 
@@ -120,7 +120,7 @@
             return BookSetting.SettingValue;
         }
 
-        private async Task SetSettingValue(int settingId, string settingName, bool userAmendable, string newValue)
+        async Task SetSettingValue(int settingId, string settingName, bool userAmendable, string newValue)
         {
             BookSetting = await repo.GetBookSettingById(settingId);
 

@@ -42,13 +42,13 @@
 
     [Inject] internal IBookSettingRepository Repo { get; set; }
 
-    private string BookName { get; set; } = Constants.BookName;
+    string BookName { get; set; } = Constants.BookName;
 
-    public List<BookSetting> BookSettings { get; set; }
+    List<BookSetting> BookSettings { get; set; }
 
-    private MudTable<BookSetting> Table;
+    MudTable<BookSetting> Table;
 
-    private readonly BookSettingValidator validator = new();
+    readonly BookSettingValidator validator = new();
 
     protected async override Task OnInitializedAsync()
     {
@@ -57,7 +57,7 @@
         BookSettings = (await Repo.GetAllBookSettings()).ToList();
     }
 
-    private async void Save()
+    async void Save()
     {
         if (!Table.Validator.IsValid) return;
 

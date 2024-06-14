@@ -13,13 +13,18 @@
                 <HeaderContent>
                     <MudTh Class="py-0"><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.Name)">@Localizer["Name"]</MudTableSortLabel></MudTh>
                     <MudTh Class="py-0"><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<SummaryType, object>(x=>x.Order)">@Localizer["Order"]</MudTableSortLabel></MudTh>
-                    <MudTh Class="py-0"><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.CreateDate)">@Localizer["Created"]</MudTableSortLabel></MudTh>
+                    <MudTh Class="py-0" Style="text-align:center" >@Localizer["Colour"]</MudTh>
                     <MudTh Class="py-0">@Localizer["Tools"]</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="@Localizer["Name"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))">@context.Name</MudTd>
                     <MudTd DataLabel="@Localizer["Order"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))">@context.Order</MudTd>
-                    <MudTd DataLabel="@Localizer["Created"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))">@context.CreateDate.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="@Localizer["Colour"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))">
+                        @if (context.ChartColour != null)
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.Square" Style="@($"color:{@context.ChartColour};display:block;margin-left:auto;margin-right:auto;")" />
+                        }
+                    </MudTd>
                     <MudTd DataLabel="@Localizer["Tools"]">
                         <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditSummaryType"]" OnClick="() => EditSType(context.SummaryTypeId)" />
                         @if (context.TransactionTypes.Any())
@@ -43,7 +48,7 @@
                 </ToolBarContent>
                 <HeaderContent>
                     <MudTh Class="py-0"><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<TransactionType, object>(x=>x.Name)">@Localizer["Name"]</MudTableSortLabel></MudTh>
-                    <MudTh Class="py-0"><MudTableSortLabel SortBy="new Func<TransactionType, object>(x=>x.CreateDate)">@Localizer["Created"]</MudTableSortLabel></MudTh>
+                    <MudTh Class="py-0" Style="text-align:center" >@Localizer["Colour"]</MudTh>
                     <MudTh Class="py-0">@Localizer["Tools"]</MudTh>
                 </HeaderContent>
                 <NoRecordsContent>
@@ -51,7 +56,12 @@
                 </NoRecordsContent>
                 <RowTemplate>
                     <MudTd DataLabel="@Localizer["Name"]" @ondblclick="@(() => EditTType(context.TransactionTypeId))">@context.Name</MudTd>
-                    <MudTd DataLabel="@Localizer["Created"]" @ondblclick="@(() => EditTType(context.TransactionTypeId))">@context.CreateDate.ToShortDateString()</MudTd>
+                    <MudTd DataLabel="@Localizer["Colour"]" @ondblclick="@(() => EditTType(context.TransactionTypeId))">
+                        @if (context.ChartColour != null)
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.Square" Style="@($"color:{@context.ChartColour};display:block;margin-left:auto;margin-right:auto;")" />
+                        }
+                    </MudTd>
                     <MudTd DataLabel="@Localizer["Tools"]">
                         <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditEntryType"]" OnClick="()=> EditTType(context.TransactionTypeId)" />
                         <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" Title="@Localizer["ListEntriesForEntryType"]" OnClick="()=> ListTransactionsTType(context)" />
