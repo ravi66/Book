@@ -51,8 +51,6 @@
 
 @code
 {
-    [Inject] internal IInitialiseSvc InitialiseSvc { get; set; }
-
     [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
     [Inject] public IBookDbMigratorSvc DbMigrator { get; set; }
@@ -77,9 +75,6 @@
     protected async override Task OnInitializedAsync()
     {
         await DbMigrator.EnsureDbCreated();
-
-        // Hard Refresh to reload Index.html may be required
-        if (!await InitialiseSvc.RefreshRequiredAsync()) NavigationManager.Refresh(true);
 
         BookName = await BookSettingSvc.GetBookName();
 

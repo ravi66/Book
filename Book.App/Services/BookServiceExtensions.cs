@@ -8,7 +8,6 @@
              * Although AddScoped is used as Book is entirely client side they are actually Singletons
              */
 
-            services.AddScoped<IInitialiseSvc, InitialiseSvc>();
             services.AddScoped<IBookDbMigratorSvc, BookDbMigratorSvc>();
             services.AddScoped<IBookSettingRepository, BookSettingRepository>();
             services.AddScoped<IBookSettingSvc, BookSettingSvc>();

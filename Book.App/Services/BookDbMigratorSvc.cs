@@ -8,23 +8,24 @@
         
         readonly IDbContextFactory<BookDbContext> dbContextFactory = dbContextFactory;
 
-        public async Task<string> EnsureDbCreated()
+        public async Task EnsureDbCreated()
         {
             _dbContext = await dbContextFactory.CreateDbContextAsync();
 
             await _dbContext.Database.EnsureCreatedAsync();
 
-            string? dbVersion = _dbContext.BookSetting.Where(b => b.BookSettingId == 7).Select(b => b.SettingValue).FirstOrDefault();
-            await EnsureDbMigratedAsync(dbVersion);
+            await EnsureDbMigratedAsync();
 
             await _dbContext.Database.ExecuteSqlRawAsync("VACUUM;");
             await _dbContext.SaveChangesAsync();
 
-            return CurrentDbVersion;
+            return;
         }
 
-        async Task EnsureDbMigratedAsync(string? dbVersion)
+        async Task EnsureDbMigratedAsync()
         {
+            string? dbVersion = _dbContext.BookSetting.Where(b => b.BookSettingId == 7).Select(b => b.SettingValue).FirstOrDefault();
+
             if (dbVersion is null)
             {
                 await ApplyDbVersionAsync(CurrentDbVersion);

@@ -1,4 +1,3 @@
-using Blazored.LocalStorage;
 using Book;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -15,8 +14,6 @@ builder.Services.AddLocalization();
 builder.Services.AddBesqlDbContextFactory<BookDbContext>(options => options.UseSqlite("Data Source=book.sqlite3"));
 
 builder.Services.AddMudServices();
-
-builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddBookServices();
 
