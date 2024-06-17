@@ -4,11 +4,11 @@
     {
         public event EventHandler<bool>? ThemeChanged;
 
+        public event EventHandler<int>? TransactionTypeDeleted;
+
         public event EventHandler<TransactionsChangedEventArgs>? TransactionsChanged;
 
         public event Action? SummaryTypeDeleted;
-
-        public event Action? TransactionTypeDeleted;
 
         public virtual void OnThemeChanged(object sender, bool darkMode)
         {
@@ -26,9 +26,9 @@
             SummaryTypeDeleted?.Invoke();
         }
 
-        public virtual void OnTransactionTypeDeleted()
+        public virtual void OnTransactionTypeDeleted(object sender, int summaryTypeId)
         {
-            TransactionTypeDeleted?.Invoke();
+            TransactionTypeDeleted?.Invoke(sender, summaryTypeId);
         }
     }
 

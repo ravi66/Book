@@ -11,6 +11,7 @@ namespace Book.Services
         public int Month { get; set; }
         public int TransactionTypeId { get; set; }
         public int SummaryTypeId { get; set; }
+        public string NavigateTo { get; set; }
         public List<Transaction> Transactions { get; set; }
 
         public void Init()
@@ -22,6 +23,7 @@ namespace Book.Services
             Month = 0;
             TransactionTypeId = 0;
             SummaryTypeId = 0;
+            NavigateTo = "/";
             Transactions = [];
         }
     }

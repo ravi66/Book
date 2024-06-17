@@ -2,20 +2,22 @@
 {
     internal class BookDbMigratorSvc(IDbContextFactory<BookDbContext> dbContextFactory, IStringLocalizer<Resources.BookResources> Localizer) : IBookDbMigratorSvc
     {
-        private const string CurrentDbVersion = "2.10";
+        const string CurrentDbVersion = "2.10";
 
-        private BookDbContext _dbContext;
-        private readonly IDbContextFactory<BookDbContext> _dbContextFactory = dbContextFactory;
+        BookDbContext _dbContext;
+        
+        readonly IDbContextFactory<BookDbContext> dbContextFactory = dbContextFactory;
 
         public async Task<string> EnsureDbCreated()
         {
-            _dbContext = await _dbContextFactory.CreateDbContextAsync();
+            _dbContext = await dbContextFactory.CreateDbContextAsync();
 
-            _ = await _dbContext.Database.EnsureCreatedAsync();
-            var dbVersionBookSetting = await _dbContext.BookSetting.FirstOrDefaultAsync(x => x.BookSettingId == 7);
-            await EnsureDbMigratedAsync(dbVersionBookSetting?.SettingValue);
+            await _dbContext.Database.EnsureCreatedAsync();
 
-            _ = await _dbContext.Database.ExecuteSqlRawAsync("VACUUM;");
+            string? dbVersion = _dbContext.BookSetting.Where(b => b.BookSettingId == 7).Select(b => b.SettingValue).FirstOrDefault();
+            await EnsureDbMigratedAsync(dbVersion);
+
+            await _dbContext.Database.ExecuteSqlRawAsync("VACUUM;");
             await _dbContext.SaveChangesAsync();
 
             return CurrentDbVersion;
@@ -31,18 +33,20 @@
 
             if (dbVersion == CurrentDbVersion) return;
 
-            if (!float.TryParse(dbVersion, out float floatDbVersion)) floatDbVersion = 0.00F;
+            // If rubbish in dbVersion from table assume latest build
+            if (!float.TryParse(dbVersion, out float dbVersionF)) dbVersionF = float.Parse(CurrentDbVersion);
 
-            await M200(floatDbVersion);
-            await M210(floatDbVersion);
+            await M200(dbVersionF);
+            await M210(dbVersionF);
             
             await ApplyDbVersionAsync(CurrentDbVersion);
+
             return;
         }
 
-        async Task M200(float dbVersion)
+        async Task M200(float M200dbVersion)
         {
-            if (dbVersion >= 2.00F) return;
+            if (M200dbVersion >= 2.00F) return;
 
             const string M210_1 = @"ALTER TABLE ""SummaryTypes"" ADD ""ChartColour"" STRING;";
             _ = await _dbContext.Database.ExecuteSqlRawAsync(M210_1);
@@ -53,9 +57,9 @@
             return;
         }
 
-        async Task M210(float dbVersion)
+        async Task M210(float M210dbVersion)
         {
-            if (dbVersion >= 2.10F) return;
+            if (M210dbVersion >= 2.10F) return;
 
             const string M210_1 = @"UPDATE ""Transactions"" SET ""TransactionTypeId"" = -1 WHERE ""TransactionTypeId"" IS NULL;";
             _ = await _dbContext.Database.ExecuteSqlRawAsync(M210_1);

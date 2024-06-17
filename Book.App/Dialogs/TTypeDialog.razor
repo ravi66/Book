@@ -1,36 +1,38 @@
 ﻿@implements IDisposable
 
-<MudDialog>
+<MudDialog OnBackdropClick="Close" >
     <DialogContent>
         <MudText Typo="Typo.h6" Class="mb-2">@DialogTitle</MudText>
         <MudForm Model="@TransactionType" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0">
             <MudGrid Spacing="1" Justify="Justify.FlexStart" Class="pa-0" >
-                <MudItem xs="12" sm="5" >
+                <MudItem xs="12" sm="6" >
                     <MudPaper Elevation="5" >
                         <MudTextField Label="@Localizer["Name"]" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value=TransactionType.Name For="@(() => TransactionType.Name)" Required="true" />
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12" sm="4" >
+                <MudItem xs="12" sm="6" >
                     <MudPaper Elevation="5" >
                         <MudAutocomplete Label="@Localizer["Summary"]" T="SummaryType" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="SelectedSummaryType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" ReadOnly="@ReadOnlySummary" />
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12" sm="3" >
-                    <MudPaper Elevation="0" >
-                        <MudText>@Localizer["Created"]: @TransactionType.CreateDate.ToShortDateString()</MudText>
+                <MudItem xs="12" sm="6" >
+                    <MudPaper Elevation="5" >
+                        <MudStack AlignItems="AlignItems.Center" Row="true">
+                            <MudText Class="ms-2" Align="Align.Start" Typo="Typo.body1">@Localizer["ChartColour"] @RandomInd</MudText>
+                            <MudIconButton Class="ma-0 pa-1" Icon="@Icons.Material.Filled.Square" Style="@($"color:{TransactionType.ChartColour};")" OnClick="ChangeColour" Title="@Localizer["ChangeColour"]" />
+                        </MudStack>
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12">
-                    <MudStack>
-                        <MudText Typo="Typo.body1">@Localizer["ChartColour"] @RandomInd</MudText>
-                        <MudColorPicker @bind-Value="@ChartColour" PickerVariant="PickerVariant.Static" Margin="Margin.None" ColorPickerMode="ColorPickerMode.HEX" DisableAlpha="true" DisableModeSwitch="true" DisableInputs="true" />
-                    </MudStack>
+                <MudItem xs="12" sm="6" >
+                    <MudPaper Elevation="5" >
+                        <MudText Class="py-1 ps-2">@Localizer["Created"]: @TransactionType.CreateDate.ToShortDateString()</MudText>
+                    </MudPaper>
                 </MudItem>
             </MudGrid>
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveEntryType"]" OnClick="Save" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveEntryType"]" OnClick="SaveExit" />
         @if (!TransactionType.TransactionsFound && TransactionType.TransactionTypeId > 0)
         {
             <DeleteTTypeBtn TransactionType="@TransactionType" Size="@Size.Medium" Variant="@Variant.Filled" />
@@ -46,6 +48,8 @@
     [Parameter] public int SavedTransactionTypeId { get; set; }
 
     [Parameter] public int NewSummaryTypeId { get; set; }
+
+    [Inject] public IDialogService DialogService { get; set; }
 
     [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
 
@@ -68,13 +72,23 @@
 
     MudForm form;
 
-    MudColor ChartColour { get; set; }
-
     string RandomInd = string.Empty;
 
-    void Close() => MudDialog.Cancel();
-
     bool ReadOnlySummary { get; set; } = false;
+
+    bool ColourChanged;
+
+    void Close()
+    {
+        if (ColourChanged)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            MudDialog.Cancel();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -101,28 +115,26 @@
 
         SelectedSummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == TransactionType.SummaryTypeId);
 
-        if (TransactionType.ChartColour is null)
-        {
-            ChartColour = Utils.RandomColour();
-            RandomInd = Localizer["RandomInd"];
-        }
-        else
-        {
-            ChartColour = TransactionType.ChartColour;
-        }
+        if (TransactionType.ChartColour is null) RandomInd = Localizer["RandomInd"];
 
-        NotifierSvc.TransactionTypeDeleted += Close;
+        NotifierSvc.TransactionTypeDeleted += TransactionTypeDeleted;
     }
 
-    async void Save()
+    async void SaveExit()
+    {
+        if (await Save())
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    async Task<bool> Save()
     {
         await form.Validate();
 
         if (form.IsValid)
         {
             TransactionType.SummaryTypeId = SelectedSummaryType.SummaryTypeId;
-
-            TransactionType.ChartColour = ChartColour.Value;
 
             switch (SavedTransactionTypeId)
             {
@@ -134,7 +146,11 @@
                     break;
             }
 
-            MudDialog.Close(DialogResult.Ok(true));
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -147,9 +163,24 @@
             : SummaryTypes.Where(s => s.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
     }
 
+    void TransactionTypeDeleted(object? sender, int summaryTypeId) => Close();
+
+    async void ChangeColour()
+    {
+        MudColor chartColour = String.IsNullOrEmpty(TransactionType.ChartColour) ? Utils.RandomColour() : TransactionType.ChartColour;
+
+        var result = await DialogService.Show<ColourDialog>($"{TransactionType.Name} {Localizer["Colour"]}", new DialogParameters<ColourDialog> { { x => x.Colour, chartColour } }).Result;
+        if (!result.Canceled)
+        {
+            TransactionType.ChartColour = result.Data.ToString();
+            if (await Save()) ColourChanged = true;
+            StateHasChanged();
+        }
+    }
+
     public void Dispose()
     {
-        NotifierSvc.TransactionTypeDeleted -= Close;
+        NotifierSvc.TransactionTypeDeleted -= TransactionTypeDeleted;
         GC.SuppressFinalize(this);
     }
 }

@@ -1,36 +1,38 @@
 ﻿@implements IDisposable
 
-<MudDialog >
+<MudDialog OnBackdropClick="Close" >
     <DialogContent>
         <MudText Typo="Typo.h6" Class="mb-2" >@DialogTitle</MudText>
         <MudForm Model="@SummaryType" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0">
             <MudGrid Spacing="1" Justify="Justify.FlexStart" Class="pa-0" >
-                <MudItem xs="12" sm="7">
-                    <MudPaper Elevation="5">
+                <MudItem xs="12" sm="8" >
+                    <MudPaper Elevation="5" >
                         <MudTextField Label="@Localizer["Name"]" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="SummaryType.Name" For="@(() => SummaryType.Name)" Required="true" />
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12" sm="2">
-                    <MudPaper Elevation="5">
+                <MudItem xs="12" sm="4" >
+                    <MudPaper Elevation="5" >
                         <MudNumericField Label="@Localizer["Order"]" Variant="Variant.Outlined" Margin="Margin.Dense" @bind-Value="SummaryType.Order" For="@(() => SummaryType.Order)" />
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12" sm="3">
-                    <MudPaper Elevation="0">
-                        <MudText>@Localizer["Created"]: @SummaryType.CreateDate.ToShortDateString()</MudText>
+                <MudItem xs="12" sm="8" >
+                    <MudPaper Elevation="5" >
+                        <MudStack AlignItems="AlignItems.Center" Row="true">
+                            <MudText Class="ms-2" Align="Align.Start" Typo="Typo.body1">@Localizer["ChartColour"] @RandomInd</MudText>
+                            <MudIconButton Class="ma-0 pa-1" Icon="@Icons.Material.Filled.Square" Style="@($"color:{SummaryType.ChartColour};")" OnClick="ChangeColour" Title="@Localizer["ChangeColour"]" />
+                        </MudStack>
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12">
-                    <MudStack >
-                        <MudText Typo="Typo.body1">@Localizer["ChartColour"] @RandomInd</MudText>
-                        <MudColorPicker @bind-Value="@ChartColour" PickerVariant="PickerVariant.Static" Margin="Margin.None" ColorPickerMode="ColorPickerMode.HEX" DisableAlpha="true" DisableModeSwitch="true" DisableInputs="true" />
-                    </MudStack>
+                <MudItem xs="12" sm="4" >
+                    <MudPaper Elevation="5" >
+                        <MudText Class="py-1 ps-2">@Localizer["Created"]: @SummaryType.CreateDate.ToShortDateString()</MudText>
+                    </MudPaper>
                 </MudItem>
             </MudGrid>
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveSummaryType"]" OnClick="@(async () => await Save())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveSummaryType"]" OnClick="SaveExit" />
         @if (!SummaryType.TransactionTypes.Any() && SummaryType.SummaryTypeId > 0)
         {
             <DeleteSTypeBtn SummaryType="@SummaryType" Size="@Size.Medium" Variant="@Variant.Filled" />
@@ -44,6 +46,8 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
     [Parameter] public int SavedSummaryTypeId { get; set; }
+
+    [Inject] public IDialogService DialogService { get; set; }
 
     [Inject] internal ISummaryTypeRepository Repo { get; set; }
 
@@ -61,11 +65,21 @@
 
     MudForm form;
 
-    MudColor ChartColour { get; set; }
-
     string RandomInd = string.Empty;
 
-    void Close() => MudDialog.Cancel();
+    bool ColourChanged;
+
+    void Close()
+    {
+        if (ColourChanged)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        else
+        {
+            MudDialog.Cancel();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -84,27 +98,25 @@
             DialogTitle = Localizer["NewSummaryType"];
         }
 
-        if (SummaryType.ChartColour is null)
-        {
-            ChartColour = Utils.RandomColour();
-            RandomInd = Localizer["RandomInd"];
-        }
-        else
-        {
-            ChartColour = SummaryType.ChartColour;
-        }
+        if (SummaryType.ChartColour is null) RandomInd = Localizer["RandomInd"];
 
         NotifierSvc.SummaryTypeDeleted += Close;
     }
 
-    async Task Save()
+    async void SaveExit()
+    {
+        if (await Save())
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    async Task<bool> Save()
     {
         await form.Validate();
 
         if (form.IsValid)
         {
-            SummaryType.ChartColour = ChartColour.Value;
-
             switch (SavedSummaryTypeId)
             {
                 case 0:
@@ -115,7 +127,24 @@
                     break;
             }
 
-            MudDialog.Close(DialogResult.Ok(true));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    async void ChangeColour()
+    {
+        MudColor chartColour = String.IsNullOrEmpty(SummaryType.ChartColour) ? Utils.RandomColour() : SummaryType.ChartColour;
+
+        var result = await DialogService.Show<ColourDialog>($"{SummaryType.Name} {Localizer["Colour"]}", new DialogParameters<ColourDialog> { { x => x.Colour, chartColour } }).Result;
+        if (!result.Canceled)
+        {
+            SummaryType.ChartColour = result.Data.ToString();
+            if (await Save()) ColourChanged = true;
+            StateHasChanged();
         }
     }
 

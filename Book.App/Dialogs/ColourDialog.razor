@@ -1,0 +1,23 @@
+﻿<MudDialog TitleClass="d-flex justify-center pa-0 mx-0 mt-2 mb-0" ClassActions="pa-0 ma-2">
+    <DialogContent>
+        <MudColorPicker @bind-Value="Colour" PickerVariant="PickerVariant.Static" DisableToolbar="false" DisableAlpha="true" ColorPickerMode="ColorPickerMode.HEX" Class="pa-0 ma-0" />
+    </DialogContent>
+    <DialogActions>
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveEntry"]" OnClick="Save" />
+        <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Title="@Localizer["ClearColour"]" OnClick="Delete" />
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["Close"]" OnClick="Close" />
+    </DialogActions>
+</MudDialog>
+
+@code
+{
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public MudColor Colour { get; set; }
+
+    void Close() => MudDialog.Cancel();
+
+    void Save() => MudDialog.Close(DialogResult.Ok(Colour));
+
+    void Delete() => MudDialog.Close(DialogResult.Ok(string.Empty));
+}

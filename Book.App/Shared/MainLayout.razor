@@ -6,8 +6,8 @@
 
 <MudLayout>
     <MudAppBar Elevation="0" Dense="true" >
-        <MudIconButton Class="pa-0" Edge="Edge.Start" OnClick="@ToggleDrawer" Icon="@menuIcon" Color="Color.Info" Size="Size.Large" Title="@menuToolTip" />
-        <MudIconButton Class="pa-0" Href="/" Icon="@Icons.Material.Filled.Home" Color="Color.Info" Size="Size.Large" Title="@Localizer["Summary"]" />
+        <MudIconButton Class="pa-0" Edge="Edge.Start" OnClick="ToggleDrawer" Icon="@menuIcon" Color="Color.Info" Size="Size.Large" Title="@menuToolTip" />
+        <MudIconButton Class="py-0 px-2" OnClick="Navigate" Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" Size="Size.Large" Title="@Localizer["GoBack"]" />
         <MudSpacer />
         <TransactionBtn IsIcon="false" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
         <MudSpacer />
@@ -61,6 +61,8 @@
 
     [Inject] public INotifierSvc NotifierSvc { get; set; }
 
+    [Inject] public PageParamsSvc PageParamsSvc { get; set;  }
+
     bool _isDarkMode = true;
     string themeIcon = Icons.Material.Filled.LightMode;
     string themeText = string.Empty;
@@ -86,6 +88,8 @@
 
         _isDarkMode = await BookSettingSvc.GetDarkMode();
         SetTheme();
+
+        PageParamsSvc.Init();
     }
 
     void ToggleDrawer()
@@ -111,4 +115,8 @@
         themeColor = _isDarkMode ? Color.Warning : Color.Dark;
     }
 
+    void Navigate()
+    {
+        NavigationManager.NavigateTo(PageParamsSvc.NavigateTo, false);
+    }
 }

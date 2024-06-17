@@ -28,8 +28,7 @@
         if (!(await dialog.Result).Canceled)
         {
             await Repo.DeleteTransactionType(TransactionType.TransactionTypeId);
-
-            NotifierSvc.OnTransactionTypeDeleted();
+            NotifierSvc.OnTransactionTypeDeleted(this, TransactionType.SummaryTypeId);
         }
     }
 }

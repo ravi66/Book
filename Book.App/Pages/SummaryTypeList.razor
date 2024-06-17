@@ -12,18 +12,15 @@
                 </ToolBarContent>
                 <HeaderContent>
                     <MudTh Class="py-0"><MudTableSortLabel SortBy="new Func<SummaryType, object>(x=>x.Name)">@Localizer["Name"]</MudTableSortLabel></MudTh>
-                    <MudTh Class="py-0"><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<SummaryType, object>(x=>x.Order)">@Localizer["Order"]</MudTableSortLabel></MudTh>
+                    <MudTh Class="py-0" ><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<SummaryType, object>(x=>x.Order)">@Localizer["Order"]</MudTableSortLabel></MudTh>
                     <MudTh Class="py-0" Style="text-align:center" >@Localizer["Colour"]</MudTh>
-                    <MudTh Class="py-0">@Localizer["Tools"]</MudTh>
+                    <MudTh Class="py-0" >@Localizer["Tools"]</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="@Localizer["Name"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))">@context.Name</MudTd>
-                    <MudTd DataLabel="@Localizer["Order"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))">@context.Order</MudTd>
-                    <MudTd DataLabel="@Localizer["Colour"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))">
-                        @if (context.ChartColour != null)
-                        {
-                            <MudIcon Icon="@Icons.Material.Filled.Square" Style="@($"color:{@context.ChartColour};display:block;margin-left:auto;margin-right:auto;")" />
-                        }
+                    <MudTd DataLabel="@Localizer["Order"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))" >@context.Order</MudTd>
+                    <MudTd DataLabel="@Localizer["Colour"]" @ondblclick="@(() => EditSType(context.SummaryTypeId))" >
+                        <MudIconButton Class="py-0" OnClick="() => ChangeSummaryColour(context)" Icon="@Icons.Material.Filled.Square" Size="Size.Small" Style="@($"color:{@context.ChartColour};display:block;margin-left:auto;margin-right:auto;")" Title="@Localizer["ChangeColour"]" />
                     </MudTd>
                     <MudTd DataLabel="@Localizer["Tools"]">
                         <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditSummaryType"]" OnClick="() => EditSType(context.SummaryTypeId)" />
@@ -55,17 +52,14 @@
                     <MudText>@Localizer["NoEntryTypesFound"]</MudText>
                 </NoRecordsContent>
                 <RowTemplate>
-                    <MudTd DataLabel="@Localizer["Name"]" @ondblclick="@(() => EditTType(context.TransactionTypeId))">@context.Name</MudTd>
-                    <MudTd DataLabel="@Localizer["Colour"]" @ondblclick="@(() => EditTType(context.TransactionTypeId))">
-                        @if (context.ChartColour != null)
-                        {
-                            <MudIcon Icon="@Icons.Material.Filled.Square" Style="@($"color:{@context.ChartColour};display:block;margin-left:auto;margin-right:auto;")" />
-                        }
+                    <MudTd DataLabel="@Localizer["Name"]" @ondblclick="@(() => EditTType(context))">@context.Name</MudTd>
+                    <MudTd DataLabel="@Localizer["Colour"]" @ondblclick="@(() => EditTType(context))" >
+                        <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.Square" Size="Size.Small" Style="@($"color:{@context.ChartColour};display:block;margin-left:auto;margin-right:auto;")" OnClick="() => ChangeTypeColour(context)" Title="@Localizer["ChangeColour"]" />
                     </MudTd>
                     <MudTd DataLabel="@Localizer["Tools"]">
-                        <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditEntryType"]" OnClick="()=> EditTType(context.TransactionTypeId)" />
-                        <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" Title="@Localizer["ListEntriesForEntryType"]" OnClick="()=> ListTransactionsTType(context)" />
-                        <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.ShowChart" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EntryTypeChart"]" OnClick="()=> EntryTypeChart(context)" />
+                        <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EditEntryType"]" OnClick="() => EditTType(context)" />
+                        <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.PointOfSale" Color="Color.Primary" Size="Size.Small" Title="@Localizer["ListEntriesForEntryType"]" OnClick="() => ListTransactionsTType(context)" />
+                        <MudIconButton Class="py-0" Icon="@Icons.Material.Filled.ShowChart" Color="Color.Primary" Size="Size.Small" Title="@Localizer["EntryTypeChart"]" OnClick="() => EntryTypeChart(context)" />
                         @if (!context.TransactionsFound && context.TransactionTypeId > -1)
                         {
                             <DeleteTTypeBtn TransactionType="@context" Variant="@Variant.Text" Size="@Size.Small" />
@@ -84,7 +78,9 @@
 
     [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
-    [Inject] internal ISummaryTypeRepository Repo { get; set; }
+    [Inject] internal ISummaryTypeRepository SRepo { get; set; }
+
+    [Inject] internal ITransactionTypeRepository TRepo { get; set; }
 
     [Inject] public INotifierSvc NotifierSvc { get; set; }
 
@@ -106,18 +102,34 @@
     {
         BookName = await BookSettingSvc.GetBookName();
 
-        NotifierSvc.TransactionsChanged += TransactionsChanged;
-        NotifierSvc.SummaryTypeDeleted += () => LoadSummaryTypes();
-        NotifierSvc.TransactionTypeDeleted += () => LoadSummaryTypes();
+        NotifierSvc.TransactionsChanged += LoadSummaryTypes;
+        NotifierSvc.SummaryTypeDeleted += LoadSummaryTypes;
+        NotifierSvc.TransactionTypeDeleted += LoadSummaryTypes;
 
-        LoadSummaryTypes();
+        PageParamsSvc.NavigateTo = "/";
+
+        LoadSummaryTypes(PageParamsSvc.SummaryTypeId);
     }
 
-    async void LoadSummaryTypes()
+    async void LoadSummaryTypes(int summaryTypeId)
     {
-        SummaryTypes = await Repo.GetAllSummaryTypes();
-        SummaryChanged(SummaryTypes.First());
+        SummaryTypes = await SRepo.GetAllSummaryTypes();
+
+        if (summaryTypeId == 0)
+        {
+            SummaryChanged(SummaryTypes.First());
+        }
+        else
+        {
+            SummaryChanged(SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == summaryTypeId));
+        }
     }
+
+    void LoadSummaryTypes() => LoadSummaryTypes(0);
+
+    void LoadSummaryTypes(object? sender, TransactionsChangedEventArgs args) => LoadSummaryTypes(0);  // Reload regardless of year
+
+    void LoadSummaryTypes(object? sender, int summaryTypeId) => LoadSummaryTypes(summaryTypeId);
 
     void SummaryChanged(SummaryType summaryType)
     {
@@ -132,7 +144,9 @@
         PageParamsSvc.Init();
         PageParamsSvc.Mode = 2;
         PageParamsSvc.Name = summary.Name;
+        PageParamsSvc.SummaryTypeId = summary.SummaryTypeId;
         PageParamsSvc.Types = summary.TransactionTypes.Select(s => s.TransactionTypeId).ToList();
+        PageParamsSvc.NavigateTo = "SummaryTypeList";
 
         NavigationManager.NavigateTo("TransList", false);
     }
@@ -143,6 +157,7 @@
         PageParamsSvc.Mode = 2;
         PageParamsSvc.Name = summary.Name;
         PageParamsSvc.SummaryTypeId = summary.SummaryTypeId;
+        PageParamsSvc.NavigateTo = "SummaryTypeList";
         PageParamsSvc.Types = summary.TransactionTypes.Select(s => s.TransactionTypeId).ToList();
 
         NavigationManager.NavigateTo("LineChart", false);
@@ -155,7 +170,7 @@
 
     async void EditSType(int summaryTypeId)
     {
-        if (!(await DialogService.Show<STypeDialog>("", new DialogParameters<STypeDialog> { { x => x.SavedSummaryTypeId, summaryTypeId } }).Result).Canceled) LoadSummaryTypes();
+        if (!(await DialogService.Show<STypeDialog>("", new DialogParameters<STypeDialog> { { x => x.SavedSummaryTypeId, summaryTypeId } }).Result).Canceled) LoadSummaryTypes(summaryTypeId);
     }
 
     void ListTransactionsTType(TransactionType transactionType)
@@ -164,6 +179,8 @@
         PageParamsSvc.Mode = 3;
         PageParamsSvc.Name = transactionType.Name;
         PageParamsSvc.TransactionTypeId = transactionType.TransactionTypeId;
+        PageParamsSvc.SummaryTypeId = transactionType.SummaryTypeId;
+        PageParamsSvc.NavigateTo = "SummaryTypeList";
 
         NavigationManager.NavigateTo("TransList", false);
     }
@@ -174,30 +191,53 @@
         PageParamsSvc.Mode = 3;
         PageParamsSvc.Name = transactionType.Name;
         PageParamsSvc.TransactionTypeId = transactionType.TransactionTypeId;
+        PageParamsSvc.SummaryTypeId = transactionType.SummaryTypeId;
+        PageParamsSvc.NavigateTo = "SummaryTypeList";
 
         NavigationManager.NavigateTo("LineChart", false);
     }
 
     async void AddTType(int summaryTypeId)
     {
-        if (!(await DialogService.Show<TTypeDialog>("", new DialogParameters<TTypeDialog> { { x => x.NewSummaryTypeId, summaryTypeId } }).Result).Canceled) LoadSummaryTypes();
+        if (!(await DialogService.Show<TTypeDialog>("", new DialogParameters<TTypeDialog> { { x => x.NewSummaryTypeId, summaryTypeId } }).Result).Canceled) LoadSummaryTypes(summaryTypeId);
     }
 
-    async void EditTType(int transactionTypeId)
+    async void EditTType(TransactionType transactionType)
     {
-        if (!(await DialogService.Show<TTypeDialog>("", new DialogParameters<TTypeDialog> { { x => x.SavedTransactionTypeId, transactionTypeId }, }).Result).Canceled) LoadSummaryTypes();
+        if (!(await DialogService.Show<TTypeDialog>("", new DialogParameters<TTypeDialog> { { x => x.SavedTransactionTypeId, transactionType.TransactionTypeId }, }).Result).Canceled) LoadSummaryTypes(transactionType.SummaryTypeId);
     }
 
-    void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
+    async void ChangeSummaryColour(SummaryType summaryType)
     {
-        // Reload regardless of year
-        LoadSummaryTypes();
+        MudColor colour = String.IsNullOrEmpty(summaryType.ChartColour) ? Utils.RandomColour() : summaryType.ChartColour;
+
+        var result = await DialogService.Show<ColourDialog>($"{summaryType.Name} {Localizer["Colour"]}", new DialogParameters<ColourDialog> { { x => x.Colour, colour } }).Result;
+        if (!result.Canceled)
+        {
+            summaryType.ChartColour = result.Data.ToString();
+            await SRepo.UpdateSummaryType(summaryType);
+            LoadSummaryTypes(summaryType.SummaryTypeId);
+        }
+    }
+
+    async void ChangeTypeColour(TransactionType transactionType)
+    {
+        MudColor colour = String.IsNullOrEmpty(transactionType.ChartColour) ? Utils.RandomColour() : transactionType.ChartColour;
+
+        var result = await DialogService.Show<ColourDialog>($"{transactionType.Name} {Localizer["Colour"]}", new DialogParameters<ColourDialog> { { x => x.Colour, colour } }).Result;
+        if (!result.Canceled)
+        {
+            transactionType.ChartColour = result.Data.ToString();
+            await TRepo.UpdateTransactionType(transactionType);
+            LoadSummaryTypes(transactionType.SummaryTypeId);
+        };
     }
 
     public void Dispose()
     {
-        NotifierSvc.TransactionsChanged -= TransactionsChanged;
+        NotifierSvc.TransactionsChanged -= LoadSummaryTypes;
         NotifierSvc.SummaryTypeDeleted -= LoadSummaryTypes;
+        NotifierSvc.TransactionTypeDeleted -= LoadSummaryTypes;
         GC.SuppressFinalize(this);
     }
 }

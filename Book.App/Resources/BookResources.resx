@@ -185,6 +185,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="Cash" xml:space="preserve">
     <value>Cash</value>
   </data>
+  <data name="ChangeColour" xml:space="preserve">
+    <value>Change Colour</value>
+  </data>
   <data name="ChangesLost" xml:space="preserve">
     <value>All changes will be permanently lost</value>
   </data>
@@ -196,6 +199,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="ChartColour" xml:space="preserve">
     <value>Chart Colour</value>
+  </data>
+  <data name="ClearColour" xml:space="preserve">
+    <value>Clear Colour</value>
   </data>
   <data name="Close" xml:space="preserve">
     <value>Close</value>
@@ -364,6 +370,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="FVText" xml:space="preserve">
     <value>A validation library for .NET that uses a fluent interface and lambda expressions for building strongly-typed validation rules.</value>
+  </data>
+  <data name="GoBack" xml:space="preserve">
+    <value>Go Back</value>
   </data>
   <data name="Groceries" xml:space="preserve">
     <value>Groceries</value>

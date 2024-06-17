@@ -4,6 +4,6 @@
     {
         public const string IndexHtmlVersion = "v1.0";
         public const string BookName = "Book";
-        public const string BookVersion = "v2.0.00";
+        public const string BookVersion = "v2.1.00";
     }
 }
