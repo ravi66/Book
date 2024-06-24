@@ -353,6 +353,12 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="ExpenditureChart" xml:space="preserve">
     <value>{0} Expenditure Chart</value>
   </data>
+  <data name="ExportAsJson" xml:space="preserve">
+    <value>Export as JSON</value>
+  </data>
+  <data name="ExportAsJsonText" xml:space="preserve">
+    <value>Download tables as JSON formatted files</value>
+  </data>
   <data name="FluentValidation" xml:space="preserve">
     <value>Fluent Validation</value>
   </data>

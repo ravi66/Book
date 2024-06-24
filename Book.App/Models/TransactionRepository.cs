@@ -160,5 +160,11 @@
             return [.. query.OrderByDescending(t => t.TransactionDate)];
         }
 
+        public async Task<List<Transaction>> Export()
+        {
+            using var dbContext = await db.CreateDbContextAsync();
+            return [.. dbContext.Transactions];
+        }
+
     }
 }

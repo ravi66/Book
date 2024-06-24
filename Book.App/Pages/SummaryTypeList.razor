@@ -106,8 +106,6 @@
         NotifierSvc.SummaryTypeDeleted += LoadSummaryTypes;
         NotifierSvc.TransactionTypeDeleted += LoadSummaryTypes;
 
-        PageParamsSvc.NavigateTo = "/";
-
         LoadSummaryTypes(PageParamsSvc.SummaryTypeId);
     }
 
@@ -146,7 +144,6 @@
         PageParamsSvc.Name = summary.Name;
         PageParamsSvc.SummaryTypeId = summary.SummaryTypeId;
         PageParamsSvc.Types = summary.TransactionTypes.Select(s => s.TransactionTypeId).ToList();
-        PageParamsSvc.NavigateTo = "SummaryTypeList";
 
         NavigationManager.NavigateTo("TransList", false);
     }
@@ -157,7 +154,6 @@
         PageParamsSvc.Mode = 2;
         PageParamsSvc.Name = summary.Name;
         PageParamsSvc.SummaryTypeId = summary.SummaryTypeId;
-        PageParamsSvc.NavigateTo = "SummaryTypeList";
         PageParamsSvc.Types = summary.TransactionTypes.Select(s => s.TransactionTypeId).ToList();
 
         NavigationManager.NavigateTo("LineChart", false);
@@ -180,7 +176,6 @@
         PageParamsSvc.Name = transactionType.Name;
         PageParamsSvc.TransactionTypeId = transactionType.TransactionTypeId;
         PageParamsSvc.SummaryTypeId = transactionType.SummaryTypeId;
-        PageParamsSvc.NavigateTo = "SummaryTypeList";
 
         NavigationManager.NavigateTo("TransList", false);
     }
@@ -192,7 +187,6 @@
         PageParamsSvc.Name = transactionType.Name;
         PageParamsSvc.TransactionTypeId = transactionType.TransactionTypeId;
         PageParamsSvc.SummaryTypeId = transactionType.SummaryTypeId;
-        PageParamsSvc.NavigateTo = "SummaryTypeList";
 
         NavigationManager.NavigateTo("LineChart", false);
     }

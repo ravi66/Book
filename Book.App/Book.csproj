@@ -15,7 +15,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Pages\Database.razor.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\.nojekyll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Pages\Database.razor.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

@@ -8,5 +8,6 @@
         public Task<TransactionType?> UpdateTransactionType(TransactionType transactionType);
         public Task DeleteTransactionType(int transactionTypeId);
         public Task<string?> GetColour(int transactionTypeId);
+        public Task<List<TransactionType>> Export();
     }
 }

@@ -1,4 +1,8 @@
 ﻿@page "/database"
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Converters
+@using System.Text
+@inject IJSRuntime JsRuntime
 @implements IAsyncDisposable
 
 <PageTitle>@BookName - @Localizer["Database"]</PageTitle>
@@ -24,10 +28,10 @@
 
 <MudContainer Class="ma-0 pa-2">
     <MudGrid >
-        <MudItem xs="12" sm="6" md="4" lg="3">
+        <MudItem xs="12" sm="6" md="4" >
             <MudCard Elevation="5">
-                <MudCardContent Style="min-height: 130px;">
-                    <MudText Typo="Typo.h5">@Localizer["Backup"]</MudText>
+                <MudCardContent Class="pa-2" Style="min-height: 90px;">
+                    <MudText Typo="Typo.h6">@Localizer["Backup"]</MudText>
                     <MudText Typo="Typo.body2">@Localizer["DatabaseBackupText"]</MudText>
                 </MudCardContent>
                 <MudCardActions>
@@ -35,10 +39,10 @@
                 </MudCardActions>
             </MudCard>
         </MudItem>
-        <MudItem xs="12" sm="6" md="4" lg="3">
+        <MudItem xs="12" sm="6" md="4" >
             <MudCard Elevation="5">
-                <MudCardContent Style="min-height: 130px;">
-                    <MudText Typo="Typo.h5">@Localizer["Restore"]</MudText>
+                <MudCardContent Class="pa-2" Style="min-height: 90px;">
+                    <MudText Typo="Typo.h6">@Localizer["Restore"]</MudText>
                     <MudText Typo="Typo.body2">@Localizer["DatabaseRestoreText"]</MudText>
                 </MudCardContent>
                 <MudCardActions>
@@ -46,10 +50,10 @@
                 </MudCardActions>
             </MudCard>
         </MudItem>
-        <MudItem xs="12" sm="6" md="4" lg="3">
+        <MudItem xs="12" sm="6" md="4" >
             <MudCard Elevation="5">
-                <MudCardContent Style="min-height: 130px;">
-                    <MudText Typo="Typo.h5">@Localizer["LoadDemoData"]</MudText>
+                <MudCardContent Class="pa-2" Style="min-height: 90px;">
+                    <MudText Typo="Typo.h6">@Localizer["LoadDemoData"]</MudText>
                     <MudText Typo="Typo.body2">@Localizer["DatabaseDemoText"]</MudText>
                 </MudCardContent>
                 <MudCardActions>
@@ -57,10 +61,21 @@
                 </MudCardActions>
             </MudCard>
         </MudItem>
-        <MudItem xs="12" sm="6" md="4" lg="3">
+        <MudItem xs="12" sm="6" md="4">
             <MudCard Elevation="5">
-                <MudCardContent Style="min-height: 130px;">
-                    <MudText Typo="Typo.h5">@Localizer["Delete"]</MudText>
+                <MudCardContent Class="pa-2" Style="min-height: 90px;">
+                    <MudText Typo="Typo.h6">@Localizer["ExportAsJson"]</MudText>
+                    <MudText Typo="Typo.body2">@Localizer["ExportAsJsonText"]</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CloudDownload" OnClick="ExportAsJson">@Localizer["ExportAsJson"]</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="5">
+                <MudCardContent Class="pa-2" Style="min-height: 90px;">
+                    <MudText Typo="Typo.h6">@Localizer["Delete"]</MudText>
                     <MudText Typo="Typo.body2">@Localizer["DatabaseDeleteText"]</MudText>
                 </MudCardContent>
                 <MudCardActions>
@@ -73,8 +88,6 @@
 
 @code
 {
-    [Inject] public IJSRuntime JsRuntime { get; set; }
-
     [Inject] public NavigationManager NavigationManager { get; set; }
 
     [Inject] public IDialogService DialogService { get; set; }
@@ -84,6 +97,12 @@
     [Inject] HttpClient HttpClient { get; set; }
 
     [Inject] public IBookDbMigratorSvc DbMigrator { get; set; }
+
+    [Inject] internal ISummaryTypeRepository SRepo { get; set; }
+
+    [Inject] internal ITransactionTypeRepository TTRepo { get; set; }
+
+    [Inject] internal ITransactionRepository TRepo { get; set; }
 
     IJSObjectReference? jsModule;
 
@@ -100,19 +119,84 @@
         BookName = await BookSettingSvc.GetBookName();
         LastBackupDate = await BookSettingSvc.GetLastBackupDate();
         BookDbFileName = $"{await BookSettingSvc.GetDbPrefix()}-{DateTime.Now:yyyyMMddhhmm}.sqlite3";
+    }
 
-        jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/database.js");
-        BookDownloadUrl = await GetDownloadUrl();
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Pages/Database.razor.js");
+            BookDownloadUrl = await GetDownloadUrl() ?? string.Empty;
+        }
     }
 
     async ValueTask<string?> GetDownloadUrl() => jsModule is not null ? await jsModule.InvokeAsync<string>("generateDownloadUrl") : null;
 
     async void UploadDb(InputFileChangeEventArgs e)
     {
+        if (jsModule is null) return;
+
         var fileContent = new byte[e.File.Size];
         await e.File.OpenReadStream().ReadAsync(fileContent);
         await jsModule.InvokeVoidAsync("uploadDatabase", fileContent);
         NavigationManager.NavigateTo("/", true);
+    }
+
+    async void SetLastBackupDate()
+    {
+        if (jsModule is null) return;
+        await BookSettingSvc.SetLastBackupDate(DateTime.Now);
+        NavigationManager.NavigateTo("refresh/Database");
+    }
+
+    async void LoadDemoData()
+    {
+        if (jsModule is null) return;
+
+        var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
+            {
+                { x => x.AcceptColour, Color.Error },
+                { x => x.AcceptToolTip, Localizer["DatabaseDemoAcptToolTip"] },
+                { x => x.CancelColour, Color.Success },
+                { x => x.Warning, true },
+                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU", LastBackupDate] : Localizer["ChangesLost"] },
+            });
+
+        if (!(await dialog.Result).Canceled)
+        {
+            using HttpResponseMessage response = await HttpClient.GetAsync("Demo.bin");
+            if (response.IsSuccessStatusCode)
+            {
+                await jsModule.InvokeVoidAsync("uploadDatabase", (byte[]?)await response.Content.ReadAsByteArrayAsync());
+                NavigationManager.NavigateTo("/", true);
+            }
+        }
+    }
+
+    async void ExportAsJson()
+    {
+        if (jsModule is null) return;
+
+        string jsonDbFileName = "SummaryTypes.json";
+
+        List<SummaryType> summaryTypes = await SRepo.Export();
+
+        using var sStreamRef = new DotNetStreamReference(stream: new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(summaryTypes))));
+        await jsModule.InvokeVoidAsync("downloadJsonDb", jsonDbFileName, sStreamRef);
+
+        jsonDbFileName = "TransactionTypes.json";
+
+        List<TransactionType> transactionTypes = await TTRepo.Export();
+
+        using var ttStreamRef = new DotNetStreamReference(stream: new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(transactionTypes))));
+        await jsModule.InvokeVoidAsync("downloadJsonDb", jsonDbFileName, ttStreamRef);
+
+        jsonDbFileName = "Transactions.json";
+
+        List<Transaction> transactions = await TRepo.Export();
+
+        using var tStreamRef = new DotNetStreamReference(stream: new MemoryStream(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(transactions))));
+        await jsModule.InvokeVoidAsync("downloadJsonDb", jsonDbFileName, tStreamRef);
     }
 
     async void DeleteDatabase()
@@ -132,35 +216,6 @@
             if (success) NavigationManager.NavigateTo("/", true);
             NavigationManager.NavigateTo("refresh/Database");
         }
-    }
-
-    async void SetLastBackupDate()
-    {
-        await BookSettingSvc.SetLastBackupDate(DateTime.Now);
-        NavigationManager.NavigateTo("refresh/Database");
-    }
-
-    async void LoadDemoData()
-    {
-        var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
-            {
-                { x => x.AcceptColour, Color.Error },
-                { x => x.AcceptToolTip, Localizer["DatabaseDemoAcptToolTip"] },
-                { x => x.CancelColour, Color.Success },
-                { x => x.Warning, true },
-                { x => x.WarningMessage, LastBackupDate != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU", LastBackupDate] : Localizer["ChangesLost"] },
-            });
-
-        if (!(await dialog.Result).Canceled)
-        {
-            using HttpResponseMessage response = await HttpClient.GetAsync("Demo.bin");
-            if (response.IsSuccessStatusCode)
-            {
-                await jsModule.InvokeVoidAsync("uploadDatabase", (byte[]?)await response.Content.ReadAsByteArrayAsync());
-                NavigationManager.NavigateTo("/", true);
-            }
-        }
-
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()

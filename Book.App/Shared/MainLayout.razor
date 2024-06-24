@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@implements IDisposable
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" />
 <MudDialogProvider />
@@ -7,7 +8,7 @@
 <MudLayout>
     <MudAppBar Elevation="0" Dense="true" >
         <MudIconButton Class="pa-0" Edge="Edge.Start" OnClick="ToggleDrawer" Icon="@menuIcon" Color="Color.Info" Size="Size.Large" Title="@menuToolTip" />
-        <MudIconButton Class="py-0 px-2" OnClick="Navigate" Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" Size="Size.Large" Title="@Localizer["GoBack"]" />
+        <MudIconButton Class="py-0 px-2" OnClick="Back" Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" Size="Size.Large" Title="@Localizer["GoBack"]" />
         <MudSpacer />
         <TransactionBtn IsIcon="false" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
         <MudSpacer />
@@ -59,7 +60,7 @@
 
     [Inject] public INotifierSvc NotifierSvc { get; set; }
 
-    [Inject] public PageParamsSvc PageParamsSvc { get; set;  }
+    List<string> Locations { get; set; } = new List<string> { "/" };
 
     bool _isDarkMode = true;
     string themeIcon = Icons.Material.Filled.LightMode;
@@ -84,7 +85,7 @@
         _isDarkMode = await BookSettingSvc.GetDarkMode();
         SetTheme();
 
-        PageParamsSvc.Init();
+        NavigationManager.LocationChanged += LocationChanged;
     }
 
     void ToggleDrawer()
@@ -110,8 +111,26 @@
         themeColor = _isDarkMode ? Color.Warning : Color.Dark;
     }
 
-    void Navigate()
+    void Back()
     {
-        NavigationManager.NavigateTo(PageParamsSvc.NavigateTo, false);
+        if (Locations.Count > 1)
+        {
+            NavigationManager.NavigateTo(Locations[^2], false);
+            Locations.RemoveAt(Locations.Count - 1);
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/", false);
+        }
+
+        Locations.RemoveAt(Locations.Count - 1);
+    }
+
+    void LocationChanged(object? sender, LocationChangedEventArgs args) => Locations.Add(args.Location);
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= LocationChanged;
+        GC.SuppressFinalize(this);
     }
 }

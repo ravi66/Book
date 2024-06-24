@@ -18,8 +18,6 @@
 
             await _dbContext.Database.ExecuteSqlRawAsync("VACUUM;");
             await _dbContext.SaveChangesAsync();
-
-            return;
         }
 
         async Task EnsureDbMigratedAsync()
@@ -41,8 +39,6 @@
             await M210(dbVersionF);
             
             await ApplyDbVersionAsync(CurrentDbVersion);
-
-            return;
         }
 
         async Task M200(float M200dbVersion)
@@ -54,8 +50,6 @@
 
             const string M210_2 = @"ALTER TABLE ""TransactionTypes"" ADD ""ChartColour"" STRING;";
             _ = await _dbContext.Database.ExecuteSqlRawAsync(M210_2);
-
-            return;
         }
 
         async Task M210(float M210dbVersion)
@@ -76,11 +70,9 @@
 
             const string M210_5 = @"ALTER TABLE ""TransactionsCopy"" RENAME TO ""Transactions"";";
             _ = await _dbContext.Database.ExecuteSqlRawAsync(M210_5);
-
-            return;
         }
 
-        public async Task ApplyDbVersionAsync(string dbVersion)
+        async Task ApplyDbVersionAsync(string dbVersion)
         {
             var bookSettingDbVersion = _dbContext.BookSetting.SingleOrDefault(x => x.BookSettingId == 7);
             if (bookSettingDbVersion is not null)
@@ -92,6 +84,7 @@
             {
                 _dbContext.BookSetting.Add(new BookSetting { BookSettingId = 7, SettingName = Localizer["DatabaseVersion"], UserAmendable = false, SettingValue = dbVersion });
             }
+
             await _dbContext.SaveChangesAsync();
         }
 

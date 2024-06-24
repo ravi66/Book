@@ -84,5 +84,11 @@
             return dbContext.TransactionTypes.Where(s => s.TransactionTypeId == transactionTypeId).Select(s => s.ChartColour).FirstOrDefault() ?? Utils.RandomColour();
         }
 
+        public async Task<List<TransactionType>> Export()
+        {
+            using var dbContext = await db.CreateDbContextAsync();
+            return [.. dbContext.TransactionTypes];
+        }
+
     }
 }

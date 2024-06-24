@@ -1,13 +1,13 @@
-﻿using FluentValidation;
-
-namespace Book.Models
+﻿namespace Book.Models
 {
+    [JsonObject(MemberSerialization.OptOut)]
     public class TransactionType
     {
         public int TransactionTypeId { get; set; }
 
         public int SummaryTypeId { get; set; }
 
+        [JsonIgnore]
         public SummaryType SummaryType { get; set; }
 
         public string Name { get; set; } = string.Empty;
@@ -16,8 +16,10 @@ namespace Book.Models
 
         public string? ChartColour { get; set; }
 
+        [JsonIgnore]
         public List<Transaction> Transactions { get; set; } = [];
 
+        [JsonIgnore]
         [NotMapped]
         public bool TransactionsFound { get; set; }
     }

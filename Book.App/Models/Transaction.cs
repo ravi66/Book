@@ -1,11 +1,11 @@
-﻿using FluentValidation;
-
-namespace Book.Models
+﻿namespace Book.Models
 {
+    [JsonObject(MemberSerialization.OptOut)]
     public class Transaction
     {
         public int TransactionId { get; set; }
 
+        [JsonIgnore]
         public TransactionType? TransactionType { get; set; }
 
         public int TransactionTypeId { get; set; }
@@ -19,21 +19,27 @@ namespace Book.Models
 
         public string? Notes { get; set; }
 
+        [JsonIgnore]
         [NotMapped]
         public string? SummaryName { get; set; }
 
+        [JsonIgnore]
         [NotMapped]
         public int SummaryTypeId { get; set; }
 
+        [JsonIgnore]
         [NotMapped]
         public string? TransactionTypeName { get; set; }
 
+        [JsonIgnore]
         [NotMapped]
         public int Order { get; set; }
 
+        [JsonIgnore]
         [NotMapped]
         public string? SummaryColour { get; set; }
 
+        [JsonIgnore]
         [NotMapped]
         public string? TypeColour { get; set; }
     }

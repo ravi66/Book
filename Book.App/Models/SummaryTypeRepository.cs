@@ -138,5 +138,10 @@
             return dbContext.SummaryTypes.Where(s => s.SummaryTypeId == summaryTypeId).Select(s => s.ChartColour).FirstOrDefault() ?? Utils.RandomColour();
         }
 
+        public async Task<List<SummaryType>> Export()
+        {
+            using var dbContext = await db.CreateDbContextAsync();
+            return [.. dbContext.SummaryTypes];
+        }
     }
 }

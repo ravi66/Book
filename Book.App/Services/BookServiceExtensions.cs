@@ -14,7 +14,7 @@
             services.AddScoped<ISummaryTypeRepository, SummaryTypeRepository>();
             services.AddScoped<ITransactionTypeRepository, TransactionTypeRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
-            services.AddScoped<PageParamsSvc>();
+            services.AddSingleton<PageParamsSvc>();
             services.AddSingleton<INotifierSvc, NotifierSvc>();
 
             return services;

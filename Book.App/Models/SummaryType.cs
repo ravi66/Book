@@ -1,7 +1,6 @@
-﻿using FluentValidation;
-
-namespace Book.Models
+﻿namespace Book.Models
 {
+    [JsonObject(MemberSerialization.OptOut)]
     public class SummaryType
     {
         public int SummaryTypeId { get; set; }
@@ -14,6 +13,7 @@ namespace Book.Models
 
         public string? ChartColour { get; set; }
 
+        [JsonIgnore]
         public List<TransactionType> TransactionTypes { get; set; } = [];
     }
 
