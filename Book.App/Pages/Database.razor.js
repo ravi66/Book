@@ -1,7 +1,7 @@
 ﻿const cacheName = 'Bit-Besql';
 const bookDbPath = '/data/cache/book.sqlite3';
 
-export async function generateDownloadUrl() {
+export async function downloadDb(fileName) {
 
     window.sqlitedb = window.sqlitedb || {
         init: false,
@@ -11,13 +11,19 @@ export async function generateDownloadUrl() {
     const match = await window.sqlitedb.cache.match(bookDbPath);
 
     if (match && match.ok) {
+
         const dbBlob = await match.blob();
         if (dbBlob) {
-            return URL.createObjectURL(dbBlob);
+
+            const url = URL.createObjectURL(dbBlob);
+            const anchorElement = document.createElement('a');
+            anchorElement.href = url;
+            anchorElement.download = fileName ?? '';
+            anchorElement.click();
+            anchorElement.remove();
+            URL.revokeObjectURL(url);
         }
     }
-
-    return '';
 }
 
 export async function downloadJsonDb(fileName, contentStreamReference) {

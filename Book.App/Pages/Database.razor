@@ -35,7 +35,7 @@
                     <MudText Typo="Typo.body2">@Localizer["DatabaseBackupText"]</MudText>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CloudDownload" Href="@BookDownloadUrl" Target="_blank" download="@BookDbFileName" OnClick="SetLastBackupDate">@Localizer["Backup"]</MudButton>
+                    <MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CloudDownload" OnClick="ExportDb">@Localizer["Backup"]</MudButton>
                 </MudCardActions>
             </MudCard>
         </MudItem>
@@ -106,10 +106,6 @@
 
     IJSObjectReference? jsModule;
 
-    string BookDownloadUrl { get; set; } = string.Empty;
-
-    string BookDbFileName { get; set; }
-
     string BookName { get; set; } = string.Empty;
 
     string LastBackupDate { get; set; } = string.Empty;
@@ -118,19 +114,19 @@
     {
         BookName = await BookSettingSvc.GetBookName();
         LastBackupDate = await BookSettingSvc.GetLastBackupDate();
-        BookDbFileName = $"{await BookSettingSvc.GetDbPrefix()}-{DateTime.Now:yyyyMMddhhmm}.sqlite3";
+
+        jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Pages/Database.razor.js");
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    async void ExportDb()
     {
-        if (firstRender)
-        {
-            jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Pages/Database.razor.js");
-            BookDownloadUrl = await GetDownloadUrl() ?? string.Empty;
-        }
-    }
+        if (jsModule is null) return;
 
-    async ValueTask<string?> GetDownloadUrl() => jsModule is not null ? await jsModule.InvokeAsync<string>("generateDownloadUrl") : null;
+        await jsModule.InvokeVoidAsync("downloadDb", $"{await BookSettingSvc.GetDbPrefix()}-{DateTime.Now:yyyyMMddhhmm}.sqlite3");
+
+        await BookSettingSvc.SetLastBackupDate(DateTime.Now);
+        NavigationManager.NavigateTo("refresh/Database");
+    }
 
     async void UploadDb(InputFileChangeEventArgs e)
     {
@@ -140,13 +136,6 @@
         await e.File.OpenReadStream().ReadAsync(fileContent);
         await jsModule.InvokeVoidAsync("uploadDatabase", fileContent);
         NavigationManager.NavigateTo("/", true);
-    }
-
-    async void SetLastBackupDate()
-    {
-        if (jsModule is null) return;
-        await BookSettingSvc.SetLastBackupDate(DateTime.Now);
-        NavigationManager.NavigateTo("refresh/Database");
     }
 
     async void LoadDemoData()
