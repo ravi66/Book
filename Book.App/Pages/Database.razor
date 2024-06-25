@@ -125,7 +125,8 @@
         await jsModule.InvokeVoidAsync("downloadDb", $"{await BookSettingSvc.GetDbPrefix()}-{DateTime.Now:yyyyMMddhhmm}.sqlite3");
 
         await BookSettingSvc.SetLastBackupDate(DateTime.Now);
-        NavigationManager.NavigateTo("refresh/Database");
+        LastBackupDate = await BookSettingSvc.GetLastBackupDate();
+        StateHasChanged();
     }
 
     async void UploadDb(InputFileChangeEventArgs e)
