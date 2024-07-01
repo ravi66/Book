@@ -58,6 +58,7 @@
                 foundTransactionType.Name = transactionType.Name;
                 foundTransactionType.SummaryTypeId = transactionType.SummaryTypeId;
                 foundTransactionType.ChartColour = transactionType.ChartColour;
+                foundTransactionType.CreateDate = DateTime.Now;
 
                 await dbContext.SaveChangesAsync();
 
