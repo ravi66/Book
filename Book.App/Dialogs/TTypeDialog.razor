@@ -25,7 +25,7 @@
                 </MudItem>
                 <MudItem xs="12" sm="6" >
                     <MudPaper Elevation="5" >
-                        <MudText Class="py-1 ps-2">@Localizer["Created"]: @TransactionType.CreateDate.ToShortDateString()</MudText>
+                        <MudText Class="py-1 ps-2">@Localizer["Changed"]: @TransactionType.CreateDate.ToShortDateString()</MudText>
                     </MudPaper>
                 </MudItem>
             </MudGrid>
@@ -59,10 +59,7 @@
 
     string DialogTitle { get; set; } = string.Empty;
 
-    TransactionType TransactionType { get; set; } = new TransactionType
-        {
-            CreateDate = DateTime.Today,
-        };
+    TransactionType TransactionType { get; set; } = new TransactionType { CreateDate = DateTime.Now, };
 
     List<SummaryType> SummaryTypes { get; set; }
 

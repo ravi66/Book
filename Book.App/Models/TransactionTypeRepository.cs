@@ -41,6 +41,7 @@
             using var dbContext = await db.CreateDbContextAsync();
 
             transactionType.SummaryType = null;
+            transactionType.CreateDate = DateTime.Now;
             var addedEntity = dbContext.TransactionTypes.Add(transactionType);
             await dbContext.SaveChangesAsync();
             return addedEntity.Entity;
@@ -89,6 +90,12 @@
         {
             using var dbContext = await db.CreateDbContextAsync();
             return [.. dbContext.TransactionTypes];
+        }
+
+        public async Task<DateTime?> GetLastUpdDt()
+        {
+            using var dbContext = await db.CreateDbContextAsync();
+            return dbContext.TransactionTypes.Where(t => t.TransactionTypeId != -1).Max(t => (DateTime?)t.CreateDate);
         }
 
     }

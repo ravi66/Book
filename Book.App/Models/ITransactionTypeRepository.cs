@@ -9,5 +9,6 @@
         public Task DeleteTransactionType(int transactionTypeId);
         public Task<string?> GetColour(int transactionTypeId);
         public Task<List<TransactionType>> Export();
+        public Task<DateTime?> GetLastUpdDt();
     }
 }

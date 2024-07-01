@@ -15,6 +15,7 @@
         {
             using var dbContext = await db.CreateDbContextAsync();
             transaction.TransactionType = null;
+            transaction.CreateDate = DateTime.Now;
             var addedEntity = dbContext.Transactions.Add(transaction);
             await dbContext.SaveChangesAsync();
             return addedEntity.Entity;
@@ -28,6 +29,7 @@
 
             foreach (var transaction in transactions)
             {
+                transaction.CreateDate = DateTime.Now;
                 _ = dbContext.Transactions.Add(transaction);
                 await dbContext.SaveChangesAsync();
             }
@@ -48,6 +50,7 @@
                 foundTransaction.TransactionTypeId = transaction.TransactionTypeId;
                 foundTransaction.TransactionDate = transaction.TransactionDate;
                 foundTransaction.Notes = transaction.Notes;
+                foundTransaction.CreateDate = DateTime.Now;
 
                 await dbContext.SaveChangesAsync();
 
@@ -164,6 +167,12 @@
         {
             using var dbContext = await db.CreateDbContextAsync();
             return [.. dbContext.Transactions];
+        }
+
+        public async Task<DateTime?> GetLastUpdDt()
+        {
+            using var dbContext = await db.CreateDbContextAsync();
+            return dbContext.Transactions.Max(t => (DateTime?)t.CreateDate);
         }
 
     }

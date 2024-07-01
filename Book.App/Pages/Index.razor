@@ -1,5 +1,5 @@
 ﻿@page "/"
-@implements IDisposable
+@implements IAsyncDisposable
 
 <PageTitle>@BookName - Summary @Year</PageTitle>
 
@@ -26,6 +26,8 @@
 
 @if (MonthlySummaries != null)
 {
+    <LoadDemoData @ref="LoadDemoData" />
+
     <MudTable Dense="true" Hover="true" Elevation="5" Breakpoint="Breakpoint.Xs" Items="@MonthlySummaries" Class="pa-1">
         <ColGroup>
             <col style="width: 10%;" />
@@ -114,6 +116,10 @@ else
 
     bool DarkMode { get; set; }
 
+    LoadDemoData LoadDemoData;
+
+    bool LoadDemoChecked = false;
+
     protected async override Task OnInitializedAsync()
     {
         BookName = await BookSettingSvc.GetBookName();
@@ -140,6 +146,18 @@ else
         SummaryTypes = (await SummaryRepo.LoadSummary()).Where(s => s.TransactionTypes.Count > 0).ToList();
 
         await LoadSummary();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender && !LoadDemoChecked)
+        {
+            LoadDemoChecked = true;
+
+            if (!await SummaryRepo.IsEmptyDb()) return;
+
+            await LoadDemoData.ConfirmLoad();
+        }
     }
 
     async Task LoadSummary()
@@ -310,10 +328,11 @@ else
         StateHasChanged();
     }
 
-    public void Dispose()
+    async ValueTask IAsyncDisposable.DisposeAsync()
     {
         NotifierSvc.TransactionsChanged -= TransactionsChanged;
         NotifierSvc.ThemeChanged -= ThemeChanged;
+
         GC.SuppressFinalize(this);
     }
 }

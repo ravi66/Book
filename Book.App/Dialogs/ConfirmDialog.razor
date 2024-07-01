@@ -6,7 +6,7 @@
                 <MudText Typo="Typo.h3" Color="Color.Warning" Align="Align.Center">@Localizer["WarningUpp"]</MudText>
                 @if (!string.IsNullOrEmpty(WarningMessage))
                 {
-                    <MudText Typo="Typo.h5" Color="Color.Warning" Align="Align.Center">@WarningMessage</MudText>
+                    <MudText Typo="Typo.h5" Color="Color.Warning" Align="Align.Center" Class="px-2" >@WarningMessage</MudText>
                 }
             </MudPaper>
         }

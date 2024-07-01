@@ -74,6 +74,7 @@
         public async Task<SummaryType> AddSummaryType(SummaryType summaryType)
         {
             using var dbContext = await db.CreateDbContextAsync();
+            summaryType.CreateDate = DateTime.Now;
             var addedEntity = dbContext.SummaryTypes.Add(summaryType);
             await dbContext.SaveChangesAsync();
             return addedEntity.Entity;
@@ -89,6 +90,7 @@
                 foundSummaryType.Name = summaryType.Name;
                 foundSummaryType.Order = summaryType.Order;
                 foundSummaryType.ChartColour = summaryType.ChartColour;
+                foundSummaryType.CreateDate = DateTime.Now;
 
                 await dbContext.SaveChangesAsync();
 
@@ -143,5 +145,23 @@
             using var dbContext = await db.CreateDbContextAsync();
             return [.. dbContext.SummaryTypes];
         }
+
+        public async Task<DateTime?> GetLastUpdDt()
+        {
+            using var dbContext = await db.CreateDbContextAsync();
+            return dbContext.SummaryTypes.Where(s => s.SummaryTypeId != -1).Max(t => (DateTime?)t.CreateDate);
+        }
+
+        public async Task<bool> IsEmptyDb()
+        {
+            using var dbContext = await db.CreateDbContextAsync();
+
+            if (!dbContext.SummaryTypes.Where(s => s.SummaryTypeId != -1).Any() &&
+                !dbContext.TransactionTypes.Where(s => s.TransactionTypeId != -1).Any() &&
+                !dbContext.Transactions.Any()) return true;
+
+            return false;
+        }
+
     }
 }

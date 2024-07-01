@@ -11,5 +11,6 @@
         public Task<IEnumerable<Transaction>> GetTransactionsBySummary(List<int>? types);
         public Task<IEnumerable<Transaction>> GetTransactionsByType(int typeId);
         public Task<List<Transaction>> Export();
+        public Task<DateTime?> GetLastUpdDt();
     }
 }

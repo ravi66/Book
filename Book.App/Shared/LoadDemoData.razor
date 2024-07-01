@@ -1,0 +1,54 @@
+﻿@implements IAsyncDisposable
+
+@code {
+
+    [Inject] public HttpClient HttpClient { get; set; }
+
+    [Inject] public IDialogService DialogService { get; set; }
+
+    [Inject] public IJSRuntime JsRuntime { get; set; }
+
+    [Inject] public NavigationManager NavigationManager { get; set; }
+
+    IJSObjectReference? jsModule;
+
+    public async Task ConfirmLoad()
+    {
+        var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
+        {
+            { x => x.AcceptLabel, Localizer["LoadDemoData"] },
+            { x => x.AcceptColour, Color.Primary },
+            { x => x.AcceptToolTip, Localizer["DatabaseDemoText"] },
+            { x => x.CancelColour, Color.Primary },
+            { x => x.CancelLabel, Localizer["No"] },
+        });
+
+        if ((await dialog.Result).Canceled) return;
+
+        await Load();
+    }
+
+    public async Task Load()
+    {
+        jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Shared/LoadDemoData.razor.js");
+
+        HttpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true, };
+
+        using HttpResponseMessage response = await HttpClient.GetAsync("Demo.bin");
+        if (response.IsSuccessStatusCode)
+        {
+            await jsModule.InvokeVoidAsync("uploadDemoData", Constants.BookDbCacheName, Constants.BookDbPath, (byte[]?)await response.Content.ReadAsByteArrayAsync());
+            NavigationManager.NavigateTo("/", true);
+        }
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (jsModule is not null)
+        {
+            await jsModule.DisposeAsync();
+        }
+
+        GC.SuppressFinalize(this);
+    }
+}

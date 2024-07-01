@@ -1,7 +1,4 @@
-﻿const cacheName = 'Bit-Besql';
-const bookDbPath = '/data/cache/book.sqlite3';
-
-export async function downloadDb(fileName) {
+﻿export async function downloadDb(cacheName, bookDbPath, fileName) {
 
     window.sqlitedb = window.sqlitedb || {
         init: false,
@@ -39,7 +36,7 @@ export async function downloadJsonDb(fileName, contentStreamReference) {
     URL.revokeObjectURL(url);
 }
 
-export async function uploadDatabase(blob) {
+export async function uploadDatabase(cacheName, bookDbPath, blob) {
 
     window.sqlitedb = window.sqlitedb || {
         init: false,

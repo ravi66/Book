@@ -31,7 +31,7 @@
                 </MudItem>
                 <MudItem xs="12" >
                     <MudPaper Elevation="5" Class="mb-2" >
-                        <MudText>@Localizer["Created"]: @Transaction.CreateDate.ToShortDateString()</MudText>
+                        <MudText>@Localizer["Changed"]: @Transaction.CreateDate.ToShortDateString()</MudText>
                     </MudPaper>
                 </MudItem>
             </MudGrid>
@@ -66,7 +66,7 @@
         {
             Value = 0.00M,
             TransactionTypeId = -1,
-            CreateDate = DateTime.Today,
+            CreateDate = DateTime.Now,
         };
 
     readonly TransactionValidator validator = new();
