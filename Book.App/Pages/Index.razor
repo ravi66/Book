@@ -65,7 +65,9 @@
             @foreach (var summary in context.SummaryDetails)
             {
                 <MudTd Style="text-align:center" DataLabel="@summary.SummaryName" Class="py-0" >
-                    <MudLink Color="Color.Inherit" OnClick="(e => TransList(summary.SummaryName, summary.Types, context.MonthNo))"><MudText Style="@Utils.BalanceColour(summary.Total, DarkMode)">@summary.Total.ToString("N2")</MudText></MudLink>
+                    <MudTooltip Text="@(Localizer["TransList"])" Delay="500" Duration="0" ShowOnFocus="false" >
+                        <MudLink Color="Color.Inherit" OnClick="(e => TransList(summary.SummaryName, summary.Types, context.MonthNo))" ><MudText Style="@Utils.BalanceColour(summary.Total, DarkMode)">@summary.Total.ToString("N2")</MudText></MudLink>
+                    </MudTooltip>
                 </MudTd>
             }
         </RowTemplate>

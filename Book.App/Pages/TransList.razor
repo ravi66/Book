@@ -15,11 +15,11 @@
             <MudText Typo="Typo.h5">@FilteredItems</MudText>
         </MudItem>
         <MudItem>
-            <MudTextField Class="flex-initial d-flex " Variant="Variant.Outlined" Clearable="true" T="string" ValueChanged="@(e => OnSearch(e))" DisableUnderLine="true" Margin="Margin.Dense" Placeholder="@Localizer["Search"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudTextField>
+            <MudTextField Class="flex-initial d-flex " Variant="Variant.Outlined" Clearable="true" T="string" ValueChanged="@(e => OnSearch(e))" Underline="false" Margin="Margin.Dense" Placeholder="@Localizer["Search"]" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Small"></MudTextField>
         </MudItem>
     </MudGrid>
 </MudPaper>
-<MudTable ServerData="@(new Func<TableState, Task<TableData<Transaction>>>(ServerReload))" Dense="true" Hover="true" @ref="table" SortLabel="Sort By" AllowUnsorted="false" Breakpoint="Breakpoint.Sm" Elevation="5" >
+<MudTable ServerData="ServerReload" Dense="true" Hover="true" @ref="table" SortLabel="Sort By" AllowUnsorted="false" Breakpoint="Breakpoint.Sm" Elevation="5" >
     <HeaderContent>
         <MudTh Class="py-1" ><MudTableSortLabel SortLabel="type_field" T="Transaction">@Localizer["Type"]</MudTableSortLabel></MudTh>
         <MudTh Class="py-1" ><MudTableSortLabel SortLabel="value_field" T="Transaction">@Localizer["Value"]</MudTableSortLabel></MudTh>
@@ -45,7 +45,7 @@
         <MudText>@Localizer["LoadingEntries"]</MudText>
     </LoadingContent>
     <PagerContent>
-        <MudTablePager RowsPerPageString="@Localizer["RowsPerPage"]" InfoFormat="@Localizer["PagerInfoFormat"]" AllItemsText="@Localizer["AllItemsText"]" PageSizeOptions="new int[] { 10, 50, int.MaxValue }" HorizontalAlignment="HorizontalAlignment.Center" />
+        <MudTablePager RowsPerPageString="@Localizer["RowsPerPage"]" InfoFormat="@Localizer["PagerInfoFormat"]" AllItemsText="@Localizer["AllItemsText"]" PageSizeOptions="new int[] { 10, 50, int.MaxValue }" HorizontalAlignment="HorizontalAlignment.Center" /> 
     </PagerContent>
 </MudTable>
 
@@ -96,7 +96,7 @@
         NotifierSvc.ThemeChanged += ThemeChanged;
     }
 
-    async Task<TableData<Transaction>> ServerReload(TableState state)
+    async Task<TableData<Transaction>> ServerReload(TableState state, CancellationToken token)
     {
         Transactions = [];
 

@@ -1,27 +1,17 @@
 ﻿@using ApexCharts;
 
-<MudDialog @rendermode="RenderMode.InteractiveWebAssembly" Class="d-flex " Style="width:100%;" DisableSidePadding="true" >
+<MudDialog @rendermode="RenderMode.InteractiveWebAssembly" Gutters="false" ContentClass="pa-2" >
     <DialogContent>
-        <MudPaper Style="min-width:320px; max-height:500px; " Elevation="5" Class="flex-grow-1">
-            @if (Transactions.Any())
+        <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@DialogTitle" OnDataPointSelection="OnDataPointSelection" FormatYAxisLabel="GetYAxisLabel">
+            @if (!ShowEntryTypes)
             {
-                <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@DialogTitle" OnDataPointSelection="OnDataPointSelection" FormatYAxisLabel="GetYAxisLabel">
-                    @if (!ShowEntryTypes)
-                    {
-                        <ApexPointSeries TItem="Transaction" Items="Transactions" XValue="@(t => t.SummaryName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
-                    }
-                    else
-                    {
-                        <ApexPointSeries TItem="Transaction" Items="Transactions" XValue="@(t => t.TransactionTypeName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
-                    }
-                </ApexChart>
+                <ApexPointSeries TItem="Transaction" Items="Transactions" XValue="@(t => t.SummaryName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
             }
             else
             {
-                <MudText Class="py-4" Align="MudBlazor.Align.Center" Typo="Typo.h5">@DialogTitle</MudText>
-                <MudText Class="py-4" Align="MudBlazor.Align.Center" Typo="Typo.h5">@Localizer["NoPieData"]</MudText>
+                <ApexPointSeries TItem="Transaction" Items="Transactions" XValue="@(t => t.TransactionTypeName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
             }
-        </MudPaper>
+        </ApexChart>
     </DialogContent>
 </MudDialog>
 
@@ -44,6 +34,7 @@
     protected async override Task OnInitializedAsync()
     {
         MudDialog.Options.NoHeader = true;
+        MudDialog.Options.FullWidth = true;
         MudDialog.SetOptions(MudDialog.Options);
 
         ChartOptions = new ApexChartOptions<Transaction>();
@@ -51,7 +42,8 @@
         ChartOptions.Chart = new Chart { Toolbar = new Toolbar { Show = true } };
         ChartOptions.Legend = new Legend { Position = LegendPosition.Bottom, FontSize = "14px" };
         ChartOptions.DataLabels = new DataLabels { Style = new DataLabelsStyle { FontSize = "12px" }, };
-        ChartOptions.NoData = new NoData { Text = @Localizer["NoPieData"] };
+        ChartOptions.NoData = new NoData { Text = @Localizer["NoPieData"], Style = new NoDataStyle { FontSize = "24px" } };
+        ChartOptions.Title = new Title { Style = new TitleStyle { FontSize = "18px" } };
         ChartOptions.Colors = GetColours();
     }
 

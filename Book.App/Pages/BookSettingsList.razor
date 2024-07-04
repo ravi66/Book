@@ -1,8 +1,12 @@
 ﻿@page "/booksettings"
+@implements IDisposable
 
 <PageTitle>@BookName - @Localizer["Settings"]</PageTitle>
 
-<MudTable T="BookSetting" Items="BookSettings" @ref="Table" Elevation="5" Dense="true" Hover="true" IsEditRowSwitchingBlocked="true" >
+<MudTable T="BookSetting" Items="BookSettings" @ref="Table" Elevation="5" Dense="true" Hover="true" 
+        IsEditRowSwitchingBlocked="true" CanCancelEdit="true" RowEditCancel="EditCancelled" 
+        RowEditPreview="EditPreview" RowEditCommit="Save" CancelEditIcon="@Icons.Material.Filled.Cancel"
+        CommitEditIcon="@Icons.Material.Filled.Save" >
     <ToolBarContent>
         <MudGrid Class="align-center">
             <MudItem Class="py-0 px-2">
@@ -11,9 +15,12 @@
             <MudItem Class="pa-0">
                 <MudText Typo="Typo.h5">@Localizer["Settings"]</MudText>
             </MudItem>
-            <MudItem Class="py-0 px-2">
-                <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveSettings"]" OnClick="Save" />
-            </MudItem>
+            @if (reloadRequired)
+            {
+                <MudItem Class="py-0 px-2">
+                    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Variant="Variant.Filled" Color="Color.Warning" Title="@Localizer["SaveSettings"]" OnClick="Reload" />
+                </MudItem>
+            }
         </MudGrid>
     </ToolBarContent>
     <HeaderContent>
@@ -34,8 +41,6 @@
 
 @code
 {
-    [Inject] public IDialogService DialogService { get; set; }
-
     [Inject] public NavigationManager NavigationManager { get; set; }
 
     [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
@@ -50,18 +55,66 @@
 
     readonly BookSettingValidator validator = new();
 
+    IDisposable? locationChangingRegistration;
+
+    bool reloadRequired = false;
+
+    BookSetting settingBeforeEdit;
+
     protected async override Task OnInitializedAsync()
     {
         BookName = await BookSettingSvc.GetBookName();
         await BookSettingSvc.EnsureUserAmendableSettingsCreated();
         BookSettings = (await Repo.GetAllBookSettings()).ToList();
+        locationChangingRegistration = NavigationManager.RegisterLocationChangingHandler(OnLocationChanging);
     }
 
-    async void Save()
+    private void EditCancelled(object setting)
+    {
+        ((BookSetting)setting).BookSettingId = settingBeforeEdit.BookSettingId;
+        ((BookSetting)setting).SettingName = settingBeforeEdit.SettingName;
+        ((BookSetting)setting).SettingValue = settingBeforeEdit.SettingValue;
+        ((BookSetting)setting).UserAmendable = settingBeforeEdit.UserAmendable;
+    }
+
+    private void EditPreview(object setting)
+    {
+        settingBeforeEdit = new()
+        {
+            BookSettingId = ((BookSetting)setting).BookSettingId,
+            SettingName = ((BookSetting)setting).SettingName,
+            SettingValue = ((BookSetting)setting).SettingValue,
+            UserAmendable = ((BookSetting)setting).UserAmendable,
+        };
+    }
+
+    async void Save(object setting)
     {
         if (!Table.Validator.IsValid) return;
 
-        await Repo.UpdateBookSettings(BookSettings);
+        await Repo.UpdateBookSetting((BookSetting)setting);
+
+        reloadRequired = true;
+        StateHasChanged();
+    }
+
+    void Reload()
+    {
+        reloadRequired = false;
         NavigationManager.NavigateTo("/", true);
+    }
+
+    private ValueTask OnLocationChanging(LocationChangingContext context)
+    {
+        if (reloadRequired) Reload();
+
+        return ValueTask.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        locationChangingRegistration?.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 }

@@ -3,7 +3,7 @@
 <MudDialog OnBackdropClick="Close" >
     <DialogContent>
         <MudText Typo="Typo.h6" Class="mb-2" >@DialogTitle</MudText>
-        <MudForm Model="@SummaryType" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0">
+        <MudForm Model="@SummaryType" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0" FieldChanged="FormMod" >
             <MudGrid Spacing="1" Justify="Justify.FlexStart" Class="pa-0" >
                 <MudItem xs="12" sm="8" >
                     <MudPaper Elevation="5" >
@@ -18,8 +18,8 @@
                 <MudItem xs="12" sm="8" >
                     <MudPaper Elevation="5" >
                         <MudStack AlignItems="AlignItems.Center" Row="true">
-                            <MudText Class="ms-2" Align="Align.Start" Typo="Typo.body1">@Localizer["ChartColour"] @RandomInd</MudText>
-                            <MudIconButton Class="ma-0 pa-1" Icon="@Icons.Material.Filled.Square" Style="@($"color:{SummaryType.ChartColour};")" OnClick="ChangeColour" Title="@Localizer["ChangeColour"]" />
+                            <MudText Class="ms-2" Align="Align.Start" Typo="Typo.body1">@Localizer["ChartColour"] @randomInd</MudText>
+                            <MudIconButton Class="ma-0 pa-1" Icon="@Icons.Material.Filled.ColorLens" Style="@($"color:{SummaryType.ChartColour};")" OnClick="ChangeColour" title="@Localizer["ChangeColour"]" />
                         </MudStack>
                     </MudPaper>
                 </MudItem>
@@ -32,12 +32,12 @@
         </MudForm>
     </DialogContent>
     <DialogActions>
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveSummaryType"]" OnClick="SaveExit" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" title="@Localizer["SaveSummaryType"]" OnClick="Save" />
         @if (!SummaryType.TransactionTypes.Any() && SummaryType.SummaryTypeId > 0)
         {
             <DeleteSTypeBtn SummaryType="@SummaryType" Size="@Size.Medium" Variant="@Variant.Filled" />
         }
-        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["Close"]" OnClick="Close" />
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" title="@Localizer["Close"]" OnClick="Close" />
     </DialogActions>
 </MudDialog>
 
@@ -61,20 +61,28 @@
 
     MudForm form;
 
-    string RandomInd = string.Empty;
+    bool formHasChanged = false;
 
-    bool ColourChanged;
+    string randomInd = string.Empty;
 
-    void Close()
+    async void Close()
     {
-        if (ColourChanged)
+        if (formHasChanged && form is not null && form.IsValid)
         {
-            MudDialog.Close(DialogResult.Ok(true));
+            var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
+            {
+                { x => x.AcceptLabel, Localizer["SaveChanges", SummaryType.Name] },
+                { x => x.AcceptColour, Color.Success },
+                { x => x.AcceptToolTip, Localizer["SaveClose"] },
+                { x => x.CancelLabel, Localizer["Discard"] },
+                { x => x.CancelColour, Color.Error },
+                { x => x.CancelToolTip, Localizer["DiscardChanges"] },
+            });
+
+            if (!(await dialog.Result).Canceled) Save();
         }
-        else
-        {
-            MudDialog.Cancel();
-        }
+
+        MudDialog.Cancel();
     }
 
     protected override async Task OnInitializedAsync()
@@ -94,59 +102,50 @@
             DialogTitle = Localizer["NewSummaryType"];
         }
 
-        if (SummaryType.ChartColour is null) RandomInd = Localizer["RandomInd"];
+        if (SummaryType.ChartColour is null) randomInd = Localizer["RandomInd"];
 
         NotifierSvc.SummaryTypeDeleted += Close;
     }
 
-    async void SaveExit()
-    {
-        if (await Save())
-        {
-            MudDialog.Close(DialogResult.Ok(true));
-        }
-    }
-
-    async Task<bool> Save()
+    async void Save()
     {
         await form.Validate();
+        if (!form.IsValid) return;
 
-        if (form.IsValid)
+        switch (SavedSummaryTypeId)
         {
-            switch (SavedSummaryTypeId)
-            {
-                case 0:
-                    await Repo.AddSummaryType(SummaryType);
-                    break;
-                default:
-                    await Repo.UpdateSummaryType(SummaryType);
-                    break;
-            }
+            case 0:
+                SummaryType = await Repo.AddSummaryType(SummaryType);
+                SavedSummaryTypeId = SummaryType.SummaryTypeId;
+                break;
 
-            return true;
+            default:
+                await Repo.UpdateSummaryType(SummaryType);
+                break;
         }
-        else
-        {
-            return false;
-        }
+
+        MudDialog.Close(DialogResult.Ok(true));
     }
 
     async void ChangeColour()
     {
         MudColor chartColour = String.IsNullOrEmpty(SummaryType.ChartColour) ? Utils.RandomColour() : SummaryType.ChartColour;
 
-        var result = await DialogService.Show<ColourDialog>($"{SummaryType.Name} {Localizer["Colour"]}", new DialogParameters<ColourDialog> { { x => x.Colour, chartColour } }).Result;
+        var result = await DialogService.Show<ColourDialog>("", new DialogParameters<ColourDialog> { { x => x.Colour, chartColour }, { x => x.Title, $"{SummaryType.Name} {Localizer["Colour"]}" } }).Result;
         if (!result.Canceled)
         {
             SummaryType.ChartColour = result.Data.ToString();
-            if (await Save()) ColourChanged = true;
+            formHasChanged = true;
+            randomInd = string.Empty;
             StateHasChanged();
         }
     }
 
+    void FormMod(FormFieldChangedEventArgs args) => formHasChanged = true;
+
     public void Dispose()
     {
-        NotifierSvc.SummaryTypeDeleted -= () => Close();
+        NotifierSvc.SummaryTypeDeleted -= Close;
         GC.SuppressFinalize(this);
     }
 }

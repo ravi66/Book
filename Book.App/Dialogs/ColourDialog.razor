@@ -1,11 +1,12 @@
-﻿<MudDialog TitleClass="d-flex justify-center pa-0 mx-0 mt-2 mb-0" ClassActions="pa-0 ma-2">
+﻿<MudDialog ActionsClass="pa-0 mt-0 mb-2 mx-2" >
     <DialogContent>
-        <MudColorPicker @bind-Value="Colour" PickerVariant="PickerVariant.Static" DisableToolbar="false" DisableAlpha="true" ColorPickerMode="ColorPickerMode.HEX" Class="pa-0 ma-0" />
+        <MudText Align="Align.Center" Typo="Typo.h5" Class="pa-0 ma-0" >@Title</MudText>
+        <MudColorPicker @bind-Value="Colour" PickerVariant="PickerVariant.Static" ShowToolbar="true" ShowAlpha="false" ColorPickerMode="ColorPickerMode.HEX" Class="pa-0 ma-0" />
     </DialogContent>
     <DialogActions>
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveEntry"]" OnClick="Save" />
-        <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" Title="@Localizer["ClearColour"]" OnClick="Delete" />
-        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["Close"]" OnClick="Close" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" title="@Localizer["SaveEntry"]" OnClick="Save" />
+        <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Error" title="@Localizer["ClearColour"]" OnClick="Delete" />
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" title="@Localizer["Close"]" OnClick="Close" />
     </DialogActions>
 </MudDialog>
 
@@ -14,6 +15,14 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
 
     [Parameter] public MudColor Colour { get; set; }
+
+    [Parameter] public string Title { get; set; } = string.Empty;
+
+    protected async override Task OnInitializedAsync()
+    {
+        MudDialog.Options.NoHeader = true;
+        MudDialog.SetOptions(MudDialog.Options);
+    }
 
     void Close() => MudDialog.Cancel();
 

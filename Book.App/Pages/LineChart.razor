@@ -7,20 +7,12 @@
 
 <MudContainer Class="d-flex flex-grow-1 ma-0 pa-0" >
     <MudPaper Elevation="5" MinWidth="100%" >
-        @if (Series.First().Transactions.Any())
-        {
-            <ApexChart TItem="ChartTransaction" Title="@ChartTitle" XAxisType="XAxisType.Datetime" Options="ChartOptions" @ref="ApexChart" Height="525" OnLegendClicked="OnLegendClicked" FormatYAxisLabel="GetYAxisLabel" >
-                @foreach (var series in Series)
-                {
-                    <ApexPointSeries Color="@series.ChartColour" TItem="ChartTransaction" Items="series.Transactions" Name="@series.SummaryName" SeriesType="SeriesType.Line" XValue="@(e => e.Dated.FirstDayOfMonth())" YAggregate="@(e => e.Sum(e => e.Value))" OrderBy="e => e.X" />
-                }
-            </ApexChart>
-        }
-        else
-        {
-            <MudText Class="py-4" Align="MudBlazor.Align.Center" Typo="Typo.h5">@ChartTitle</MudText>
-            <MudText Class="py-4" Align="MudBlazor.Align.Center" Typo="Typo.h5">@Localizer["NoPieData"]</MudText>
-        }
+        <ApexChart TItem="ChartTransaction" Title="@ChartTitle" XAxisType="XAxisType.Datetime" Options="ChartOptions" @ref="ApexChart" Height="525" OnLegendClicked="OnLegendClicked" FormatYAxisLabel="GetYAxisLabel">
+            @foreach (var series in Series)
+            {
+                <ApexPointSeries Color="@series.ChartColour" TItem="ChartTransaction" Items="series.Transactions" Name="@series.SummaryName" SeriesType="SeriesType.Line" XValue="@(e => e.Dated.FirstDayOfMonth())" YAggregate="@(e => e.Sum(e => e.Value))" OrderBy="e => e.X" />
+            }
+        </ApexChart>
     </MudPaper>
 </MudContainer>
 
@@ -176,6 +168,8 @@
         ChartOptions.Xaxis = new XAxis { Type = XAxisType.Datetime, Labels = new XAxisLabels { MinHeight = 50, Style = new AxisLabelStyle { FontSize = "14px" } } };
 
         ChartOptions.Legend = new Legend { Position = LegendPosition.Bottom, FontSize = "16px", };
+
+        ChartOptions.NoData = new NoData { Text = @Localizer["NoPieData"], Style = new NoDataStyle { FontSize = "24px" } };
     }
 
     List<ChartTransaction> GetSeriesTransactions(List<Transaction> transactions) => transactions.Select(t => new ChartTransaction { Dated = t.TransactionDate, Value = t.Value }).ToList();

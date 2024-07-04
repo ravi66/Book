@@ -1,4 +1,4 @@
-﻿<MudDialog ClassContent="@ContentClass" DisableSidePadding="true" Class="d-flex">
+﻿<MudDialog ContentClass="@ContentClass" Class="d-flex" Gutters="false" >
     <DialogContent>
         @if (Warning)
         {
@@ -10,9 +10,9 @@
                 }
             </MudPaper>
         }
-        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true" Class="flex-grow-1 px-1 py-0">
-            <MudFab Color="@AcceptColour" Title="@AcceptToolTip" Label="@AcceptLabel" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Accept" Size="Size.Small" />
-            <MudFab Color="@CancelColour" Title="@CancelToolTip" Label="@CancelLabel" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Close" Size="Size.Small" />
+        <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true" Class="flex-grow-1 pa-0" >
+            <MudChip T="string" Color="@AcceptColour" title="@AcceptToolTip" Label="true" Icon="@Icons.Material.Filled.CheckCircle" OnClick="Accept" Class="@ChipClass" >@AcceptLabel</MudChip>
+            <MudChip T="string" Color="@CancelColour" title="@CancelToolTip" Label="true" Icon="@Icons.Material.Filled.Cancel" OnClick="Close" Class="@ChipClass" >@CancelLabel</MudChip>
         </MudStack>
     </DialogContent>
 </MudDialog>
@@ -37,7 +37,9 @@
 
     [Parameter] public string WarningMessage { get; set; } = string.Empty;
 
-    string ContentClass { get; set; } = string.Empty;
+    string ContentClass { get; set; } = "my-0";
+
+    string ChipClass { get; set; } = "ma-0";
 
     void Close() => MudDialog.Cancel();
 
@@ -48,7 +50,11 @@
         MudDialog.Options.NoHeader = true;
         MudDialog.SetOptions(MudDialog.Options);
 
-        if (Warning) ContentClass = "mud-warning";
+        if (Warning)
+        {
+            ContentClass = "mud-warning";
+            ChipClass = string.Empty;
+        }
 
         if (string.IsNullOrEmpty(CancelLabel)) CancelLabel = Localizer["Cancel"];
         if (string.IsNullOrEmpty(CancelToolTip)) CancelToolTip = Localizer["Cancel"];

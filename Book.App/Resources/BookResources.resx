@@ -296,6 +296,12 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="DeleteTTypeAccLabel" xml:space="preserve">
     <value>Delete "{0}"?</value>
   </data>
+  <data name="Discard" xml:space="preserve">
+    <value>Discard</value>
+  </data>
+  <data name="DiscardChanges" xml:space="preserve">
+    <value>Close without saving changes</value>
+  </data>
   <data name="EditEntry" xml:space="preserve">
     <value>Edit Entry</value>
   </data>
@@ -509,8 +515,17 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="RowsPerPage" xml:space="preserve">
     <value>Rows per Page:</value>
   </data>
+  <data name="SaveChanges" xml:space="preserve">
+    <value>Save the changes made to "{0}"</value>
+  </data>
+  <data name="SaveClose" xml:space="preserve">
+    <value>Save changes and close</value>
+  </data>
   <data name="SaveEntry" xml:space="preserve">
     <value>Save Entry</value>
+  </data>
+  <data name="SaveEntryChanges" xml:space="preserve">
+    <value>Save the changes made to this Entry</value>
   </data>
   <data name="SaveEntryType" xml:space="preserve">
     <value>Save Entry Type</value>
@@ -589,6 +604,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="TransCopyTitle" xml:space="preserve">
     <value>Copy {0} {1} Entry</value>
+  </data>
+  <data name="TransList" xml:space="preserve">
+    <value>List Entries</value>
   </data>
   <data name="TransListNameM" xml:space="preserve">
     <value>{0} {1} Entries</value>

@@ -1,36 +1,36 @@
 ﻿@implements IDisposable
 
-<MudDialog >
+<MudDialog OnBackdropClick="Close" TitleClass="mb-0 mt-2 py-0" >
     <DialogContent >
-        <MudForm Model="@Transaction" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0">
+        <MudForm Model="@Transaction" @ref="@form" Validation="@(validator.ValidateValue)" ValidationDelay="0" FieldChanged="FormMod" >
             <MudGrid Spacing="1" Justify="Justify.FlexStart" >
                 <MudItem xs="12" sm="6" >
-                    <MudPaper Elevation="5" Class="mb-2" >
-                        <MudNumericField Label="@Localizer["Value"]" Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Format="F2" @bind-Value=Transaction.Value For="@(() => Transaction.Value)" onFocus="this.select()" Required="true"/>
+                    <MudPaper Elevation="5" Class="my-0" >
+                            <MudNumericField Label="@Localizer["Value"]" Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Format="F2" @bind-Value=Transaction.Value For="@(() => Transaction.Value)" onFocus="this.select()" Required="true"/>
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6" >
-                    <MudPaper Elevation="5" Class="mb-2" >
-                        <MudDatePicker Variant="Variant.Outlined" Label="@Localizer["Dated"]" Required="true" RequiredError="@Localizer["EntryMustBeDated"]" @bind-Date="PickerDate" PickerVariant="PickerVariant.Dialog" Margin="Margin.Dense" Editable="true" MaxDate="MaxDate" MinDate="MinDate" />
+                    <MudPaper Elevation="5" Class="my-0" >
+                        <MudDatePicker Variant="Variant.Outlined" Label="@Localizer["Dated"]" RequiredError="@Localizer["EntryMustBeDated"]" PickerVariant="PickerVariant.Dialog" Editable="true" Margin="Margin.Dense" @bind-Date="PickerDate" />
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12" sm="6" >
-                    <MudPaper Elevation="5" Class="mb-2" >
-                        <MudAutocomplete Label="@Localizer["Type"]" T="TransactionType" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnClick="true" SelectValueOnTab="true" @bind-Value="SelectedTransactionType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
+                <MudItem xs="12" sm="6">
+                    <MudPaper Elevation="5" Class="my-2">
+                        <MudAutocomplete Label="@Localizer["Type"]" T="TransactionType" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnActivation="true" SelectValueOnTab="true" @bind-Value="SelectedTransactionType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12" sm="6" >
-                    <MudPaper Elevation="5" Class="mb-2" >
+                <MudItem xs="12" sm="6">
+                    <MudPaper Elevation="5" Class="my-2">
                         <MudTextField Label="@Localizer["Summary"]" ReadOnly="true" Value="@SelectedTransactionType.SummaryType.Name" Variant="Variant.Outlined" Margin="Margin.Dense" />
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12" >
-                    <MudPaper Elevation="5" Class="mb-2" >
+                <MudItem xs="12">
+                    <MudPaper Elevation="5" Class="my-2">
                         <MudTextField Label="@Localizer["Notes"]" Variant="Variant.Outlined" @bind-Value="Transaction.Notes" Lines="3" />
                     </MudPaper>
                 </MudItem>
-                <MudItem xs="12" >
-                    <MudPaper Elevation="5" Class="mb-2" >
+                <MudItem xs="12">
+                    <MudPaper Elevation="5" Class="my-2">
                         <MudText>@Localizer["Changed"]: @Transaction.CreateDate.ToShortDateString()</MudText>
                     </MudPaper>
                 </MudItem>
@@ -62,6 +62,8 @@
 
     [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
 
+    [Inject] public IDialogService DialogService { get; set; }
+
     Transaction Transaction { get; set; } = new Transaction
         {
             Value = 0.00M,
@@ -73,6 +75,8 @@
 
     MudForm form;
 
+    bool formHasChanged = false;
+
     List<TransactionType> TransactionTypes { get; set; }
 
     TransactionType SelectedTransactionType { get; set; } = new TransactionType
@@ -83,20 +87,32 @@
 
     DateTime? PickerDate { get; set; }
 
-    DateTime MinDate { get; set; }
-
-    DateTime MaxDate { get; set; }
-
     int OriginalYear { get; set; } = 0;
 
-    void Close() => MudDialog.Cancel();
-
-    protected override async Task OnInitializedAsync()
+    async void Close()
     {
-        await Task.Yield();
+        if (formHasChanged && form is not null && form.IsValid)
+        {
+            var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
+            {
+                { x => x.AcceptLabel, Localizer["SaveEntryChanges"] },
+                { x => x.AcceptColour, Color.Success },
+                { x => x.AcceptToolTip, Localizer["SaveClose"] },
+                { x => x.CancelLabel, Localizer["Discard"] },
+                { x => x.CancelColour, Color.Error },
+                { x => x.CancelToolTip, Localizer["DiscardChanges"] },
+            });
 
-        MaxDate = new DateTime(await BookSettingSvc.GetEndYear(), 12, 31);
-        MinDate = new DateTime(await BookSettingSvc.GetStartYear(), 1, 1);
+            if (!(await dialog.Result).Canceled) Save();
+        }
+
+        MudDialog.Cancel();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        MudDialog.Options.NoHeader = false;
+        MudDialog.SetOptions(MudDialog.Options);
 
         TransactionTypes = (await TTypeRepo.GetAllTransactionTypes()).ToList();
 
@@ -104,13 +120,16 @@
         {
             Transaction.TransactionType = TransactionTypes.FirstOrDefault(tt => tt.TransactionTypeId == -1);
 
-            if (DateTime.Today <= MaxDate && DateTime.Today >= MinDate)
+            var maxDate = new DateTime(await BookSettingSvc.GetEndYear(), 12, 31);
+            var minDate = new DateTime(await BookSettingSvc.GetStartYear(), 1, 1);
+
+            if (DateTime.Today <= maxDate && DateTime.Today >= minDate)
             {
                 Transaction.TransactionDate = DateTime.Today;
             }
             else
             {
-                Transaction.TransactionDate = DateTime.Today > MaxDate ? MaxDate : MinDate;
+                Transaction.TransactionDate = DateTime.Today > maxDate ? maxDate : minDate;
             }
         }
         else
@@ -128,7 +147,6 @@
     async void Save()
     {
         await form.Validate();
-
         if (!form.IsValid) return;
 
         Transaction.TransactionTypeId = SelectedTransactionType.TransactionTypeId;
@@ -143,12 +161,14 @@
         MudDialog.Close(DialogResult.Ok(true));
     }
 
-    async Task<IEnumerable<TransactionType>> TypeSearch(string searchValue)
+    async Task<IEnumerable<TransactionType>> TypeSearch(string searchValue, CancellationToken token)
     {
         await Task.Yield();
 
         return string.IsNullOrEmpty(searchValue) ? (IEnumerable<TransactionType>)TransactionTypes : TransactionTypes.Where(t => t.Name.Contains(searchValue, StringComparison.InvariantCultureIgnoreCase));
     }
+
+    void FormMod(FormFieldChangedEventArgs args) => formHasChanged = true;
 
     void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
     {

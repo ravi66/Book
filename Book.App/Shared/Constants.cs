@@ -4,7 +4,7 @@
     {
         public const string IndexHtmlVersion = "v1.0";
         public const string BookName = "Book";
-        public const string BookVersion = "v2.1.01";
+        public const string BookVersion = "v2.2.00";
         public const string BookDbCacheName = "Bit-Besql";
         public const string BookDbPath = "/data/cache/book.sqlite3";
     }
