@@ -98,5 +98,10 @@
             return dbContext.TransactionTypes.Where(t => t.TransactionTypeId != -1).Max(t => (DateTime?)t.CreateDate);
         }
 
+        public async Task<int> GetSummaryTypeId(int transactionTypeId)
+        {
+            using var dbContext = await db.CreateDbContextAsync();
+            return dbContext.TransactionTypes.Where(t => t.TransactionTypeId == transactionTypeId).Select(t => t.SummaryTypeId).FirstOrDefault();
+        }
     }
 }

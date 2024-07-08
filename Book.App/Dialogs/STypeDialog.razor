@@ -47,6 +47,8 @@
 
     [Parameter] public int SavedSummaryTypeId { get; set; }
 
+    [Parameter] public string NewName { get; set; } = string.Empty;
+
     [Inject] public IDialogService DialogService { get; set; }
 
     [Inject] internal ISummaryTypeRepository Repo { get; set; }
@@ -99,6 +101,7 @@
         }
         else
         {
+            if (NewName != string.Empty) SummaryType.Name = NewName;
             DialogTitle = Localizer["NewSummaryType"];
         }
 
@@ -117,6 +120,7 @@
             case 0:
                 SummaryType = await Repo.AddSummaryType(SummaryType);
                 SavedSummaryTypeId = SummaryType.SummaryTypeId;
+                NotifierSvc.OnSummaryTypeCreated(this, SummaryType.SummaryTypeId);
                 break;
 
             default:
@@ -124,7 +128,7 @@
                 break;
         }
 
-        MudDialog.Close(DialogResult.Ok(true));
+        MudDialog.Close(DialogResult.Ok(SummaryType));
     }
 
     async void ChangeColour()

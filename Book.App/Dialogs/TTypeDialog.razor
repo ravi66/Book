@@ -12,7 +12,26 @@
                 </MudItem>
                 <MudItem xs="12" sm="6" >
                     <MudPaper Elevation="5" >
-                        <MudAutocomplete Label="@Localizer["Summary"]" T="SummaryType" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnActivation="true" SelectValueOnTab="true" @bind-Value="SelectedSummaryType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" ReadOnly="@ReadOnlySummary" />
+                        <MudAutocomplete 
+                            Label="@Localizer["Summary"]" 
+                            T="SummaryType" 
+                            Style="width: 100%;" 
+                            Variant="Variant.Outlined" 
+                            Margin="Margin.Dense" 
+                            Dense="true" 
+                            SearchFunc="@TypeSearch" 
+                            SelectOnActivation="true" 
+                            SelectValueOnTab="true" 
+                            Value="SelectedSummaryType"
+                            ValueChanged="STypeChanged"
+                            ToStringFunc="@(t => t == null ? null : t.Name )" 
+                            ReadOnly="@ReadOnlySummary"
+                            DebounceInterval="500"
+                            MaxItems="null"
+                            CoerceValue="true"
+                            @ref="@sTypeField" 
+                            
+                            />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6" >
@@ -49,6 +68,8 @@
 
     [Parameter] public int NewSummaryTypeId { get; set; }
 
+    [Parameter] public string NewName { get; set; } = string.Empty;
+
     [Inject] public IDialogService DialogService { get; set; }
 
     [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
@@ -74,6 +95,8 @@
     string randomInd = string.Empty;
 
     bool ReadOnlySummary { get; set; } = false;
+
+    MudAutocomplete<SummaryType> sTypeField;
 
     async void Close()
     {
@@ -106,6 +129,7 @@
 
         if (SavedTransactionTypeId == 0)
         {
+            if (NewName != string.Empty) TransactionType.Name = NewName;
             TransactionType.SummaryTypeId = NewSummaryTypeId;
             TransactionType.SummaryType = SummaryTypes.FirstOrDefault(s => s.SummaryTypeId == NewSummaryTypeId);
             DialogTitle = Localizer["NewEntryType"];
@@ -125,6 +149,39 @@
         NotifierSvc.TransactionTypeDeleted += TransactionTypeDeleted;
     }
 
+    async void STypeChanged(SummaryType summaryType)
+    {
+        if (summaryType is not null)
+        {
+            SelectedSummaryType = summaryType;
+            return;
+        }
+
+        string newName = sTypeField.Text;
+
+        var confDialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
+            {
+                { x => x.AcceptLabel, Localizer["CreateNewSummaryType"] },
+                { x => x.AcceptColour, Color.Success },
+                { x => x.CancelColour, Color.Primary },
+            });
+
+        if ((await confDialog.Result).Canceled) return;
+
+        var sTypeDialog = DialogService.Show<STypeDialog>("", new DialogParameters<STypeDialog>
+            {
+                { x => x.NewName, newName },
+            });
+
+        if ((await sTypeDialog.Result).Canceled) return;
+
+        SelectedSummaryType = (SummaryType)sTypeDialog.Result.Result.Data;
+        SummaryTypes.Add(SelectedSummaryType);
+        StateHasChanged();
+
+        return;
+    }
+
     async void Save()
     {
         await form.Validate();
@@ -135,8 +192,9 @@
         switch (SavedTransactionTypeId)
         {
             case 0:
-                TransactionType = await TTypeRepo.AddTransactionType(TransactionType);
+                await TTypeRepo.AddTransactionType(TransactionType);
                 SavedTransactionTypeId = TransactionType.TransactionTypeId;
+                NotifierSvc.OnTransactionTypeCreated(this, TransactionType.SummaryTypeId);
                 break;
 
             default:
@@ -144,7 +202,9 @@
                 break;
         }
 
-        MudDialog.Close(DialogResult.Ok(true));
+        TransactionType.SummaryType = SelectedSummaryType;
+
+        MudDialog.Close(DialogResult.Ok(TransactionType));
     }
 
     async Task<IEnumerable<SummaryType>> TypeSearch(string searchValue, CancellationToken token)

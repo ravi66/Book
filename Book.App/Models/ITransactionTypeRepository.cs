@@ -10,5 +10,6 @@
         public Task<string?> GetColour(int transactionTypeId);
         public Task<List<TransactionType>> Export();
         public Task<DateTime?> GetLastUpdDt();
+        public Task<int> GetSummaryTypeId(int transactionTypeId);
     }
 }

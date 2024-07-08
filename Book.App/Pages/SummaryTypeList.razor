@@ -104,12 +104,14 @@
 
         NotifierSvc.TransactionsChanged += LoadSummaryTypes;
         NotifierSvc.SummaryTypeDeleted += LoadSummaryTypes;
+        NotifierSvc.SummaryTypeCreated += LoadSummaryTypes;
         NotifierSvc.TransactionTypeDeleted += LoadSummaryTypes;
+        NotifierSvc.TransactionTypeCreated += LoadSummaryTypes;
 
-        LoadSummaryTypes(PageParamsSvc.SummaryTypeId);
+        await LoadSummaryTypes(PageParamsSvc.SummaryTypeId);
     }
 
-    async void LoadSummaryTypes(int summaryTypeId)
+    async Task LoadSummaryTypes(int summaryTypeId)
     {
         SummaryTypes = await SRepo.GetAllSummaryTypes();
 
@@ -123,11 +125,11 @@
         }
     }
 
-    void LoadSummaryTypes() => LoadSummaryTypes(0);
+    async void LoadSummaryTypes() => await LoadSummaryTypes(0);
 
-    void LoadSummaryTypes(object? sender, TransactionsChangedEventArgs args) => LoadSummaryTypes(0);  // Reload regardless of year
+    async void LoadSummaryTypes(object? sender, TransactionsChangedEventArgs args) => await LoadSummaryTypes(args.SummaryTypeId);
 
-    void LoadSummaryTypes(object? sender, int summaryTypeId) => LoadSummaryTypes(summaryTypeId);
+    async void LoadSummaryTypes(object? sender, int summaryTypeId) => await LoadSummaryTypes(summaryTypeId);
 
     void SummaryChanged(SummaryType summaryType)
     {
@@ -231,7 +233,10 @@
     {
         NotifierSvc.TransactionsChanged -= LoadSummaryTypes;
         NotifierSvc.SummaryTypeDeleted -= LoadSummaryTypes;
+        NotifierSvc.SummaryTypeCreated -= LoadSummaryTypes;
         NotifierSvc.TransactionTypeDeleted -= LoadSummaryTypes;
+        NotifierSvc.TransactionTypeCreated -= LoadSummaryTypes;
+
         GC.SuppressFinalize(this);
     }
 }

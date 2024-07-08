@@ -145,8 +145,6 @@ else
             Year = DateTime.Today.Year > Years.Max() ? Years.Max() : Years.Min();
         }
 
-        SummaryTypes = (await SummaryRepo.LoadSummary()).Where(s => s.TransactionTypes.Count > 0).ToList();
-
         await LoadSummary();
     }
 
@@ -164,6 +162,8 @@ else
 
     async Task LoadSummary()
     {
+        SummaryTypes = (await SummaryRepo.LoadSummary()).Where(s => s.TransactionTypes.Count > 0).ToList();
+
         // Get all Transactions for year
         Transactions = (await Repo.GetTransactionsByTypeMonth([], Year, 0)).ToList();
 

@@ -236,6 +236,12 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="CreateEntries" xml:space="preserve">
     <value>Create Entries</value>
   </data>
+  <data name="CreateNewEntryType" xml:space="preserve">
+    <value>Create a new Entry Type?</value>
+  </data>
+  <data name="CreateNewSummaryType" xml:space="preserve">
+    <value>Create a new Summary Type?</value>
+  </data>
   <data name="Credits" xml:space="preserve">
     <value>Credits</value>
   </data>

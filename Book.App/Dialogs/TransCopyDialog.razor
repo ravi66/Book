@@ -157,7 +157,7 @@
             if (years.IndexOf(transaction.TransactionDate.Year) == -1) years.Add(transaction.TransactionDate.Year);
         }
 
-        NotifierSvc.OnTransactionsChanged(this, years);
+        NotifierSvc.OnTransactionsChanged(this, years, TransactionToCopy.SummaryTypeId);
 
         Close();
     }

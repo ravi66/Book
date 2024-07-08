@@ -6,7 +6,7 @@
             <MudGrid Spacing="1" Justify="Justify.FlexStart" >
                 <MudItem xs="12" sm="6" >
                     <MudPaper Elevation="5" Class="my-0" >
-                            <MudNumericField Label="@Localizer["Value"]" Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Format="F2" @bind-Value=Transaction.Value For="@(() => Transaction.Value)" onFocus="this.select()" Required="true"/>
+                        <MudNumericField Label="@Localizer["Value"]" Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Format="F2" @bind-Value=Transaction.Value For="@(() => Transaction.Value)" onFocus="this.select()" Required="true"/>
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6" >
@@ -16,7 +16,25 @@
                 </MudItem>
                 <MudItem xs="12" sm="6">
                     <MudPaper Elevation="5" Class="my-2">
-                        <MudAutocomplete Label="@Localizer["Type"]" T="TransactionType" Style="width: 100%;" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" SearchFunc="@TypeSearch" SelectOnActivation="true" SelectValueOnTab="true" @bind-Value="SelectedTransactionType" ToStringFunc="@(t => t == null ? null : $" {t.Name}")" />
+                        <MudAutocomplete 
+                            Label="@Localizer["Type"]" 
+                            T="TransactionType"
+                            Style="width: 100%;" 
+                            Variant="Variant.Outlined" 
+                            Margin="Margin.Dense"
+                            Dense="true" 
+                            SearchFunc="@TypeSearch" 
+                            SelectOnActivation="true" 
+                            SelectValueOnTab="true" 
+                            Value="SelectedTransactionType" 
+                            ValueChanged= "TTypeChanged"
+                            ToStringFunc="@(t => t == null ? null : t.Name )" 
+                            DebounceInterval="500" 
+                            MaxItems="null"
+                            CoerceValue="true"
+                            @ref="@tTypeField"
+                            
+                            />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6">
@@ -89,9 +107,11 @@
 
     int OriginalYear { get; set; } = 0;
 
+    MudAutocomplete<TransactionType> tTypeField;
+
     async void Close()
     {
-        if (formHasChanged && form is not null && form.IsValid)
+        if (formHasChanged && form is not null && form.IsValid && Transaction.Value != 0)
         {
             var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
             {
@@ -144,6 +164,40 @@
         NotifierSvc.TransactionsChanged += TransactionsChanged;
     }
 
+    async void TTypeChanged(TransactionType transactionType)
+    {
+        if (transactionType is not null)
+        {
+            SelectedTransactionType = transactionType;
+            return;
+        }
+
+        string newName = tTypeField.Text;
+
+        var confDialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
+            {
+                { x => x.AcceptLabel, Localizer["CreateNewEntryType"] },
+                { x => x.AcceptColour, Color.Success },
+                { x => x.CancelColour, Color.Primary },
+            });
+
+        if ((await confDialog.Result).Canceled) return;
+
+        var tTypeDialog = DialogService.Show<TTypeDialog>("", new DialogParameters<TTypeDialog>
+            {
+                { x => x.NewSummaryTypeId, -1 },
+                { x => x.NewName, newName },
+            });
+
+        if ((await tTypeDialog.Result).Canceled) return;
+
+        SelectedTransactionType = (TransactionType)tTypeDialog.Result.Result.Data;
+        TransactionTypes.Add(SelectedTransactionType);
+        StateHasChanged();
+
+        return;
+    }
+
     async void Save()
     {
         await form.Validate();
@@ -156,7 +210,9 @@
 
         List<int> years = [Transaction.TransactionDate.Year];
         if (OriginalYear != 0 && OriginalYear != Transaction.TransactionDate.Year) years.Add(OriginalYear);
-        NotifierSvc.OnTransactionsChanged(this, years);
+
+        int summaryTypeId = await TTypeRepo.GetSummaryTypeId(Transaction.TransactionTypeId);
+        NotifierSvc.OnTransactionsChanged(this, years, summaryTypeId);
 
         MudDialog.Close(DialogResult.Ok(true));
     }

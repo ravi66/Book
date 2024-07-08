@@ -29,7 +29,7 @@
         {
             await Repo.DeleteTransaction(Transaction.TransactionId);
 
-            NotifierSvc.OnTransactionsChanged(this, [Transaction.TransactionDate.Year]);
+            NotifierSvc.OnTransactionsChanged(this, [Transaction.TransactionDate.Year], 0);
         }
     }
 }
