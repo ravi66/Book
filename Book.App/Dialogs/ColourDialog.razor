@@ -26,7 +26,7 @@
 
     void Close() => MudDialog.Cancel();
 
-    void Save() => MudDialog.Close(DialogResult.Ok(Colour));
+    void Save() => MudDialog.Close(DialogResult.Ok(Colour.ToString(MudColorOutputFormats.Hex)));
 
     void Delete() => MudDialog.Close(DialogResult.Ok(string.Empty));
 }

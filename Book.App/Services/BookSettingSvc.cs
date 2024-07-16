@@ -10,6 +10,7 @@
             _ = await GetStartYear();
             _ = await GetEndYear();
             _ = await GetDbPrefix();
+            _ = await GetTotalColour();
         }
 
         // Gets
@@ -75,6 +76,12 @@
         {
             return await GetSettingValue(7, Localizer["DatabaseVersion"], false, "1.0");
         }
+
+        public async Task<string> GetTotalColour()
+        {
+            return await GetSettingValue(8, Localizer["TotalColour"], true, "#ffd700");  // Gold
+        }
+
 
         // Sets
 

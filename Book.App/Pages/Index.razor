@@ -176,7 +176,7 @@ else
                 CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(i),
                 CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i),
                 i,
-                CreateSummaryDetails(i)
+                await CreateSummaryDetails(i)
             ));
         }
 
@@ -186,7 +186,7 @@ else
             Localizer["Total"],
             Year.ToString(),
             0,
-            CreateSummaryDetails(0)
+            await CreateSummaryDetails(0)
         ));
 
         // Remove Zero Transactions SummaryDetails
@@ -200,7 +200,7 @@ else
         StateHasChanged();
     }
 
-    List<SummaryDetail> CreateSummaryDetails(int monthNo)
+    async Task<List<SummaryDetail>> CreateSummaryDetails(int monthNo)
     {
         List<SummaryDetail> summaryDetails = [];
 
@@ -216,7 +216,7 @@ else
             [],
             total,
             true,
-            string.Empty
+            $"color:{await BookSettingSvc.GetTotalColour()};"
         ));
 
         // User defined Summaries
@@ -278,22 +278,20 @@ else
 
         if (monthNo >= 0)
         {
-            dialogTitle = Localizer["Expenditure", MonthlySummaries[monthNo].MonthNameFull, Year];
-
             SetDates(++monthNo);
             transactions = Transactions
-                .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate && t.Value > 0)
+                .Where(t => t.TransactionDate >= StartDate && t.TransactionDate < EndDate)
                 .ToList();
         }
         else
         {
-            dialogTitle = Localizer["Expenditure", Year, ""];
-            transactions = Transactions.Where(t => t.Value > 0).ToList();
+            transactions = Transactions.ToList();
         }
 
         var parameters = new DialogParameters<MonthChartDialog>
             {
-                { p => p.DialogTitle, dialogTitle },
+                { p => p.Year, Year },
+                { p => p.MonthNo, monthNo },
                 { p => p.Transactions, transactions },
             };
 

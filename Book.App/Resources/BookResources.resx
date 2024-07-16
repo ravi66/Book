@@ -413,6 +413,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="In" xml:space="preserve">
     <value>in</value>
   </data>
+  <data name="Income" xml:space="preserve">
+    <value>{0} {1} Income</value>
+  </data>
   <data name="Info" xml:space="preserve">
     <value>More Information</value>
   </data>
@@ -500,6 +503,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="PagerInfoFormat" xml:space="preserve">
     <value>{first_item}-{last_item} of {all_items}</value>
   </data>
+  <data name="PlottingChart" xml:space="preserve">
+    <value>Plotting Chart</value>
+  </data>
   <data name="Property" xml:space="preserve">
     <value>Property</value>
   </data>
@@ -554,6 +560,12 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="Show" xml:space="preserve">
     <value>Show</value>
   </data>
+  <data name="ShowCredits" xml:space="preserve">
+    <value>Plot Income</value>
+  </data>
+  <data name="ShowDebits" xml:space="preserve">
+    <value>Plot Spend</value>
+  </data>
   <data name="ShowEntryTypes" xml:space="preserve">
     <value>Show {0} Entry Types</value>
   </data>
@@ -589,6 +601,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="Total" xml:space="preserve">
     <value>Total</value>
+  </data>
+  <data name="TotalColour" xml:space="preserve">
+    <value>Total Colour</value>
   </data>
   <data name="Trackor" xml:space="preserve">
     <value>Trackor</value>

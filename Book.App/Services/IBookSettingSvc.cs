@@ -10,6 +10,8 @@
         public Task<string> GetLastBackupDate();
         public Task<string> GetDbPrefix();
         public Task<string> GetDbVersion();
+        public Task<string> GetTotalColour();
+
         public Task SetDarkMode(bool isDarkMode);
         public Task SetLastBackupDate(DateTime lastBackupDate);
     }

@@ -1,4 +1,5 @@
 ﻿@page "/booksettings"
+@using System.Text.RegularExpressions
 @implements IDisposable
 
 <PageTitle>@BookName - @Localizer["Settings"]</PageTitle>
@@ -6,7 +7,7 @@
 <MudTable T="BookSetting" Items="BookSettings" @ref="Table" Elevation="5" Dense="true" Hover="true" 
         IsEditRowSwitchingBlocked="true" CanCancelEdit="true" RowEditCancel="EditCancelled" 
         RowEditPreview="EditPreview" RowEditCommit="Save" CancelEditIcon="@Icons.Material.Filled.Cancel"
-        CommitEditIcon="@Icons.Material.Filled.Save" >
+        CommitEditIcon="@Icons.Material.Filled.Save" OnRowClick="OnRowClick" RowEditableFunc="CanEditRow" >
     <ToolBarContent>
         <MudGrid Class="align-center">
             <MudItem Class="py-0 px-2">
@@ -29,18 +30,34 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="@Localizer["Name"]">@context.SettingName</MudTd>
-        <MudTd DataLabel="@Localizer["Value"]">@context.SettingValue</MudTd>
+        @if (context.BookSettingId == 8)
+        {
+            <MudTd DataLabel="@Localizer["Value"]" Style="@TotalColour" >@context.SettingValue</MudTd>
+        }
+        else
+        {
+            <MudTd DataLabel="@Localizer["Value"]">@context.SettingValue</MudTd>
+        }
     </RowTemplate>
     <RowEditingTemplate>
         <MudTd DataLabel="@Localizer["Name"]">@context.SettingName</MudTd>
         <MudTd>
-            <MudTextField Label="@Localizer["Value"]" @bind-Value="@context.SettingValue" For="@(() => context.SettingValue)" Immediate="true" Validation=@(async (string x) => await validator.ValidateValueAsync(context, "SettingValue")) />
+            @if (context.BookSettingId == 8)
+            {
+                <MudTextField Label="@Localizer["Value"]" @bind-Value="@context.SettingValue" For="@(() => context.SettingValue)" Immediate="true" Validation=@(async (string x) => await validator.ValidateValueAsync(context, "SettingValue")) Style="@TotalColour" />
+            }
+            else
+            {
+                <MudTextField Label="@Localizer["Value"]" @bind-Value="@context.SettingValue" For="@(() => context.SettingValue)" Immediate="true" Validation=@(async (string x) => await validator.ValidateValueAsync(context, "SettingValue")) />
+            }
         </MudTd>
     </RowEditingTemplate>
 </MudTable>
 
 @code
 {
+    [Inject] public IDialogService DialogService { get; set; }
+
     [Inject] public NavigationManager NavigationManager { get; set; }
 
     [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
@@ -61,15 +78,18 @@
 
     BookSetting settingBeforeEdit;
 
+    string TotalColour { get; set; } = string.Empty;
+
     protected async override Task OnInitializedAsync()
     {
         BookName = await BookSettingSvc.GetBookName();
         await BookSettingSvc.EnsureUserAmendableSettingsCreated();
         BookSettings = (await Repo.GetAllBookSettings()).ToList();
+        TotalColour = $"color: {BookSettings.Where(b => b.BookSettingId == 8).Select(b => b.SettingValue).FirstOrDefault() ?? "#ffd700"};"; // Gold
         locationChangingRegistration = NavigationManager.RegisterLocationChangingHandler(OnLocationChanging);
     }
 
-    private void EditCancelled(object setting)
+    void EditCancelled(object setting)
     {
         ((BookSetting)setting).BookSettingId = settingBeforeEdit.BookSettingId;
         ((BookSetting)setting).SettingName = settingBeforeEdit.SettingName;
@@ -77,7 +97,7 @@
         ((BookSetting)setting).UserAmendable = settingBeforeEdit.UserAmendable;
     }
 
-    private void EditPreview(object setting)
+    void EditPreview(object setting)
     {
         settingBeforeEdit = new()
         {
@@ -92,7 +112,9 @@
     {
         if (!Table.Validator.IsValid) return;
 
-        await Repo.UpdateBookSetting((BookSetting)setting);
+        BookSetting bookSetting = (BookSetting)setting;
+
+        await Repo.UpdateBookSetting(bookSetting);
 
         reloadRequired = true;
         StateHasChanged();
@@ -104,7 +126,31 @@
         NavigationManager.NavigateTo("/", true);
     }
 
-    private ValueTask OnLocationChanging(LocationChangingContext context)
+    async void OnRowClick(TableRowClickEventArgs<BookSetting> args)
+    {
+        BookSetting? setting = args.Item;
+        if (setting is null || setting.BookSettingId != 8) return;
+
+        setting = BookSettings.Where(s => s.BookSettingId == 8).FirstOrDefault();
+        MudColor colour = String.IsNullOrEmpty(setting.SettingValue) ? "#ffd700" : setting.SettingValue; // Gold
+
+        var result = await DialogService.Show<ColourDialog>("", new DialogParameters<ColourDialog> { { x => x.Colour, colour }, { x => x.Title, $"{setting.SettingName}" } }).Result;
+        if (!result.Canceled)
+        {
+            setting.SettingValue = result.Data.ToString();
+            TotalColour = $"color: {setting.SettingValue};";
+            Save(setting);
+        }
+    }
+
+    bool CanEditRow(BookSetting setting)
+    {
+        if (setting.BookSettingId == 8) return false;
+
+        return true;
+    }
+
+    ValueTask OnLocationChanging(LocationChangingContext context)
     {
         if (reloadRequired) Reload();
 

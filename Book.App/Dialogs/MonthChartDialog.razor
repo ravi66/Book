@@ -1,17 +1,36 @@
 ﻿@using ApexCharts;
 
-<MudDialog @rendermode="RenderMode.InteractiveWebAssembly" Gutters="false" ContentClass="pa-2" >
+<MudDialog @rendermode="RenderMode.InteractiveWebAssembly" Gutters="false" ContentClass="d-flex pa-2" >
     <DialogContent>
-        <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@DialogTitle" OnDataPointSelection="OnDataPointSelection" FormatYAxisLabel="GetYAxisLabel">
-            @if (!ShowEntryTypes)
+        <MudPaper Class="flex-grow-1">
+            @if (Loading == true)
             {
-                <ApexPointSeries TItem="Transaction" Items="Transactions" XValue="@(t => t.SummaryName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
+                <MudText Align="MudBlazor.Align.Center" Typo="Typo.h5">@Localizer["PlottingChart"]</MudText>
             }
             else
             {
-                <ApexPointSeries TItem="Transaction" Items="Transactions" XValue="@(t => t.TransactionTypeName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
+                <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Row="true" Class="py-0">
+                    <MudButton Variant="Variant.Filled" Class="my-2 py-0" Color="@MudBlazor.Color.Primary" OnClick="ShowCredits" >@CreditsBtnText</MudButton>
+                </MudStack>
             }
-        </ApexChart>
+            @if (DisplayTransactions.Count > 0)
+            {
+                <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@ChartTitle" OnDataPointSelection="OnDataPointSelection" FormatYAxisLabel="GetYAxisLabel" OnBeforeMount="OnBeforeMount">
+                    @if (!ShowEntryTypes)
+                    {
+                        <ApexPointSeries TItem="Transaction" Items="DisplayTransactions" XValue="@(t => t.SummaryName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
+                    }
+                    else
+                    {
+                        <ApexPointSeries TItem="Transaction" Items="DisplayTransactions" XValue="@(t => t.TransactionTypeName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
+                    }
+                </ApexChart>
+            }
+            else
+            {
+                <MudText Align="MudBlazor.Align.Center" Typo="Typo.h5">@Localizer["NoPieData"]</MudText>
+            }
+        </MudPaper>
     </DialogContent>
 </MudDialog>
 
@@ -23,13 +42,31 @@
 
     [Parameter] public List<Transaction> Transactions { get; set; }
 
-    [Parameter] public string DialogTitle { get; set; }
+    [Parameter] public int Year { get; set; }
+
+    [Parameter] public int MonthNo { get; set; }
+
+    string DisplayMonth { get; set; } = string.Empty;
+
+    string ChartTitle { get; set; } = string.Empty;
+
+    List<Transaction> DisplayTransactions { get; set; } = [];
+
+    List<Transaction>? DebitTransactions { get; set; }
+
+    List<Transaction>? CreditTransactions { get; set; }
 
     ApexChartOptions<Transaction> ChartOptions;
 
     ApexChart<Transaction> ApexChart;
 
+    bool Loading = true;
+
     bool ShowEntryTypes = false;
+
+    bool Credits = false;
+
+    string CreditsBtnText = string.Empty;
 
     protected async override Task OnInitializedAsync()
     {
@@ -37,14 +74,61 @@
         MudDialog.Options.FullWidth = true;
         MudDialog.SetOptions(MudDialog.Options);
 
+        DisplayMonth = MonthNo > 0 ? CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(MonthNo) : string.Empty;
+
+        SetDisplayTransactions();
+
         ChartOptions = new ApexChartOptions<Transaction>();
         ChartOptions.Theme = new Theme { Mode = await BookSettingSvc.GetDarkMode() ? Mode.Dark : Mode.Light, Palette = null };
         ChartOptions.Chart = new Chart { Toolbar = new Toolbar { Show = true } };
         ChartOptions.Legend = new Legend { Position = LegendPosition.Bottom, FontSize = "14px" };
         ChartOptions.DataLabels = new DataLabels { Style = new DataLabelsStyle { FontSize = "12px" }, };
-        ChartOptions.NoData = new NoData { Text = @Localizer["NoPieData"], Style = new NoDataStyle { FontSize = "24px" } };
         ChartOptions.Title = new Title { Style = new TitleStyle { FontSize = "18px" } };
         ChartOptions.Colors = GetColours();
+    }
+
+    void SetDisplayTransactions()
+    {
+        if (DebitTransactions is null)
+        {
+            DebitTransactions = Transactions.Where(t => t.Value > 0).ToList();
+        }
+
+        if (CreditTransactions is null)
+        {
+            CreditTransactions = Transactions.Where(t => t.Value < 0)
+                .Select(t => new Transaction()
+                    {
+                        TransactionId = t.TransactionId,
+                        TransactionTypeId = t.TransactionTypeId,
+                        TransactionDate = t.TransactionDate,
+                        Value = t.Value * -1,
+                        SummaryName = t.SummaryName,
+                        TransactionTypeName = t.TransactionTypeName,
+                    })
+                .ToList();
+        }
+
+        if (DebitTransactions.Count > CreditTransactions.Count)
+        {
+            DisplayTransactions = DebitTransactions;
+            ChartTitle = Localizer["Expenditure", DisplayMonth, Year];
+            CreditsBtnText = Localizer["ShowCredits"];
+        }
+        else
+        {
+            DisplayTransactions = CreditTransactions;
+            ChartTitle = Localizer["Income", DisplayMonth, Year];
+            CreditsBtnText = Localizer["ShowDebits"];
+        }
+
+        if (DisplayTransactions.Count < 1) Loading = false;
+    }
+
+    void OnBeforeMount()
+    {
+        Loading = false;
+        StateHasChanged();
     }
 
     List<string> GetColours()
@@ -73,4 +157,34 @@
     }
 
     string GetYAxisLabel(decimal value) => value.ToString("C2");
+
+    async void ShowCredits()
+    {
+        Credits = !Credits;
+
+        if (Credits)
+        {
+            DisplayTransactions = CreditTransactions ?? [];
+            ChartTitle = Localizer["Income", DisplayMonth, Year];
+            CreditsBtnText = Localizer["ShowDebits"];
+        }
+        else
+        {
+            DisplayTransactions = DebitTransactions ?? [];
+            ChartTitle = Localizer["Expenditure", DisplayMonth, Year];
+            CreditsBtnText = Localizer["ShowCredits"];
+        }
+
+        if (DisplayTransactions.Count < 1)
+        {
+            Loading = false;
+        }
+        else
+        {
+            ChartOptions.Colors = GetColours();
+            await ApexChart.UpdateOptionsAsync(true, true, false);
+        }
+
+        StateHasChanged();
+    }
 }

@@ -6,11 +6,15 @@
 <PageTitle>@BookName - @ChartTitle</PageTitle>
 
 <MudContainer Class="d-flex flex-grow-1 ma-0 pa-0" >
-    <MudPaper Elevation="5" MinWidth="100%" >
-        <ApexChart TItem="ChartTransaction" Title="@ChartTitle" XAxisType="XAxisType.Datetime" Options="ChartOptions" @ref="ApexChart" Height="525" OnLegendClicked="OnLegendClicked" FormatYAxisLabel="GetYAxisLabel">
+    <MudPaper Elevation="0" MinWidth="100%" >
+        @if (Loading == true)
+        {
+            <MudText Typo="Typo.h5" Align="MudBlazor.Align.Center">@Localizer["PlottingChart"]</MudText>
+        }
+        <ApexChart TItem="ChartTransaction" Title="@ChartTitle" XAxisType="XAxisType.Datetime" Options="ChartOptions" @ref="ApexChart" Height="525" OnLegendClicked="OnLegendClicked" FormatYAxisLabel="GetYAxisLabel" OnBeforeMount="OnBeforeMount" >
             @foreach (var series in Series)
             {
-                <ApexPointSeries Color="@series.ChartColour" TItem="ChartTransaction" Items="series.Transactions" Name="@series.SummaryName" SeriesType="SeriesType.Line" XValue="@(e => e.Dated.FirstDayOfMonth())" YAggregate="@(e => e.Sum(e => e.Value))" OrderBy="e => e.X" />
+                <ApexPointSeries Stroke="@series.Stroke" TItem="ChartTransaction" Items="series.Transactions" Name="@series.SummaryName" SeriesType="SeriesType.Line" XValue="@(e => e.Dated.FirstDayOfMonth())" YAggregate="@(e => e.Sum(e => e.Value))" OrderBy="e => e.X" />
             }
         </ApexChart>
     </MudPaper>
@@ -28,15 +32,19 @@
 
     [Inject] internal ITransactionRepository TransactionRepo { get; set; }
 
-    [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
+    [Inject] internal ISummaryTypeRepository STypeRepo { get; set; }
+
+    [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
 
     ApexChartOptions<ChartTransaction> ChartOptions { get; set; }
 
     ApexChart<ChartTransaction> ApexChart;
 
+    bool Loading = true;
+
     class ChartTransaction { public DateTimeOffset Dated; public decimal Value; } 
 
-    class YearSeries { public string SummaryName = string.Empty; public string ChartColour = string.Empty; public List<ChartTransaction> Transactions = new(); }
+    class YearSeries { public string SummaryName = string.Empty; public SeriesStroke Stroke; public List<ChartTransaction> Transactions = new(); }
 
     List<YearSeries> Series = new List<YearSeries>() { new YearSeries() };
 
@@ -68,8 +76,6 @@
                 break;
         }
 
-        if (Series.First().Transactions.Sum(s => s.Value) < 0) ChartOptions.Yaxis.First().Reversed = true;
-
         if (PageParamsSvc.Year == DateTime.Today.Year) ChartOptions.ForecastDataPoints = new ForecastDataPoints { Count = 13 - DateTime.Today.Month, DashArray = 4, FillOpacity = 0.75, };
 
         NotifierSvc.ThemeChanged += ThemeChanged;
@@ -86,7 +92,12 @@
         // If Total Summary split into individual summary Types
         if (PageParamsSvc.SummaryTypeId != 0)
         {
-            Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, ChartColour = await GetSeriesColour(PageParamsSvc.SummaryTypeId), Transactions = GetSeriesTransactions(PageParamsSvc.Transactions), });
+            Series.Add(new YearSeries 
+                { 
+                    SummaryName = PageParamsSvc.Name, 
+                    Stroke = new SeriesStroke { Width = 3, Color = await GetSTypeSeriesColour(PageParamsSvc.SummaryTypeId) },
+                    Transactions = GetSeriesTransactions(PageParamsSvc.Transactions), 
+                });
 
             GenerateZeroTransactions(Series.First().Transactions);
             bool forecastSet = Forecast(Series.First().Transactions);
@@ -108,12 +119,25 @@
 
             foreach (var summary in PageParamsSvc.Transactions.Select(t => new { t.SummaryTypeId, t.SummaryName }).Distinct().ToList())
             {
-                Series.Add(new YearSeries { SummaryName = summary.SummaryName, ChartColour = await GetSeriesColour(summary.SummaryTypeId), Transactions = GetSeriesTransactions(PageParamsSvc.Transactions.Where(t => t.SummaryTypeId == summary.SummaryTypeId).ToList()), });
+                Series.Add(new YearSeries 
+                    { 
+                        SummaryName = summary.SummaryName ?? string.Empty,
+                        Stroke = new SeriesStroke { Width = 3, Color = await GetSTypeSeriesColour(summary.SummaryTypeId) },
+                        Transactions = GetSeriesTransactions(PageParamsSvc.Transactions.Where(t => t.SummaryTypeId == summary.SummaryTypeId).ToList()),
+                    });
 
                 GenerateZeroTransactions(Series.Last().Transactions);
                 if (Forecast(Series.Last().Transactions)) forecastSet = true;
                 forecastTotal += Series.Last().Transactions.Sum(t => t.Value);
             }
+
+            // Total Series
+            Series.Insert(0, new YearSeries
+                {
+                    SummaryName = Localizer["Total"],
+                    Stroke = new SeriesStroke { Width = 5, Color = await BookSettingSvc.GetTotalColour() },
+                    Transactions = GetTotalSeriesTransactions(),
+                });
 
             if (forecastSet)
             {
@@ -127,7 +151,9 @@
         }
     }
 
-    async Task<string> GetSeriesColour(int summaryTypeId) => await SummaryRepo.GetColour(summaryTypeId);
+    async Task<string> GetSTypeSeriesColour(int summaryTypeId) => await STypeRepo.GetColour(summaryTypeId);
+
+    async Task<string> GetTTypeSeriesColour(int transactionTypeId) => await TTypeRepo.GetColour(transactionTypeId);
 
     async void LoadSummaryChart()
     {
@@ -138,7 +164,12 @@
         if (!transactions.Any()) return;
 
         Series.Clear();
-        Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, ChartColour = await GetSeriesColour(PageParamsSvc.SummaryTypeId), Transactions = GetSeriesTransactions(transactions.ToList()), });
+        Series.Add(new YearSeries 
+            {
+                SummaryName = PageParamsSvc.Name,
+                Stroke = new SeriesStroke { Width = 3, Color = await GetSTypeSeriesColour(PageParamsSvc.SummaryTypeId) },
+                Transactions = GetSeriesTransactions(transactions.ToList()),
+            });
     }
 
     async void LoadTransactionTypeChart()
@@ -150,7 +181,12 @@
         if (!transactions.Any()) return;
 
         Series.Clear();
-        Series.Add(new YearSeries { SummaryName = PageParamsSvc.Name, ChartColour = await GetSeriesColour(PageParamsSvc.TransactionTypeId), Transactions = GetSeriesTransactions(transactions.ToList()), });
+        Series.Add(new YearSeries
+            {
+                SummaryName = PageParamsSvc.Name,
+                Stroke = new SeriesStroke { Width = 3, Color = await GetTTypeSeriesColour(PageParamsSvc.TransactionTypeId) },
+                Transactions = GetSeriesTransactions(transactions.ToList()),
+            });
     }
 
     async Task InitChartOptions()
@@ -165,7 +201,7 @@
 
         ChartOptions.Tooltip = new ApexCharts.Tooltip { X = new TooltipX { Format = @"MMMM \ yyyy" } };
 
-        ChartOptions.Xaxis = new XAxis { Type = XAxisType.Datetime, Labels = new XAxisLabels { MinHeight = 50, Style = new AxisLabelStyle { FontSize = "14px" } } };
+        ChartOptions.Xaxis = new XAxis { Type = XAxisType.Datetime, Labels = new XAxisLabels { MinHeight = 50, Style = new AxisLabelStyle { FontSize = "14px" } }, Tooltip = new AxisTooltip { Enabled = false } };
 
         ChartOptions.Legend = new Legend { Position = LegendPosition.Bottom, FontSize = "16px", };
 
@@ -173,6 +209,33 @@
     }
 
     List<ChartTransaction> GetSeriesTransactions(List<Transaction> transactions) => transactions.Select(t => new ChartTransaction { Dated = t.TransactionDate, Value = t.Value }).ToList();
+
+    List<ChartTransaction> GetTotalSeriesTransactions()
+    {
+        List<ChartTransaction> chartTransactions = [];
+
+        decimal value = 0M;
+
+        for (int i = 1; i < 13; i++)
+        {
+            value = 0M;
+
+            foreach (YearSeries series in Series)
+            {
+                DateTime startDate = new DateTime(PageParamsSvc.Year, i, 1);
+
+                value += series.Transactions.Where(t => t.Dated >= startDate && t.Dated < startDate.AddMonths(1)).Sum(t => t.Value);
+            }
+
+            chartTransactions.Add(new ChartTransaction()
+                {
+                    Dated = new DateTime(PageParamsSvc.Year, i, 1),
+                    Value = value,
+                });
+        }
+
+        return chartTransactions;
+    }
 
     void GenerateZeroTransactions(List<ChartTransaction> chartTransactions)
     {
@@ -244,6 +307,12 @@
                 return prediction + (current * -1);
             }
         }
+    }
+
+    void OnBeforeMount()
+    {
+        Loading = false;
+        StateHasChanged();
     }
 
     void OnLegendClicked(LegendClicked<ChartTransaction> _) { }
