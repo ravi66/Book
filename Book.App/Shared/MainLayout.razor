@@ -1,24 +1,24 @@
 ﻿@inherits LayoutComponentBase
 @implements IDisposable
 
-<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" />
+<MudThemeProvider @bind-IsDarkMode="@IsDarkMode" Theme="BookTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="0" Dense="true" >
-        <MudIconButton Class="pa-0" Edge="Edge.Start" OnClick="ToggleDrawer" Icon="@menuIcon" Color="Color.Info" Size="Size.Large" Title="@menuToolTip" />
-        <MudIconButton Class="py-0 px-2" OnClick="Back" Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" Size="Size.Large" Title="@Localizer["GoBack"]" />
+    <MudAppBar Elevation="0" Dense="true" Class="pa-0" >
+        <MudIconButton Class="pa-0" Edge="Edge.Start" OnClick="ToggleDrawer" Icon="@menuIcon" Color="Color.Info" title="@menuToolTip" />
+        <MudIconButton Class="py-0 px-2" OnClick="Back" Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" title="@Localizer["GoBack"]" />
         <MudSpacer />
         <TransactionBtn IsIcon="false" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
         <MudSpacer />
-        <MudIconButton Class="pa-0" Href="info" Icon="@Icons.Material.Filled.Info" Color="Color.Info" Size="Size.Large" Title="@Localizer["MoreInformation"]" />
-        <MudIconButton Class="py-0 ps-1 pe-0" OnClick="ToggleThemeMode" Icon="@themeIcon" Color="@themeColor" Size="Size.Large" Title="@themeText" />
+        <MudIconButton Class="pa-0" Href="info" Icon="@Icons.Material.Filled.Info" Color="Color.Info" title="@Localizer["MoreInformation"]" />
+        <MudIconButton Class="py-0 ps-1 pe-0" OnClick="ToggleThemeMode" Icon="@themeIcon" Color="@themeColor" title="@themeText" />
     </MudAppBar>
     <MudDrawer @bind-Open="@drawerOpen" Variant="DrawerVariant.Responsive" Elevation="0">
-        <MudDrawerHeader Dense="true" >
-            <MudText Typo="Typo.h5" Class="pa-0" Color="Color.Info">@BookName</MudText>
+        <MudDrawerHeader Dense="true" Style="height: 48px;">
+            <MudText Typo="Typo.h6" Class="pa-0" Color="Color.Info" >@BookName</MudText>
         </MudDrawerHeader>
         <MudNavMenu Color="Color.Success" >
             <MudNavLink Href="Database">
@@ -61,9 +61,18 @@
 
     [Inject] public INotifierSvc NotifierSvc { get; set; }
 
+    MudTheme BookTheme = new MudTheme()
+        {
+            LayoutProperties = new LayoutProperties()
+            {
+                AppbarHeight = "48px"
+            }
+        };
+
     List<string> Locations { get; set; } = new List<string> { "/" };
 
-    bool _isDarkMode = true;
+    public bool IsDarkMode = true;
+
     string themeIcon = Icons.Material.Filled.LightMode;
     string themeText = string.Empty;
     Color themeColor = Color.Warning;
@@ -83,7 +92,7 @@
         themeText = Localizer["LightMode"];
         menuToolTip = Localizer["OpenMenu"];
 
-        _isDarkMode = await BookSettingSvc.GetDarkMode();
+        IsDarkMode = await BookSettingSvc.GetDarkMode();
         SetTheme();
 
         NavigationManager.LocationChanged += LocationChanged;
@@ -98,18 +107,18 @@
 
     async void ToggleThemeMode()
     {
-        _isDarkMode = !_isDarkMode;
+        IsDarkMode = !IsDarkMode;
         SetTheme();
 
-        await BookSettingSvc.SetDarkMode(_isDarkMode);
-        NotifierSvc.OnThemeChanged(this, _isDarkMode);
+        await BookSettingSvc.SetDarkMode(IsDarkMode);
+        NotifierSvc.OnThemeChanged(this, IsDarkMode);
     }
 
     void SetTheme()
     {
-        themeIcon = _isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
-        themeText = _isDarkMode ? Localizer["LightMode"] : Localizer["DarkMode"];
-        themeColor = _isDarkMode ? Color.Warning : Color.Dark;
+        themeIcon = IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
+        themeText = IsDarkMode ? Localizer["LightMode"] : Localizer["DarkMode"];
+        themeColor = IsDarkMode ? Color.Warning : Color.Dark;
     }
 
     void Back()

@@ -1,17 +1,19 @@
 ﻿@page "/linechart"
-@implements IDisposable
+@implements IAsyncDisposable
 @rendermode RenderMode.InteractiveWebAssembly
 @using ApexCharts
 
 <PageTitle>@BookName - @ChartTitle</PageTitle>
 
-<MudContainer Class="d-flex flex-grow-1 ma-0 pa-0" >
-    <MudPaper Elevation="0" MinWidth="100%" >
+<MudContainer Class="d-flex flex-grow-1" Gutters="false">
+    <MudPaper Elevation="0" Class="ma-0 pa-0" MinWidth="100%">
         @if (Loading == true)
         {
             <MudText Typo="Typo.h5" Align="MudBlazor.Align.Center">@Localizer["PlottingChart"]</MudText>
         }
-        <ApexChart TItem="ChartTransaction" Title="@ChartTitle" XAxisType="XAxisType.Datetime" Options="ChartOptions" @ref="ApexChart" Height="525" OnLegendClicked="OnLegendClicked" FormatYAxisLabel="GetYAxisLabel" OnBeforeMount="OnBeforeMount" >
+        <ApexChart TItem="ChartTransaction" Title="@ChartTitle" XAxisType="XAxisType.Datetime"
+                Options="ChartOptions" @ref="ApexChart" FormatYAxisLabel="GetYAxisLabel"
+                OnBeforeMount="OnBeforeMount" Height="@ChartHeight" >
             @foreach (var series in Series)
             {
                 <ApexPointSeries Stroke="@series.Stroke" TItem="ChartTransaction" Items="series.Transactions" Name="@series.SummaryName" SeriesType="SeriesType.Line" XValue="@(e => e.Dated.FirstDayOfMonth())" YAggregate="@(e => e.Sum(e => e.Value))" OrderBy="e => e.X" />
@@ -22,6 +24,8 @@
 
 @code
 {
+    [Inject] public IBrowserViewportService ViewportService { get; set; }
+
     [Inject] public PageParamsSvc PageParamsSvc { get; set; }
 
     [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
@@ -52,8 +56,16 @@
 
     string ChartTitle = string.Empty;
 
+    int ChartHeight = 500;
+
     protected async override Task OnInitializedAsync()
     {
+        if (PageParamsSvc.Mode < 1)
+        {
+            NavigationManager.NavigateTo("/", false);
+            return;
+        }
+
         BookName = await BookSettingSvc.GetBookName();
 
         await InitChartOptions();
@@ -80,6 +92,19 @@
 
         NotifierSvc.ThemeChanged += ThemeChanged;
     }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            BrowserWindowSize windowSize = await ViewportService.GetCurrentBrowserWindowSizeAsync();
+            ChartHeight = windowSize.Height - 60;
+            StateHasChanged();
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+
 
     async void LoadYearChart()
     {
@@ -255,7 +280,7 @@
     bool Forecast(List<ChartTransaction> chartTransactions)
     {
         if (PageParamsSvc.Year != DateTime.Today.Year) return false;
-        
+
         DateTime forecastDate = new DateTime(PageParamsSvc.Year, DateTime.Today.Month, 1);
 
         decimal average = (chartTransactions.Where(t => t.Dated < forecastDate).Sum(t => t.Value) / (forecastDate.Month - 1));
@@ -315,8 +340,6 @@
         StateHasChanged();
     }
 
-    void OnLegendClicked(LegendClicked<ChartTransaction> _) { }
-
     string GetYAxisLabel(decimal value) => value.ToString("C2");
 
     void ThemeChanged(object? sender, bool darkMode)
@@ -326,7 +349,7 @@
         ApexChart.RenderAsync();
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         NotifierSvc.ThemeChanged -= ThemeChanged;
         GC.SuppressFinalize(this);

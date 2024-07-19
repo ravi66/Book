@@ -1,8 +1,8 @@
 ﻿@using ApexCharts;
 
-<MudDialog @rendermode="RenderMode.InteractiveWebAssembly" Gutters="false" ContentClass="d-flex pa-2" >
+<MudDialog @rendermode="RenderMode.InteractiveWebAssembly" Gutters="false" ContentClass="my-0 mx-2" ContentStyle="overflow: hidden;">
     <DialogContent>
-        <MudPaper Class="flex-grow-1">
+        <MudPaper>
             @if (Loading == true)
             {
                 <MudText Align="MudBlazor.Align.Center" Typo="Typo.h5">@Localizer["PlottingChart"]</MudText>
@@ -15,7 +15,7 @@
             }
             @if (DisplayTransactions.Count > 0)
             {
-                <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@ChartTitle" OnDataPointSelection="OnDataPointSelection" FormatYAxisLabel="GetYAxisLabel" OnBeforeMount="OnBeforeMount">
+                <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@ChartTitle" OnDataPointSelection="OnDataPointSelection" FormatYAxisLabel="GetYAxisLabel" OnBeforeMount="OnBeforeMount" >
                     @if (!ShowEntryTypes)
                     {
                         <ApexPointSeries TItem="Transaction" Items="DisplayTransactions" XValue="@(t => t.SummaryName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
