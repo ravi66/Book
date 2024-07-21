@@ -8,7 +8,7 @@
         public int SummaryTypeId { get; set; }
 
         [JsonIgnore]
-        public SummaryType SummaryType { get; set; }
+        public SummaryType SummaryType { get; set; } = default!;
 
         public string Name { get; set; } = string.Empty;
 

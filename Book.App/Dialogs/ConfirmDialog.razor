@@ -19,7 +19,7 @@
 
 @code
 {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
     [Parameter] public string CancelLabel { get; set; } = string.Empty;
 
@@ -45,7 +45,7 @@
 
     void Accept() => MudDialog.Close(DialogResult.Ok(true));
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         MudDialog.Options.NoHeader = true;
         MudDialog.SetOptions(MudDialog.Options);

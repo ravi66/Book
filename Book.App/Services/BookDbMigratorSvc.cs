@@ -4,7 +4,7 @@
     {
         const string CurrentDbVersion = "2.10";
 
-        BookDbContext _dbContext;
+        BookDbContext _dbContext = default!;
         
         readonly IDbContextFactory<BookDbContext> dbContextFactory = dbContextFactory;
 

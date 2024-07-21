@@ -36,15 +36,15 @@
 
 @code {
 
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; } = default!;
 
-    [Parameter] public List<Transaction> Transactions { get; set; }
+    [Parameter] public List<Transaction> Transactions { get; set; } = default!;
 
-    [Parameter] public int Year { get; set; }
+    [Parameter] public int Year { get; set; } = default!;
 
-    [Parameter] public int MonthNo { get; set; }
+    [Parameter] public int MonthNo { get; set; } = default!;
 
     string DisplayMonth { get; set; } = string.Empty;
 
@@ -56,9 +56,9 @@
 
     List<Transaction>? CreditTransactions { get; set; }
 
-    ApexChartOptions<Transaction> ChartOptions;
+    ApexChartOptions<Transaction> ChartOptions = default!;
 
-    ApexChart<Transaction> ApexChart;
+    ApexChart<Transaction> ApexChart = default!;
 
     bool Loading = true;
 

@@ -3,7 +3,7 @@
 @inject NavigationManager NavigationManager
 
 @code {
-    [Parameter] public string Page { get; set; }
+    [Parameter] public string Page { get; set; } = default!;
 
     protected override void OnInitialized()
     {

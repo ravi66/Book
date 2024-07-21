@@ -1,5 +1,5 @@
 ﻿@page "/linechart"
-@implements IAsyncDisposable
+@implements IDisposable
 @rendermode RenderMode.InteractiveWebAssembly
 @using ApexCharts
 
@@ -24,31 +24,31 @@
 
 @code
 {
-    [Inject] public IBrowserViewportService ViewportService { get; set; }
+    [Inject] public IBrowserViewportService ViewportService { get; set; } = default!;
 
-    [Inject] public PageParamsSvc PageParamsSvc { get; set; }
+    [Inject] public PageParamsSvc PageParamsSvc { get; set; } = default!;
 
-    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; } = default!;
 
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
+    [Inject] public INotifierSvc NotifierSvc { get; set; } = default!;
 
-    [Inject] public NavigationManager NavigationManager { get; set; }
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
-    [Inject] internal ITransactionRepository TransactionRepo { get; set; }
+    [Inject] internal ITransactionRepository TransactionRepo { get; set; } = default!;
 
-    [Inject] internal ISummaryTypeRepository STypeRepo { get; set; }
+    [Inject] internal ISummaryTypeRepository STypeRepo { get; set; } = default!;
 
-    [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
+    [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; } = default!;
 
-    ApexChartOptions<ChartTransaction> ChartOptions { get; set; }
+    ApexChartOptions<ChartTransaction> ChartOptions { get; set; } = default!;
 
-    ApexChart<ChartTransaction> ApexChart;
+    ApexChart<ChartTransaction> ApexChart = default!;
 
     bool Loading = true;
 
-    class ChartTransaction { public DateTimeOffset Dated; public decimal Value; } 
+    class ChartTransaction { public DateTimeOffset Dated; public decimal Value; }
 
-    class YearSeries { public string SummaryName = string.Empty; public SeriesStroke Stroke; public List<ChartTransaction> Transactions = new(); }
+    class YearSeries { public string SummaryName = string.Empty; public SeriesStroke Stroke = default!; public List<ChartTransaction> Transactions = new(); }
 
     List<YearSeries> Series = new List<YearSeries>() { new YearSeries() };
 
@@ -60,13 +60,9 @@
 
     protected async override Task OnInitializedAsync()
     {
-        if (PageParamsSvc.Mode < 1)
-        {
-            NavigationManager.NavigateTo("/", false);
-            return;
-        }
-
         BookName = await BookSettingSvc.GetBookName();
+
+        if (PageParamsSvc.Mode < 1 || PageParamsSvc.Mode > 3) NavigationManager.NavigateTo("/", false);
 
         await InitChartOptions();
 
@@ -104,7 +100,6 @@
 
         base.OnAfterRender(firstRender);
     }
-
 
     async void LoadYearChart()
     {
@@ -178,7 +173,7 @@
 
     async Task<string> GetSTypeSeriesColour(int summaryTypeId) => await STypeRepo.GetColour(summaryTypeId);
 
-    async Task<string> GetTTypeSeriesColour(int transactionTypeId) => await TTypeRepo.GetColour(transactionTypeId);
+    async Task<string> GetTTypeSeriesColour(int transactionTypeId) => await TTypeRepo.GetColour(transactionTypeId) ?? string.Empty;
 
     async void LoadSummaryChart()
     {
@@ -349,7 +344,7 @@
         ApexChart.RenderAsync();
     }
 
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
         NotifierSvc.ThemeChanged -= ThemeChanged;
         GC.SuppressFinalize(this);

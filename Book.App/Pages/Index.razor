@@ -1,5 +1,5 @@
 ﻿@page "/"
-@implements IAsyncDisposable
+@implements IDisposable
 
 <PageTitle>@BookName - Summary @Year</PageTitle>
 
@@ -10,7 +10,7 @@
             <MudMenu Dense="true" AnchorOrigin="Origin.BottomLeft" Label="@Year.ToString()" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small ">
                 @foreach (int year in Years)
                 {
-                    <MudMenuItem OnClick="() => YearChanged(year)" OnTouch="() => YearChanged(year)">@year</MudMenuItem>
+                    <MudMenuItem OnClick="() => YearChanged(year)">@year</MudMenuItem>
                 }
             </MudMenu>
 
@@ -24,7 +24,7 @@
     </MudGrid>
 </MudHidden>
 
-@if (MonthlySummaries != null)
+@if (MonthlySummaries != null && MonthlySummaries.Count > 1)
 {
     <LoadDemoData @ref="LoadDemoData" />
 
@@ -42,7 +42,7 @@
                     <MudMenu Dense="true" AnchorOrigin="Origin.BottomLeft" Label="@Year.ToString()" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small" Class="pt-0 pb-0">
                         @foreach (int year in Years)
                         {
-                            <MudMenuItem OnClick="() => YearChanged(year)" OnTouch="() => YearChanged(year)">@year</MudMenuItem>
+                            <MudMenuItem OnClick="() => YearChanged(year)">@year</MudMenuItem>
                         }
                     </MudMenu>
                 </MudTooltip>
@@ -82,19 +82,19 @@ else
 
 @code
 {
-    [Inject] public NavigationManager NavigationManager { get; set; }
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; } = default!;
 
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
+    [Inject] public INotifierSvc NotifierSvc { get; set; } = default!;
 
-    [Inject] internal ITransactionRepository Repo { get; set; }
+    [Inject] internal ITransactionRepository Repo { get; set; } = default!;
 
-    [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; }
+    [Inject] internal ISummaryTypeRepository SummaryRepo { get; set; } = default!;
 
-    [Inject] PageParamsSvc PageParamsSvc { get; set; }
+    [Inject] PageParamsSvc PageParamsSvc { get; set; } = default!;
 
     List<SummaryType> SummaryTypes { get; set; } = [];
 
@@ -102,9 +102,9 @@ else
 
     record SummaryDetail(int SummaryTypeId, string SummaryName, List<int> Types, decimal Total, bool HasTransactions, string ChartColour);
 
-    List<MonthlySummary> MonthlySummaries { get; set; }
+    List<MonthlySummary> MonthlySummaries { get; set; } = [];
 
-    List<Transaction> Transactions { get; set; }
+    List<Transaction> Transactions { get; set; } = [];
 
     string BookName { get; set; } = string.Empty;
 
@@ -118,7 +118,7 @@ else
 
     bool DarkMode { get; set; }
 
-    LoadDemoData LoadDemoData;
+    LoadDemoData LoadDemoData = default!;
 
     bool LoadDemoChecked = false;
 
@@ -310,13 +310,13 @@ else
         NavigationManager.NavigateTo("TransList", false);
     }
 
-    void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
+    async void TransactionsChanged(object? sender, TransactionsChangedEventArgs args)
     {
         foreach (int transactionYear in args.Years)
         {
             if (transactionYear == Year)
             {
-                LoadSummary();
+                await LoadSummary();
                 break;
             }
         }
@@ -328,7 +328,7 @@ else
         StateHasChanged();
     }
 
-    async ValueTask IAsyncDisposable.DisposeAsync()
+    public void Dispose()
     {
         NotifierSvc.TransactionsChanged -= TransactionsChanged;
         NotifierSvc.ThemeChanged -= ThemeChanged;

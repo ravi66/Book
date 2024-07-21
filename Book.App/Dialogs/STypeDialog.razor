@@ -43,17 +43,17 @@
 
 @code
 {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    [Parameter] public int SavedSummaryTypeId { get; set; }
+    [Parameter] public int SavedSummaryTypeId { get; set; } = default!;
 
     [Parameter] public string NewName { get; set; } = string.Empty;
 
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    [Inject] internal ISummaryTypeRepository Repo { get; set; }
+    [Inject] internal ISummaryTypeRepository Repo { get; set; } = default!;
 
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
+    [Inject] public INotifierSvc NotifierSvc { get; set; } = default!;
 
     string DialogTitle { get; set; } = string.Empty;
 
@@ -61,7 +61,7 @@
 
     readonly SummaryTypeValidator validator = new();
 
-    MudForm form;
+    MudForm form = default!;
 
     bool formHasChanged = false;
 
@@ -81,7 +81,8 @@
                 { x => x.CancelToolTip, Localizer["DiscardChanges"] },
             });
 
-            if (!(await dialog.Result).Canceled) Save();
+            DialogResult dialogResult = await dialog.Result ?? default!;
+            if (!dialogResult.Canceled) Save();
         }
 
         MudDialog.Cancel();
@@ -96,7 +97,7 @@
 
         if (SavedSummaryTypeId != 0)
         {
-            SummaryType = await Repo.GetSummaryTypeById(SavedSummaryTypeId);
+            SummaryType = await Repo.GetSummaryTypeById(SavedSummaryTypeId) ?? default!;
             DialogTitle = Localizer["EditSummaryType"];
         }
         else
@@ -135,8 +136,8 @@
     {
         MudColor chartColour = String.IsNullOrEmpty(SummaryType.ChartColour) ? Utils.RandomColour() : SummaryType.ChartColour;
 
-        var result = await DialogService.Show<ColourDialog>("", new DialogParameters<ColourDialog> { { x => x.Colour, chartColour }, { x => x.Title, $"{SummaryType.Name} {Localizer["Colour"]}" } }).Result;
-        if (!result.Canceled)
+        var result = await DialogService.Show<ColourDialog>("", new DialogParameters<ColourDialog> { { x => x.Colour, chartColour }, { x => x.Title, $"{SummaryType.Name} {Localizer["Colour"]}" } }).Result ?? default!;
+        if (!result.Canceled && result.Data is not null)
         {
             SummaryType.ChartColour = result.Data.ToString();
             formHasChanged = true;

@@ -4,8 +4,8 @@
             <MudStack AlignItems="AlignItems.Center" Row="true" Class="pa-2">
                 <MudText Typo="Typo.h6">@DialogTitle</MudText>
                 <MudSpacer />
-                <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Save" OnClick="HandleSubmit" Title="@Localizer["CreateEntries"]" Size="Size.Small" />
-                <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Cancel" OnClick="Close" Title="@Localizer["Close"]" Size="Size.Small" />
+                <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Save" OnClick="HandleSubmit" title="@Localizer["CreateEntries"]" Size="Size.Small" />
+                <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Icon="@Icons.Material.Filled.Cancel" OnClick="Close" title="@Localizer["Close"]" Size="Size.Small" />
             </MudStack>
             <MudPaper Elevation="5" Class="pa-1">
                 <MudGrid>
@@ -29,7 +29,7 @@
                 <RowTemplate>
                     <MudTd DataLabel=@Localizer["Dated"]>
                         @context.TransactionDate.ToShortDateString()
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="() => DeleteTransaction(context.TransactionDate)" Size="Size.Small" Title="@Localizer["DeleteEntry"]" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="() => DeleteTransaction(context.TransactionDate)" Size="Size.Small" title="@Localizer["DeleteEntry"]" />
                     </MudTd>
                 </RowTemplate>
             </MudTable>
@@ -39,19 +39,19 @@
 
 @code
 {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    [Parameter] public int TransactionToCopyId { get; set; }
+    [Parameter] public int TransactionToCopyId { get; set; } = default!;
 
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
+    [Inject] public INotifierSvc NotifierSvc { get; set; } = default!;
 
-    [Inject] internal ITransactionRepository Repo { get; set; }
+    [Inject] internal ITransactionRepository Repo { get; set; } = default!;
 
-    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; } = default!;
 
-    Transaction TransactionToCopy { get; set; }
+    Transaction TransactionToCopy { get; set; } = default!;
 
     IEnumerable<Transaction> NewTransactions { get; set; } = [];
 
@@ -67,9 +67,9 @@
             new Frequency(6, "Daily"),
         ];
 
-    string DialogTitle { get; set; }
+    string DialogTitle { get; set; } = string.Empty;
 
-    Frequency SelectedFrequency { get; set; }
+    Frequency SelectedFrequency { get; set; } = default!;
 
     DateTime? EndDate { get; set; }
 
@@ -81,8 +81,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        TransactionToCopy = await Repo.GetTransactionById(TransactionToCopyId);
-        if (TransactionToCopy.TransactionId == 0 || TransactionToCopy.TransactionTypeId == 0) MudDialog.Cancel();
+        TransactionToCopy = await Repo.GetTransactionById(TransactionToCopyId) ?? default!;
+        if (TransactionToCopy.TransactionId == 0 || TransactionToCopy.TransactionTypeId == 0)
+        {
+            MudDialog.Cancel();
+            return;
+        }
 
         MudDialog.Options.NoHeader = true;
         MudDialog.SetOptions(MudDialog.Options);
@@ -91,7 +95,7 @@
         EndDate = new DateTime(await BookSettingSvc.GetEndYear(), 12, 31);
         MinDate = new DateTime(await BookSettingSvc.GetStartYear(), 1, 1);
 
-        DialogTitle = Localizer["TransCopyTitle", TransactionToCopy.Value.ToString("C2"), TransactionToCopy.TransactionType.Name];
+        DialogTitle = Localizer["TransCopyTitle", TransactionToCopy.Value.ToString("C2"), TransactionToCopy.TransactionTypeName ?? string.Empty];
 
         LoadCopiedTransactions();
         StateHasChanged();
@@ -146,7 +150,8 @@
                 { x => x.CancelColour, Color.Default },
             });
 
-        if ((await dialog.Result).Canceled) return;
+        DialogResult dialogResult = await dialog.Result ?? default!;
+        if (dialogResult.Canceled) return;
 
         await Repo.AddTransactions(NewTransactions);
 

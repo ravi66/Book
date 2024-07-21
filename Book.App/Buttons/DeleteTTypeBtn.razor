@@ -1,18 +1,18 @@
-﻿<MudIconButton Variant="@Variant" Size="@Size" Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="Delete" Title="@Localizer["DeleteEntryType"]"/>
+﻿<MudIconButton Variant="@Variant" Size="@Size" Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="Delete" title="@Localizer["DeleteEntryType"]"/>
 
 @code
 {
-    [Parameter] public TransactionType TransactionType { get; set; }
+    [Parameter] public TransactionType TransactionType { get; set; } = default!;
 
-    [Parameter] public Variant Variant { get; set; }
+    [Parameter] public Variant Variant { get; set; } = default!;
 
     [Parameter] public Size Size { get; set; }
 
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    [Inject] internal ITransactionTypeRepository Repo { get; set; }
+    [Inject] internal ITransactionTypeRepository Repo { get; set; } = default!;
 
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
+    [Inject] public INotifierSvc NotifierSvc { get; set; } = default!;
 
     async Task Delete()
     {
@@ -25,7 +25,8 @@
                     { x => x.CancelLabel, Localizer["No"] },
                 });
 
-        if (!(await dialog.Result).Canceled)
+        DialogResult dialogResult = await dialog.Result ?? default!;
+        if (!dialogResult.Canceled)
         {
             await Repo.DeleteTransactionType(TransactionType.TransactionTypeId);
             NotifierSvc.OnTransactionTypeDeleted(this, TransactionType.SummaryTypeId);

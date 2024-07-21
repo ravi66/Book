@@ -2,13 +2,13 @@
 
 @code {
 
-    [Inject] public HttpClient HttpClient { get; set; }
+    [Inject] public HttpClient HttpClient { get; set; } = default!;
 
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    [Inject] public IJSRuntime JsRuntime { get; set; }
+    [Inject] public IJSRuntime JsRuntime { get; set; } = default!;
 
-    [Inject] public NavigationManager NavigationManager { get; set; }
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
     IJSObjectReference? jsModule;
 
@@ -23,7 +23,8 @@
             { x => x.CancelLabel, Localizer["No"] },
         });
 
-        if ((await dialog.Result).Canceled) return;
+        DialogResult dialogResult = await dialog.Result ?? default!;
+        if (dialogResult.Canceled) return;
 
         await Load();
     }

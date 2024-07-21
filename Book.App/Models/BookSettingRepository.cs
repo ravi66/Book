@@ -22,15 +22,7 @@
         {
             using var dbContext = await db.CreateDbContextAsync();
 
-            return dbContext.BookSetting
-                .Select(b => new BookSetting
-                {
-                    BookSettingId = b.BookSettingId,
-                    UserAmendable = b.UserAmendable,
-                    SettingName = b.SettingName,
-                    SettingValue = b.SettingValue
-                })
-                .FirstOrDefault(b => b.BookSettingId == bookSettingId);
+            return dbContext.BookSetting.AsEnumerable().FirstOrDefault(b => b.BookSettingId == bookSettingId);
         }
 
         public async Task<BookSetting> AddBookSetting(BookSetting bookSetting)
@@ -45,8 +37,7 @@
         {
             using var dbContext = await db.CreateDbContextAsync();
 
-            var foundBookSetting = dbContext.BookSetting
-                .FirstOrDefault(b => b.BookSettingId == bookSetting.BookSettingId);
+            var foundBookSetting = dbContext.BookSetting.FirstOrDefault(b => b.BookSettingId == bookSetting.BookSettingId);
 
             if (foundBookSetting != null)
             {

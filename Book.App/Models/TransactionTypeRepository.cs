@@ -40,7 +40,7 @@
         {
             using var dbContext = await db.CreateDbContextAsync();
 
-            transactionType.SummaryType = null;
+            transactionType.SummaryType = default!;
             transactionType.CreateDate = DateTime.Now;
             var addedEntity = dbContext.TransactionTypes.Add(transactionType);
             await dbContext.SaveChangesAsync();
@@ -80,7 +80,7 @@
             await dbContext.SaveChangesAsync();
         }
 
-        public async Task<string?> GetColour(int transactionTypeId)
+        public async Task<string> GetColour(int transactionTypeId)
         {
             using var dbContext = await db.CreateDbContextAsync();
             return dbContext.TransactionTypes.Where(s => s.TransactionTypeId == transactionTypeId).Select(s => s.ChartColour).FirstOrDefault() ?? Utils.RandomColour();

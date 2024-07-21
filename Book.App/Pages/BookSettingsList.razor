@@ -19,14 +19,14 @@
             @if (reloadRequired)
             {
                 <MudItem Class="py-0 px-2">
-                    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Variant="Variant.Filled" Color="Color.Warning" Title="@Localizer["SaveSettings"]" OnClick="Reload" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Refresh" Variant="Variant.Filled" Color="Color.Warning" title="@Localizer["SaveSettings"]" OnClick="Reload" />
                 </MudItem>
             }
         </MudGrid>
     </ToolBarContent>
     <HeaderContent>
         <MudTh><MudTableSortLabel SortBy="new Func<BookSetting, object>(x=>x.SettingName)">@Localizer["Name"]</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortBy="new Func<BookSetting, object>(x=>x.SettingValue)">@Localizer["Value"]</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<BookSetting, object>(x=>x.SettingValue ?? string.Empty)">@Localizer["Value"]</MudTableSortLabel></MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="@Localizer["Name"]">@context.SettingName</MudTd>
@@ -56,19 +56,19 @@
 
 @code
 {
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    [Inject] public NavigationManager NavigationManager { get; set; }
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
-    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; } = default!;
 
-    [Inject] internal IBookSettingRepository Repo { get; set; }
+    [Inject] internal IBookSettingRepository Repo { get; set; } = default!;
 
     string BookName { get; set; } = Constants.BookName;
 
-    List<BookSetting> BookSettings { get; set; }
+    List<BookSetting> BookSettings { get; set; } = default!;
 
-    MudTable<BookSetting> Table;
+    MudTable<BookSetting> Table = default!;
 
     readonly BookSettingValidator validator = new();
 
@@ -76,7 +76,7 @@
 
     bool reloadRequired = false;
 
-    BookSetting settingBeforeEdit;
+    BookSetting settingBeforeEdit = default!;
 
     string TotalColour { get; set; } = string.Empty;
 
@@ -128,14 +128,15 @@
 
     async void OnRowClick(TableRowClickEventArgs<BookSetting> args)
     {
-        BookSetting? setting = args.Item;
+        BookSetting? setting = args.Item ?? default!;
         if (setting is null || setting.BookSettingId != 8) return;
 
         setting = BookSettings.Where(s => s.BookSettingId == 8).FirstOrDefault();
+        if (setting is null) return;
         MudColor colour = String.IsNullOrEmpty(setting.SettingValue) ? "#ffd700" : setting.SettingValue; // Gold
 
         var result = await DialogService.Show<ColourDialog>("", new DialogParameters<ColourDialog> { { x => x.Colour, colour }, { x => x.Title, $"{setting.SettingName}" } }).Result;
-        if (!result.Canceled)
+        if (result is not null && !result.Canceled && result.Data is not null)
         {
             setting.SettingValue = result.Data.ToString();
             TotalColour = $"color: {setting.SettingValue};";

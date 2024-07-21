@@ -120,11 +120,11 @@
                 if (BookSetting.SettingName != settingName)
                 {
                     BookSetting.SettingName = settingName;
-                    BookSetting = await repo.UpdateBookSetting(BookSetting);
+                    _ = await repo.UpdateBookSetting(BookSetting);
                 }
             }
 
-            return BookSetting.SettingValue;
+            return BookSetting.SettingValue ?? string.Empty;
         }
 
         async Task SetSettingValue(int settingId, string settingName, bool userAmendable, string newValue)

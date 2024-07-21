@@ -17,24 +17,12 @@
                 <MudItem xs="12" sm="6">
                     <MudPaper Elevation="5" Class="my-2">
                         <MudAutocomplete 
-                            Label="@Localizer["Type"]" 
-                            T="TransactionType"
-                            Style="width: 100%;" 
-                            Variant="Variant.Outlined" 
-                            Margin="Margin.Dense"
-                            Dense="true" 
-                            SearchFunc="@TypeSearch" 
-                            SelectOnActivation="true" 
-                            SelectValueOnTab="true" 
-                            Value="SelectedTransactionType" 
-                            ValueChanged= "TTypeChanged"
-                            ToStringFunc="@(t => t == null ? null : t.Name )" 
-                            DebounceInterval="500" 
-                            MaxItems="null"
-                            CoerceValue="true"
-                            @ref="@tTypeField"
-                            
-                            />
+                            Label="@Localizer["Type"]" T="TransactionType" Style="width: 100%;" 
+                            Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" 
+                            SearchFunc="@TypeSearch" SelectOnActivation="true" SelectValueOnTab="true" 
+                            Value="SelectedTransactionType" ValueChanged= "TTypeChanged"
+                            ToStringFunc="@(t => t == null ? null : t.Name )" DebounceInterval="500" 
+                            MaxItems="null" CoerceValue="true" @ref="@tTypeField" />
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" sm="6">
@@ -61,26 +49,26 @@
             <CopyTransactionBtn Transaction="@Transaction" Variant="@Variant.Filled" Size="@Size.Medium" />
             <DeleteTransactionBtn Transaction="@Transaction" Variant="@Variant.Filled" Size="@Size.Medium" />
         }
-        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["SaveEntry"]" OnClick="Save" />
-        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" Title="@Localizer["Close"]" OnClick="Close" />
+        <MudIconButton Icon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" title="@Localizer["SaveEntry"]" OnClick="Save" />
+        <MudIconButton Icon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Primary" title="@Localizer["Close"]" OnClick="Close" />
     </DialogActions>
 </MudDialog>
 
 @code
 {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    [Parameter] public int SavedTransactionId { get; set; }
+    [Parameter] public int SavedTransactionId { get; set; } = default!;
 
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
+    [Inject] public INotifierSvc NotifierSvc { get; set; } = default!;
 
-    [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; }
+    [Inject] internal ITransactionTypeRepository TTypeRepo { get; set; } = default!;
 
-    [Inject] internal ITransactionRepository Repo { get; set; }
+    [Inject] internal ITransactionRepository Repo { get; set; } = default!;
 
-    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; } = default!;
 
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
     Transaction Transaction { get; set; } = new Transaction
         {
@@ -91,11 +79,11 @@
 
     readonly TransactionValidator validator = new();
 
-    MudForm form;
+    MudForm form = default!;
 
     bool formHasChanged = false;
 
-    List<TransactionType> TransactionTypes { get; set; }
+    List<TransactionType> TransactionTypes { get; set; } = [];
 
     TransactionType SelectedTransactionType { get; set; } = new TransactionType
         {
@@ -107,23 +95,24 @@
 
     int OriginalYear { get; set; } = 0;
 
-    MudAutocomplete<TransactionType> tTypeField;
+    MudAutocomplete<TransactionType> tTypeField = new MudAutocomplete<TransactionType>();
 
     async void Close()
     {
         if (formHasChanged && form is not null && form.IsValid && Transaction.Value != 0)
         {
             var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
-            {
-                { x => x.AcceptLabel, Localizer["SaveEntryChanges"] },
-                { x => x.AcceptColour, Color.Success },
-                { x => x.AcceptToolTip, Localizer["SaveClose"] },
-                { x => x.CancelLabel, Localizer["Discard"] },
-                { x => x.CancelColour, Color.Error },
-                { x => x.CancelToolTip, Localizer["DiscardChanges"] },
-            });
+                {
+                    { x => x.AcceptLabel, Localizer["SaveEntryChanges"] },
+                    { x => x.AcceptColour, Color.Success },
+                    { x => x.AcceptToolTip, Localizer["SaveClose"] },
+                    { x => x.CancelLabel, Localizer["Discard"] },
+                    { x => x.CancelColour, Color.Error },
+                    { x => x.CancelToolTip, Localizer["DiscardChanges"] },
+                });
 
-            if (!(await dialog.Result).Canceled) Save();
+            DialogResult dialogResult = await dialog.Result ?? default!;
+            if (!dialogResult.Canceled) Save();
         }
 
         MudDialog.Cancel();
@@ -138,7 +127,7 @@
 
         if (SavedTransactionId == 0)
         {
-            Transaction.TransactionType = TransactionTypes.FirstOrDefault(tt => tt.TransactionTypeId == -1);
+            Transaction.TransactionType = TransactionTypes.FirstOrDefault(tt => tt.TransactionTypeId == -1) ?? default!;
 
             var maxDate = new DateTime(await BookSettingSvc.GetEndYear(), 12, 31);
             var minDate = new DateTime(await BookSettingSvc.GetStartYear(), 1, 1);
@@ -154,11 +143,11 @@
         }
         else
         {
-            Transaction = await Repo.GetTransactionById(SavedTransactionId);
+            Transaction = await Repo.GetTransactionById(SavedTransactionId) ?? default!;
             OriginalYear = Transaction.TransactionDate.Year;
         }
 
-        SelectedTransactionType = TransactionTypes.FirstOrDefault(t => t.TransactionTypeId == Transaction.TransactionTypeId);
+        SelectedTransactionType = TransactionTypes.First(t => t.TransactionTypeId == Transaction.TransactionTypeId);
         PickerDate = Transaction.TransactionDate;
 
         NotifierSvc.TransactionsChanged += TransactionsChanged;
@@ -172,7 +161,7 @@
             return;
         }
 
-        string newName = tTypeField.Text;
+        string newName = tTypeField.Text ?? string.Empty;
 
         var confDialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
             {
@@ -181,7 +170,8 @@
                 { x => x.CancelColour, Color.Primary },
             });
 
-        if ((await confDialog.Result).Canceled) return;
+        DialogResult confDialogResult = await confDialog.Result ?? default!;
+        if (confDialogResult.Canceled) return;
 
         var tTypeDialog = DialogService.Show<TTypeDialog>("", new DialogParameters<TTypeDialog>
             {
@@ -189,11 +179,15 @@
                 { x => x.NewName, newName },
             });
 
-        if ((await tTypeDialog.Result).Canceled) return;
+        DialogResult tTypeDialogResult = await tTypeDialog.Result ?? default!;
+        if (tTypeDialogResult.Canceled) return;
 
-        SelectedTransactionType = (TransactionType)tTypeDialog.Result.Result.Data;
-        TransactionTypes.Add(SelectedTransactionType);
-        StateHasChanged();
+        if (tTypeDialogResult.Data is not null)
+        {
+            SelectedTransactionType = (TransactionType)tTypeDialogResult.Data;
+            if (SelectedTransactionType is not null) TransactionTypes.Add(SelectedTransactionType);
+            StateHasChanged();
+        }
 
         return;
     }
@@ -206,7 +200,14 @@
         Transaction.TransactionTypeId = SelectedTransactionType.TransactionTypeId;
         Transaction.TransactionDate = (DateTime)(PickerDate is null ? DateTime.Today : PickerDate);
 
-        _ = SavedTransactionId == 0 ? await Repo.AddTransaction(Transaction) : await Repo.UpdateTransaction(Transaction);
+        if (SavedTransactionId == 0)
+        {
+            await Repo.AddTransaction(Transaction);
+        }
+        else
+        {
+            await Repo.UpdateTransaction(Transaction);
+        }
 
         List<int> years = [Transaction.TransactionDate.Year];
         if (OriginalYear != 0 && OriginalYear != Transaction.TransactionDate.Year) years.Add(OriginalYear);

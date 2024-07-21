@@ -16,12 +16,12 @@
 <InputFile id="inputFile" OnChange="@UploadDb" accept=".sqlite3" hidden />
 <LoadDemoData @ref="LoadDemoData" />
 
-<MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mt-4 mb-2" Elevation="10" ContentAlignment="HorizontalAlignment.Start" NoIcon="true">
+<MudAlert Severity="@Severity" Variant="Variant.Outlined" Class="mt-4 mb-2" Elevation="10" ContentAlignment="HorizontalAlignment.Start" NoIcon="true">
     <MudStack AlignItems="AlignItems.Center" Row="true">
         <MudIcon Icon="@Icons.Material.Filled.Warning" Size="Size.Large" />
-        <MudText Typo="Typo.h5">@Localizer["DatabaseAlertMessage", LastBackupDateStr]</MudText>
+        <MudText Typo="Typo.h5">@Localizer["DatabaseAlertMessage", LastBackupDateStr, string.Empty]</MudText>
     </MudStack>
-</MudAlert> 
+</MudAlert>
 
 <MudContainer Class="ma-0 pa-2">
     <MudGrid >
@@ -85,37 +85,45 @@
 
 @code
 {
-    [Inject] public IJSRuntime JsRuntime { get; set; }
+    [Inject] public IJSRuntime JsRuntime { get; set; } = default!;
 
-    [Inject] public NavigationManager NavigationManager { get; set; }
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; } = default!;
 
-    [Inject] public IBookDbMigratorSvc DbMigrator { get; set; }
+    [Inject] public IBookDbMigratorSvc DbMigrator { get; set; } = default!;
 
-    [Inject] internal ISummaryTypeRepository SRepo { get; set; }
+    [Inject] internal ISummaryTypeRepository SRepo { get; set; } = default!;
 
-    [Inject] internal ITransactionTypeRepository TTRepo { get; set; }
+    [Inject] internal ITransactionTypeRepository TTRepo { get; set; } = default!;
 
-    [Inject] internal ITransactionRepository TRepo { get; set; }
+    [Inject] internal ITransactionRepository TRepo { get; set; } = default!;
 
     IJSObjectReference? jsModule;
 
     string BookName { get; set; } = string.Empty;
 
-    string LastBackupDateStr { get; set; } = string.Empty;
+    string LastBackupDateStr = string.Empty;
 
     DateTime LastBUDate = DateTime.MinValue;
 
-    LoadDemoData LoadDemoData;
+    LoadDemoData LoadDemoData = default!;
+
+    Severity Severity = Severity.Info;
 
     protected override async Task OnInitializedAsync()
     {
         BookName = await BookSettingSvc.GetBookName();
         LastBackupDateStr = await BookSettingSvc.GetLastBackupDate();
         DateTime.TryParse(LastBackupDateStr, out LastBUDate);
+
+        if (await AmOld())
+        {
+            Severity = Severity.Error;
+            StateHasChanged();
+        }
 
         jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Pages/Database.razor.js");
     }
@@ -130,6 +138,7 @@
         LastBackupDateStr = await BookSettingSvc.GetLastBackupDate();
         DateTime.TryParse(LastBackupDateStr, out LastBUDate);
 
+        Severity = Severity.Info;
         StateHasChanged();
     }
 
@@ -187,11 +196,14 @@
         NavigationManager.NavigateTo("refresh/Database");
     }
 
+    async Task<bool> AmOld()
+    {
+        return (LastBUDate < await SRepo.GetLastUpdDt() || LastBUDate < await TTRepo.GetLastUpdDt() || LastBUDate < await TRepo.GetLastUpdDt()) ? true : false;
+    }
+
     async Task<bool> CheckLastUpd()
     {
-        if (LastBUDate < await SRepo.GetLastUpdDt() ||
-            LastBUDate < await TTRepo.GetLastUpdDt() ||
-            LastBUDate < await TRepo.GetLastUpdDt())
+        if (await AmOld())
         {
             var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
             {
@@ -202,7 +214,8 @@
                 { x => x.WarningMessage, LastBackupDateStr != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU", LastBackupDateStr] : Localizer["ChangesLost"] },
             });
 
-            return (await dialog.Result).Canceled;
+            DialogResult dialogResult = await dialog.Result ?? default!;
+            return dialogResult.Canceled;
         }
 
         return false;

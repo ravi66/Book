@@ -1,14 +1,14 @@
-﻿<MudIconButton Variant="@Variant" Size="@Size" Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="CopyTransaction" Title="@Localizer["CopyEntry"]"/>
+﻿<MudIconButton Variant="@Variant" Size="@Size" Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" OnClick="CopyTransaction" title="@Localizer["CopyEntry"]"/>
 
 @code
 {
-    [Parameter] public Transaction Transaction { get; set; }
+    [Parameter] public Transaction Transaction { get; set; } = default!;
 
     [Parameter] public Variant Variant { get; set; }
 
     [Parameter] public Size Size { get; set; }
 
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
     void CopyTransaction() => DialogService.Show<TransCopyDialog>(Localizer["Copy"], new DialogParameters<TransCopyDialog> { { c => c.TransactionToCopyId, Transaction.TransactionId } });
 }

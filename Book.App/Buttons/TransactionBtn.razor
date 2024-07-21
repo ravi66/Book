@@ -1,6 +1,6 @@
 ﻿@if (IsIcon)
 {
-    <MudIconButton Icon="@Icon" Variant="@Variant" Color="Color.Primary" Size="Size.Small" OnClick="CallTransactionDialog" Title="@AriaLabel" />
+    <MudIconButton Icon="@Icon" Variant="@Variant" Color="Color.Primary" Size="Size.Small" OnClick="CallTransactionDialog" title="@AriaLabel" />
 }
 else
 {
@@ -9,19 +9,19 @@ else
 
 @code
 {
-    [Parameter] public bool IsIcon { get; set; }
+    [Parameter] public bool IsIcon { get; set; } = default!;
 
-    [Parameter] public int TransactionId { get; set; }
+    [Parameter] public int TransactionId { get; set; } = default!;
 
-    [Parameter] public string Icon { get; set; }
+    [Parameter] public string Icon { get; set; } = default!;
 
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
     Variant Variant = Variant.Text;
 
     string AriaLabel = string.Empty;
 
-    protected async override Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         AriaLabel = TransactionId == 0 ? Localizer["NewEntry"] : Localizer["EditEntry"];
         Variant = TransactionId == 0 ? Variant.Filled : Variant.Text;

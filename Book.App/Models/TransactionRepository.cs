@@ -7,18 +7,25 @@
             using var dbContext = await db.CreateDbContextAsync();
 
             return dbContext.Transactions
-                .Include(t => t.TransactionType)
+                .Select(t => new Transaction
+                {
+                    TransactionId = t.TransactionId,
+                    TransactionTypeId = t.TransactionTypeId,
+                    Value = t.Value,
+                    TransactionTypeName = t.TransactionType.Name,
+                    TransactionDate = t.TransactionDate,
+                    CreateDate = t.CreateDate,
+                    Notes = t.Notes,
+                })
                 .FirstOrDefault(t => t.TransactionId == transactionId);
         }
 
-        public async Task<Transaction> AddTransaction(Transaction transaction)
+        public async Task AddTransaction(Transaction transaction)
         {
             using var dbContext = await db.CreateDbContextAsync();
-            transaction.TransactionType = null;
             transaction.CreateDate = DateTime.Now;
-            var addedEntity = dbContext.Transactions.Add(transaction);
+            await dbContext.Transactions.AddAsync(transaction);
             await dbContext.SaveChangesAsync();
-            return addedEntity.Entity;
         }
 
         public async Task AddTransactions(IEnumerable<Transaction> transactions)
@@ -30,14 +37,14 @@
             foreach (var transaction in transactions)
             {
                 transaction.CreateDate = DateTime.Now;
-                _ = dbContext.Transactions.Add(transaction);
+                await dbContext.Transactions.AddAsync(transaction);
                 await dbContext.SaveChangesAsync();
             }
 
             return;
         }
 
-        public async Task<Transaction> UpdateTransaction(Transaction transaction)
+        public async Task UpdateTransaction(Transaction transaction)
         {
             using var dbContext = await db.CreateDbContextAsync();
 
@@ -53,11 +60,7 @@
                 foundTransaction.CreateDate = DateTime.Now;
 
                 await dbContext.SaveChangesAsync();
-
-                return foundTransaction;
             }
-
-            return null;
         }
 
         public async Task DeleteTransaction(int transactionId)
@@ -92,7 +95,7 @@
                         Notes = t.Notes
                     });
 
-            if (types.Count > 0)
+            if (types is not null && types.Count > 0)
             {
                 query = query.Where(t => types.Contains((int)t.TransactionTypeId));
             }

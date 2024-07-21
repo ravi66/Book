@@ -33,7 +33,7 @@
 
     public class TransactionsChangedEventArgs : EventArgs
     {
-        public List<int> Years { get; set; }
+        public List<int> Years { get; set; } = [];
         public int SummaryTypeId { get; set; }
     }
 }

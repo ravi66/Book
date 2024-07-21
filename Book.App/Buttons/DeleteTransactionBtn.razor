@@ -1,34 +1,34 @@
-﻿<MudIconButton Variant="@Variant" Size="@Size" Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="DeleteTransaction" Title="@Localizer["DeleteEntry"]"/>
+﻿<MudIconButton Variant="@Variant" Size="@Size" Icon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="DeleteTransaction" title="@Localizer["DeleteEntry"]"/>
 
 @code
 {
-    [Parameter] public Transaction Transaction { get; set; }
+    [Parameter] public Transaction Transaction { get; set; } = default!;
 
-    [Parameter] public Variant Variant { get; set; }
+    [Parameter] public Variant Variant { get; set; } = default!;
 
-    [Parameter] public Size Size { get; set; }
+    [Parameter] public Size Size { get; set; } = default!;
 
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
-    [Inject] internal ITransactionRepository Repo { get; set; }
+    [Inject] internal ITransactionRepository Repo { get; set; } = default!;
 
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
+    [Inject] public INotifierSvc NotifierSvc { get; set; } = default!;
 
     async Task DeleteTransaction()
     {
         var dialog = DialogService.Show<ConfirmDialog>("", new DialogParameters<ConfirmDialog>
                 {
-                    { x => x.AcceptLabel, Localizer["DeleteTransAccLabel", Transaction.TransactionTypeName, Transaction.Value.ToString("C2")] },
+                    { x => x.AcceptLabel, Localizer["DeleteTransAccLabel", Transaction.TransactionTypeName ?? string.Empty, Transaction.Value.ToString("C2")] },
                     { x => x.AcceptColour, Color.Error },
                     { x => x.AcceptToolTip, Localizer["DeleteEntry"] },
                     { x => x.CancelColour, Color.Success },
                     { x => x.CancelLabel, Localizer["No"] },
                 });
-
-        if (!(await dialog.Result).Canceled && Transaction.TransactionId != 0)
+        
+        DialogResult dialogResult = await dialog.Result ?? default!;
+        if (!dialogResult.Canceled && Transaction.TransactionId != 0)
         {
             await Repo.DeleteTransaction(Transaction.TransactionId);
-
             NotifierSvc.OnTransactionsChanged(this, [Transaction.TransactionDate.Year], 0);
         }
     }

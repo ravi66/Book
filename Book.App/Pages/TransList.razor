@@ -51,17 +51,17 @@
 
 @code
 {
-    [Inject] PageParamsSvc PageParamsSvc { get; set; }
+    [Inject] PageParamsSvc PageParamsSvc { get; set; } = default!;
 
-    [Inject] internal ITransactionRepository Repo { get; set; }
+    [Inject] internal ITransactionRepository Repo { get; set; } = default!;
 
-    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; }
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; } = default!;
 
-    [Inject] public INotifierSvc NotifierSvc { get; set; }
+    [Inject] public INotifierSvc NotifierSvc { get; set; } = default!;
 
-    [Inject] public NavigationManager NavigationManager { get; set; }
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; } = default!;
 
     string EntriesTitle { get; set; } = string.Empty;
 
@@ -69,11 +69,11 @@
 
     string FilteredItems { get; set; } = string.Empty;
 
-    IEnumerable<Transaction> Transactions { get; set; }
+    IEnumerable<Transaction> Transactions { get; set; } = [];
 
-    IEnumerable<Transaction> pagedData;
+    IEnumerable<Transaction> pagedData = [];
 
-    MudTable<Transaction> table;
+    MudTable<Transaction> table = default!;
 
     int totalItems;
 

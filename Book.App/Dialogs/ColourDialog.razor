@@ -12,13 +12,13 @@
 
 @code
 {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
 
-    [Parameter] public MudColor Colour { get; set; }
+    [Parameter] public MudColor Colour { get; set; } = default!;
 
     [Parameter] public string Title { get; set; } = string.Empty;
 
-    protected async override Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         MudDialog.Options.NoHeader = true;
         MudDialog.SetOptions(MudDialog.Options);

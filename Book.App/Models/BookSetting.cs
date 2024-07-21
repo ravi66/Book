@@ -10,7 +10,7 @@ namespace Book.Models
         public bool UserAmendable { get; set; }
 
         [Required]
-        public string SettingName { get; set; }
+        public string SettingName { get; set; } = string.Empty;
 
         public string? SettingValue { get; set; }
     }

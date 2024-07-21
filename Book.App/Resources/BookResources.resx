@@ -255,7 +255,7 @@ It is an open-source project licensed under MIT and is free to use in commercial
     <value>Database</value>
   </data>
   <data name="DatabaseAlertMessage" xml:space="preserve">
-    <value>Any changes you make are saved in an SQLite database. It is highly recommended to periodically back this up. Last backup: {0}</value>
+    <value>Any changes you make are saved in an SQLite database. It is advised to periodically back this up {0} {1}</value>
   </data>
   <data name="DatabaseBackupText" xml:space="preserve">
     <value>Copy the database to a file</value>
