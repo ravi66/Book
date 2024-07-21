@@ -255,13 +255,13 @@ It is an open-source project licensed under MIT and is free to use in commercial
     <value>Database</value>
   </data>
   <data name="DatabaseAlertMessage" xml:space="preserve">
-    <value>Any changes you make are saved in an SQLite database. It is advised to periodically back this up {0} {1}</value>
+    <value>Any changes you make are saved in an SQLite database. It is advised to periodically back this up.</value>
   </data>
   <data name="DatabaseBackupText" xml:space="preserve">
     <value>Copy the database to a file</value>
   </data>
   <data name="DatabaseDeleteText" xml:space="preserve">
-    <value>Delete the current database and use one with default Types and no Entries</value>
+    <value>Delete the current database</value>
   </data>
   <data name="DatabaseDemoAcptToolTip" xml:space="preserve">
     <value>Overwrite saved changes with Demonstration data</value>
@@ -280,6 +280,12 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
+  </data>
+  <data name="DeleteEntries" xml:space="preserve">
+    <value>Delete Entries</value>
+  </data>
+  <data name="DeleteEntriesText" xml:space="preserve">
+    <value>Delete all Entries in the database</value>
   </data>
   <data name="DeleteEntry" xml:space="preserve">
     <value>Delete Entry</value>
@@ -340,6 +346,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="Entries" xml:space="preserve">
     <value>Entries</value>
+  </data>
+  <data name="EntriesDeleted" xml:space="preserve">
+    <value>{0} Entries Deleted</value>
   </data>
   <data name="EntriesFiltered" xml:space="preserve">
     <value>{0} Entries Filtered</value>
@@ -420,7 +429,7 @@ It is an open-source project licensed under MIT and is free to use in commercial
     <value>More Information</value>
   </data>
   <data name="LastBackupDate" xml:space="preserve">
-    <value>Last Backup Date</value>
+    <value>Last back up: {0}</value>
   </data>
   <data name="LightMode" xml:space="preserve">
     <value>Light Mode</value>

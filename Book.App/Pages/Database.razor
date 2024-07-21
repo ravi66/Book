@@ -19,7 +19,7 @@
 <MudAlert Severity="@Severity" Variant="Variant.Outlined" Class="mt-4 mb-2" Elevation="10" ContentAlignment="HorizontalAlignment.Start" NoIcon="true">
     <MudStack AlignItems="AlignItems.Center" Row="true">
         <MudIcon Icon="@Icons.Material.Filled.Warning" Size="Size.Large" />
-        <MudText Typo="Typo.h5">@Localizer["DatabaseAlertMessage", LastBackupDateStr, string.Empty]</MudText>
+        <MudText Typo="Typo.h5">@Localizer["DatabaseAlertMessage"] @LastBackupDateText</MudText>
     </MudStack>
 </MudAlert>
 
@@ -80,6 +80,19 @@
                 </MudCardActions>
             </MudCard>
         </MudItem>
+        @*
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="5">
+                <MudCardContent Class="pa-2" Style="min-height: 90px;">
+                    <MudText Typo="Typo.h6">@Localizer["DeleteEntries"]</MudText>
+                    <MudText Typo="Typo.body2">@Localizer["DeleteEntriesText"]</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Color="Color.Error" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" OnClick="DeleteEntries">@Localizer["DeleteEntries"]</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        *@
     </MudGrid>
 </MudContainer>
 
@@ -101,11 +114,15 @@
 
     [Inject] internal ITransactionRepository TRepo { get; set; } = default!;
 
+    [Inject] public ISnackbar Snackbar { get; set; } = default!;
+
     IJSObjectReference? jsModule;
 
     string BookName { get; set; } = string.Empty;
 
     string LastBackupDateStr = string.Empty;
+
+    string LastBackupDateText = string.Empty;
 
     DateTime LastBUDate = DateTime.MinValue;
 
@@ -116,14 +133,7 @@
     protected override async Task OnInitializedAsync()
     {
         BookName = await BookSettingSvc.GetBookName();
-        LastBackupDateStr = await BookSettingSvc.GetLastBackupDate();
-        DateTime.TryParse(LastBackupDateStr, out LastBUDate);
-
-        if (await AmOld())
-        {
-            Severity = Severity.Error;
-            StateHasChanged();
-        }
+        SetAlert();
 
         jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Pages/Database.razor.js");
     }
@@ -135,11 +145,8 @@
         await jsModule.InvokeVoidAsync("downloadDb", Constants.BookDbCacheName, Constants.BookDbPath, $"{await BookSettingSvc.GetDbPrefix()}-{DateTime.Now:yyyyMMddhhmm}.sqlite3");
 
         await BookSettingSvc.SetLastBackupDate(DateTime.Now);
-        LastBackupDateStr = await BookSettingSvc.GetLastBackupDate();
-        DateTime.TryParse(LastBackupDateStr, out LastBUDate);
 
-        Severity = Severity.Info;
-        StateHasChanged();
+        SetAlert();
     }
 
     async void UploadDb(InputFileChangeEventArgs e)
@@ -196,6 +203,17 @@
         NavigationManager.NavigateTo("refresh/Database");
     }
 
+    async void DeleteEntries()
+    {
+        if (await CheckLastUpd()) return;
+
+        int deleteCount = await DbMigrator.DeleteAllTransactions();
+
+        Snackbar.Clear();
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomStart;
+        Snackbar.Add(Localizer["EntriesDeleted", deleteCount], Severity.Success);
+    }
+
     async Task<bool> AmOld()
     {
         return (LastBUDate < await SRepo.GetLastUpdDt() || LastBUDate < await TTRepo.GetLastUpdDt() || LastBUDate < await TRepo.GetLastUpdDt()) ? true : false;
@@ -211,7 +229,7 @@
                 { x => x.AcceptToolTip, Localizer["DeleteSavedChanges"] },
                 { x => x.CancelColour, Color.Success },
                 { x => x.Warning, true },
-                { x => x.WarningMessage, LastBackupDateStr != Localizer["NoBackupRecorded"] ? Localizer["ChangesLostBU", LastBackupDateStr] : Localizer["ChangesLost"] },
+                { x => x.WarningMessage, LastBackupDateText != string.Empty ? Localizer["ChangesLostBU", LastBackupDateStr] : Localizer["ChangesLost"] },
             });
 
             DialogResult dialogResult = await dialog.Result ?? default!;
@@ -219,6 +237,17 @@
         }
 
         return false;
+    }
+
+    async void SetAlert()
+    {
+        LastBackupDateStr = await BookSettingSvc.GetLastBackupDate();
+        DateTime.TryParse(LastBackupDateStr, out LastBUDate);
+        LastBackupDateText = LastBUDate != DateTime.MinValue ? Localizer["LastBackupDate", LastBackupDateStr] : string.Empty;
+
+        Severity = await AmOld() ? Severity.Error : Severity.Info;
+
+        StateHasChanged();
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()

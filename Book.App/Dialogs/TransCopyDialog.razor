@@ -95,7 +95,7 @@
         EndDate = new DateTime(await BookSettingSvc.GetEndYear(), 12, 31);
         MinDate = new DateTime(await BookSettingSvc.GetStartYear(), 1, 1);
 
-        DialogTitle = Localizer["TransCopyTitle", TransactionToCopy.Value.ToString("C2"), TransactionToCopy.TransactionTypeName ?? string.Empty];
+        DialogTitle = Localizer["TransCopyTitle", TransactionToCopy.Value.ToString("C2"), TransactionToCopy.TransactionType != null ? TransactionToCopy.TransactionType.Name : string.Empty];
 
         LoadCopiedTransactions();
         StateHasChanged();

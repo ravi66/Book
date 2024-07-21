@@ -6,7 +6,7 @@
         public int TransactionId { get; set; }
 
         [JsonIgnore]
-        public TransactionType TransactionType { get; set; } = default!;
+        public TransactionType? TransactionType { get; set; } = default!;
 
         public int TransactionTypeId { get; set; }
 

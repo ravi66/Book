@@ -7,23 +7,16 @@
             using var dbContext = await db.CreateDbContextAsync();
 
             return dbContext.Transactions
-                .Select(t => new Transaction
-                {
-                    TransactionId = t.TransactionId,
-                    TransactionTypeId = t.TransactionTypeId,
-                    Value = t.Value,
-                    TransactionTypeName = t.TransactionType.Name,
-                    TransactionDate = t.TransactionDate,
-                    CreateDate = t.CreateDate,
-                    Notes = t.Notes,
-                })
+                .Include(t => t.TransactionType)
                 .FirstOrDefault(t => t.TransactionId == transactionId);
         }
 
         public async Task AddTransaction(Transaction transaction)
         {
             using var dbContext = await db.CreateDbContextAsync();
+
             transaction.CreateDate = DateTime.Now;
+            transaction.TransactionType = null;
             await dbContext.Transactions.AddAsync(transaction);
             await dbContext.SaveChangesAsync();
         }
@@ -36,9 +29,7 @@
 
             foreach (var transaction in transactions)
             {
-                transaction.CreateDate = DateTime.Now;
-                await dbContext.Transactions.AddAsync(transaction);
-                await dbContext.SaveChangesAsync();
+                await AddTransaction(transaction);
             }
 
             return;
@@ -84,12 +75,12 @@
                         TransactionId = t.TransactionId,
                         TransactionTypeId = t.TransactionTypeId,
                         Value = t.Value,
-                        SummaryName = t.TransactionType.SummaryType.Name,
-                        SummaryTypeId = t.TransactionType.SummaryTypeId,
-                        Order = t.TransactionType.SummaryType.Order,
-                        SummaryColour = t.TransactionType.SummaryType.ChartColour,
-                        TransactionTypeName = t.TransactionType.Name,
-                        TypeColour = t.TransactionType.ChartColour,
+                        SummaryName = t.TransactionType != null ? t.TransactionType.SummaryType.Name : string.Empty,
+                        SummaryTypeId = t.TransactionType != null ? t.TransactionType.SummaryTypeId : 0,
+                        Order = t.TransactionType != null ? t.TransactionType.SummaryType.Order : 0,
+                        SummaryColour = t.TransactionType != null ? t.TransactionType.SummaryType.ChartColour : string.Empty,
+                        TransactionTypeName = t.TransactionType != null ? t.TransactionType.Name : string.Empty,
+                        TypeColour = t.TransactionType != null ? t.TransactionType.ChartColour : string.Empty,
                         TransactionDate = t.TransactionDate,
                         CreateDate = t.CreateDate,
                         Notes = t.Notes
@@ -129,9 +120,9 @@
                         TransactionId = t.TransactionId,
                         TransactionTypeId = t.TransactionTypeId,
                         Value = t.Value,
-                        SummaryName = t.TransactionType.SummaryType.Name,
-                        SummaryTypeId = t.TransactionType.SummaryTypeId,
-                        TransactionTypeName = t.TransactionType.Name,
+                        SummaryName = t.TransactionType != null ? t.TransactionType.SummaryType.Name : string.Empty,
+                        SummaryTypeId = t.TransactionType != null ? t.TransactionType.SummaryTypeId : 0,
+                        TransactionTypeName = t.TransactionType != null ? t.TransactionType.Name : string.Empty,
                         TransactionDate = t.TransactionDate,
                         CreateDate = t.CreateDate,
                         Notes = t.Notes
@@ -155,7 +146,7 @@
                         TransactionId = t.TransactionId,
                         TransactionTypeId = t.TransactionTypeId,
                         Value = t.Value,
-                        TransactionTypeName = t.TransactionType.Name,
+                        TransactionTypeName = t.TransactionType != null ? t.TransactionType.Name : string.Empty,
                         TransactionDate = t.TransactionDate,
                         CreateDate = t.CreateDate,
                         Notes = t.Notes
