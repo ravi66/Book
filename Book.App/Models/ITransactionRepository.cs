@@ -12,5 +12,6 @@
         public Task<IEnumerable<Transaction>> GetTransactionsByType(int typeId);
         public Task<List<Transaction>> Export();
         public Task<DateTime?> GetLastUpdDt();
+        public Task<int> DeleteAllTransactions();
     }
 }

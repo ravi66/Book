@@ -6,8 +6,8 @@ namespace Book.Models
     {
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = -1, Order = 99, Name = Localizer["Unknown"], CreateDate = DateTime.Now });
-            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = -1, TransactionTypeId = -1,  Name = Localizer["Unknown"], CreateDate = DateTime.Now });
+            modelBuilder.Entity<SummaryType>().HasData(new SummaryType { SummaryTypeId = -1, Order = 99, Name = Localizer["Unknown"] });
+            modelBuilder.Entity<TransactionType>().HasData(new TransactionType { SummaryTypeId = -1, TransactionTypeId = -1, Name = Localizer["Unknown"] });
 
             base.OnModelCreating(modelBuilder);
         }

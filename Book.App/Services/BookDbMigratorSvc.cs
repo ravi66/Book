@@ -100,19 +100,5 @@
             return false;
         }
 
-        public async Task<int> DeleteAllTransactions()
-        {
-            _dbContext = await dbContextFactory.CreateDbContextAsync();
-
-            const string delSql = @"DELETE FROM ""Transactions"";";
-            int delCount = await _dbContext.Database.ExecuteSqlRawAsync(delSql);
-            //_ = await _dbContext.Database.ExecuteSqlRawAsync("COMMIT;");
-            //await _dbContext.Database.ExecuteSqlRawAsync("VACUUM;");
-
-            await _dbContext.SaveChangesAsync();
-
-            return delCount;
-        }
-
     }
 }

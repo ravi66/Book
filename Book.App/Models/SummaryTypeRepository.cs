@@ -149,7 +149,7 @@
         public async Task<DateTime?> GetLastUpdDt()
         {
             using var dbContext = await db.CreateDbContextAsync();
-            return dbContext.SummaryTypes.Where(s => s.SummaryTypeId != -1).Max(t => (DateTime?)t.CreateDate);
+            return dbContext.SummaryTypes.Max(t => (DateTime?)t.CreateDate);
         }
 
         public async Task<bool> IsEmptyDb()

@@ -95,7 +95,7 @@
         public async Task<DateTime?> GetLastUpdDt()
         {
             using var dbContext = await db.CreateDbContextAsync();
-            return dbContext.TransactionTypes.Where(t => t.TransactionTypeId != -1).Max(t => (DateTime?)t.CreateDate);
+            return dbContext.TransactionTypes.Max(t => (DateTime?)t.CreateDate);
         }
 
         public async Task<int> GetSummaryTypeId(int transactionTypeId)

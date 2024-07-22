@@ -169,5 +169,16 @@
             return dbContext.Transactions.Max(t => (DateTime?)t.CreateDate);
         }
 
+        public async Task<int> DeleteAllTransactions()
+        {
+            using var dbContext = await db.CreateDbContextAsync();
+
+            int deleteCount = dbContext.Transactions.Where(t => t.TransactionId > 0).Count();
+            if (deleteCount == 0) return 0;
+
+            dbContext.Transactions.Where(t => t.TransactionId > 0).ExecuteDelete();
+            return deleteCount;
+        }
+
     }
 }

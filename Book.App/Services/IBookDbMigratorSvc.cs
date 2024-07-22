@@ -4,6 +4,5 @@
     {
         public Task EnsureDbCreated();
         public Task<bool> DeleteDatabase();
-        public Task<int> DeleteAllTransactions();
     }
 }

@@ -494,6 +494,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="NoEntriesFound" xml:space="preserve">
     <value>No Entries Found</value>
   </data>
+  <data name="NoEntriesToDelete" xml:space="preserve">
+    <value>No Entries to delete</value>
+  </data>
   <data name="NoEntryTypesFound" xml:space="preserve">
     <value>No Entry Types found</value>
   </data>

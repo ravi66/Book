@@ -4,14 +4,10 @@
 <PageTitle>@BookName - @Localizer["Database"]</PageTitle>
 
 <MudPaper Class="pa-2" Elevation="5">
-    <MudGrid Class="align-center">
-        <MudItem>
-            <MudIconButton Icon="@SvgIcons.Database" Color="Color.Success" Size="Size.Large" />
-        </MudItem>
-        <MudItem Class="pa-0">
-            <MudText Typo="Typo.h5">@Localizer["Database"]</MudText>
-        </MudItem>
-    </MudGrid>
+    <MudStack AlignItems="AlignItems.Center" Row="true">
+        <MudIcon Icon="@SvgIcons.Database" Color="Color.Success" Size="Size.Large" />
+        <MudText Typo="Typo.h5">@Localizer["Database"]</MudText>
+    </MudStack>
 </MudPaper>
 <InputFile id="inputFile" OnChange="@UploadDb" accept=".sqlite3" hidden />
 <LoadDemoData @ref="LoadDemoData" />
@@ -80,7 +76,6 @@
                 </MudCardActions>
             </MudCard>
         </MudItem>
-        @*
         <MudItem xs="12" sm="6" md="4">
             <MudCard Elevation="5">
                 <MudCardContent Class="pa-2" Style="min-height: 90px;">
@@ -92,7 +87,6 @@
                 </MudCardActions>
             </MudCard>
         </MudItem>
-        *@
     </MudGrid>
 </MudContainer>
 
@@ -207,10 +201,26 @@
     {
         if (await CheckLastUpd()) return;
 
-        int deleteCount = await DbMigrator.DeleteAllTransactions();
+        int deleteCount = await TRepo.DeleteAllTransactions();
+        if (deleteCount == 0)
+        {
+            Snackbar.Clear();
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomStart;
+            Snackbar.Configuration.ShowCloseIcon = false;
+            Snackbar.Add(Localizer["NoEntriesToDelete"], Severity.Info);
+            return;
+        }
+
+        // Need another db update to get SaveChangesAsync to copy memory Sqlite db to Local Storage
+        SummaryType summaryType = await SRepo.GetSummaryTypeById(-1) ?? default!;
+        summaryType.CreateDate = DateTime.Now;
+        await SRepo.UpdateSummaryType(summaryType);
+
+        SetAlert();
 
         Snackbar.Clear();
         Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomStart;
+        Snackbar.Configuration.ShowCloseIcon = false;
         Snackbar.Add(Localizer["EntriesDeleted", deleteCount], Severity.Success);
     }
 
