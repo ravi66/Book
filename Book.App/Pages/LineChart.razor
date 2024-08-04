@@ -5,7 +5,7 @@
 
 <PageTitle>@BookName - @ChartTitle</PageTitle>
 
-<MudContainer Class="d-flex flex-grow-1" Gutters="false">
+<MudContainer Class="d-flex flex-grow-1" Gutters="false" MaxWidth="MaxWidth.ExtraExtraLarge">
     <MudPaper Elevation="0" Class="ma-0 pa-0" MinWidth="100%">
         @if (Loading == true)
         {
@@ -122,15 +122,12 @@
             GenerateZeroTransactions(Series.First().Transactions);
             bool forecastSet = Forecast(Series.First().Transactions);
 
-            if (forecastSet)
+            ChartOptions.Subtitle = new Subtitle
             {
-                ChartOptions.Subtitle = new Subtitle
-                {
-                    Text = Localizer["YearChartSTitle", Series.First().Transactions.Sum(t => t.Value).ToString("C2"), (Series.First().Transactions.Sum(t => t.Value) / 12).ToString("C2") ],
-                    OffsetX = 10,
-                    Style = new SubtitleStyle { FontSize = "14px" },
-                };
-            }
+                Text = Localizer[forecastSet ? "YearChartSTitle" : "YearChartSTitle1", Series.First().Transactions.Sum(t => t.Value).ToString("C2"), (Series.First().Transactions.Sum(t => t.Value) / 12).ToString("C2")],
+                OffsetX = 10,
+                Style = new SubtitleStyle { FontSize = "14px" },
+            };
         }
         else
         {
@@ -159,15 +156,12 @@
                     Transactions = GetTotalSeriesTransactions(),
                 });
 
-            if (forecastSet)
+            ChartOptions.Subtitle = new Subtitle
             {
-                ChartOptions.Subtitle = new Subtitle
-                {
-                    Text = Localizer["YearChartSTitle", forecastTotal.ToString("C2"), (forecastTotal / 12).ToString("C2") ],
-                    OffsetX = 10,
-                    Style = new SubtitleStyle { FontSize = "16px" },
-                };
-            }
+                Text = Localizer[forecastSet ? "YearChartSTitle" : "YearChartSTitle1", forecastTotal.ToString("C2"), (forecastTotal / 12).ToString("C2")],
+                OffsetX = 10,
+                Style = new SubtitleStyle { FontSize = "16px" },
+            };
         }
     }
 

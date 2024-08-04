@@ -698,6 +698,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="YearChartSTitle" xml:space="preserve">
     <value>Forecast: {0} Year / {1} Month</value>
   </data>
+  <data name="YearChartSTitle1" xml:space="preserve">
+    <value>Year: {0} / Month: {1}</value>
+  </data>
   <data name="YearChartTitle" xml:space="preserve">
     <value>{0} {1} Year Chart</value>
   </data>

@@ -15,7 +15,7 @@
             }
             @if (DisplayTransactions.Count > 0)
             {
-                <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@ChartTitle" OnDataPointSelection="OnDataPointSelection" FormatYAxisLabel="GetYAxisLabel" OnBeforeMount="OnBeforeMount" >
+                <ApexChart TItem="Transaction" Options="ChartOptions" @ref="ApexChart" Title="@ChartTitle" OnDataPointSelection="OnDataPointSelection" FormatYAxisLabel="GetYAxisLabel" OnBeforeMount="OnBeforeMount" Height="@ChartHeight">
                     @if (!ShowEntryTypes)
                     {
                         <ApexPointSeries TItem="Transaction" Items="DisplayTransactions" XValue="@(t => t.SummaryName)" Name="Value" SeriesType="SeriesType.Pie" YAggregate="@(t => t.Sum(t => t.Value))" OrderByDescending="t => t.Y" ShowDataLabels />
@@ -37,6 +37,8 @@
 @code {
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = default!;
+
+    [Inject] public IBrowserViewportService ViewportService { get; set; } = default!;
 
     [Inject] internal IBookSettingSvc BookSettingSvc { get; set; } = default!;
 
@@ -68,6 +70,8 @@
 
     string CreditsBtnText = string.Empty;
 
+    int ChartHeight = 400;
+
     protected async override Task OnInitializedAsync()
     {
         MudDialog.Options.NoHeader = true;
@@ -85,6 +89,30 @@
         ChartOptions.DataLabels = new DataLabels { Style = new DataLabelsStyle { FontSize = "12px" }, };
         ChartOptions.Title = new Title { Style = new TitleStyle { FontSize = "18px" } };
         ChartOptions.Colors = GetColours();
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            BrowserWindowSize windowSize = await ViewportService.GetCurrentBrowserWindowSizeAsync();
+            ChartHeight = windowSize.Height - 60;
+
+            if (ChartHeight > 1000)
+            {
+                MudDialog.Options.MaxWidth = MaxWidth.Large;
+                MudDialog.SetOptions(MudDialog.Options);
+            }
+            else if (ChartHeight > 800)
+            {
+                MudDialog.Options.MaxWidth = MaxWidth.Medium;
+                MudDialog.SetOptions(MudDialog.Options);
+            }
+
+            StateHasChanged();
+        }
+
+        base.OnAfterRender(firstRender);
     }
 
     void SetDisplayTransactions()
