@@ -1,50 +1,13 @@
 ﻿@inherits LayoutComponentBase
 @implements IDisposable
 
-<MudThemeProvider @bind-IsDarkMode="@IsDarkMode" Theme="BookTheme" />
+<MudThemeProvider @bind-IsDarkMode="@isDarkMode" Theme="bookTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="0" Dense="true" Class="pa-0" >
-        <MudIconButton Class="py-0 px-0" Edge="Edge.Start" OnClick="Back" Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" title="@Localizer["GoBack"]" />
-        @if (!drawerOpen)
-        {
-            <MudIconButton Class="py-0 ps-2 pe-0" OnClick="ToggleDrawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Info" title="@Localizer["OpenMenu"]" />
-        }
-        <MudSpacer />
-        <TransactionBtn IsIcon="false" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
-        <MudSpacer />
-        <MudIconButton Class="py-0 ps-0 pe-2" Href="info" Icon="@Icons.Material.Filled.Info" Color="Color.Info" title="@Localizer["MoreInformation"]" />
-        <MudIconButton Class="py-0 px-0" Edge="Edge.End" OnClick="ToggleThemeMode" Icon="@themeIcon" Color="@themeColor" title="@themeText" />
-    </MudAppBar>
-    <MudDrawer @bind-Open="@drawerOpen" Variant="DrawerVariant.Responsive" Elevation="0">
-        <MudDrawerHeader Dense="true" Style="height: 48px;">
-            <MudIconButton Class="py-0 ps-2 pe-0" OnClick="ToggleDrawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Info" title="@Localizer["CloseMenu"]" />
-            <MudButton Variant="Variant.Text" OnClick="ToggleDrawer"><MudText Typo="Typo.h6" Class="pa-0" Color="Color.Info" title="@Localizer["CloseMenu"]">@BookName</MudText></MudButton>
-        </MudDrawerHeader>
-        <MudNavMenu Color="Color.Success" >
-            <MudNavLink Href="Database">
-                <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Row="true">
-                    <MudIcon Icon="@SvgIcons.Database" />
-                    <MudText Typo="Typo.h6">@Localizer["Database"]</MudText>
-                </MudStack>
-            </MudNavLink>
-            <MudNavLink Href="SummaryTypeList">
-                <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Row="true" >
-                    <MudIcon Icon="@Icons.Material.Filled.Summarize" />
-                    <MudText Typo="Typo.h6">@Localizer["Types"]</MudText>
-                </MudStack>
-            </MudNavLink>
-            <MudNavLink Href="BookSettings">
-                <MudStack AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Row="true" >
-                    <MudIcon Icon="@Icons.Material.Filled.Settings" />
-                    <MudText Typo="Typo.h6">@Localizer["Settings"]</MudText>
-                </MudStack>
-            </MudNavLink>
-        </MudNavMenu>
-    </MudDrawer>
+    <BookAppBar />
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="pa-1" >
             <MudScrollToTop>
@@ -61,11 +24,9 @@
 
     [Inject] public IBookDbMigratorSvc DbMigrator { get; set; } = default!;
 
-    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
-
     [Inject] public INotifierSvc NotifierSvc { get; set; } = default!;
 
-    MudTheme BookTheme = new MudTheme()
+    MudTheme bookTheme = new MudTheme()
         {
             LayoutProperties = new LayoutProperties()
             {
@@ -73,80 +34,26 @@
             }
         };
 
-    List<string> Locations { get; set; } = new List<string> { "/" };
-
-    public bool IsDarkMode = true;
-
-    string themeIcon = Icons.Material.Filled.LightMode;
-    string themeText = string.Empty;
-    Color themeColor = Color.Warning;
-
-    string BookName = string.Empty;
-
-    bool drawerOpen = false;
-    //string menuIcon = @Icons.Material.Filled.Menu;
-    //string menuToolTip = string.Empty;
+    bool isDarkMode = true;
 
     protected async override Task OnInitializedAsync()
     {
         await DbMigrator.EnsureDbCreated();
 
-        BookName = await BookSettingSvc.GetBookName();
+        isDarkMode = await BookSettingSvc.GetDarkMode();
 
-        themeText = Localizer["LightMode"];
-        //menuToolTip = Localizer["OpenMenu"];
-
-        IsDarkMode = await BookSettingSvc.GetDarkMode();
-        SetTheme();
-
-        NavigationManager.LocationChanged += LocationChanged;
+        NotifierSvc.ThemeChanged += ThemeChanged;
     }
 
-    void ToggleDrawer()
+    void ThemeChanged(object? sender, bool darkMode)
     {
-        drawerOpen = !drawerOpen;
+        isDarkMode = darkMode;
         StateHasChanged();
-
-        //menuIcon = drawerOpen ? Icons.Material.Filled.MenuOpen : Icons.Material.Filled.Menu;
-        //menuToolTip = drawerOpen ? Localizer["CloseMenu"] : Localizer["OpenMenu"];
     }
-
-    async void ToggleThemeMode()
-    {
-        IsDarkMode = !IsDarkMode;
-        SetTheme();
-
-        await BookSettingSvc.SetDarkMode(IsDarkMode);
-        NotifierSvc.OnThemeChanged(this, IsDarkMode);
-    }
-
-    void SetTheme()
-    {
-        themeIcon = IsDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
-        themeText = IsDarkMode ? Localizer["LightMode"] : Localizer["DarkMode"];
-        themeColor = IsDarkMode ? Color.Warning : Color.Dark;
-    }
-
-    void Back()
-    {
-        if (Locations.Count > 1)
-        {
-            NavigationManager.NavigateTo(Locations[^2], false);
-            Locations.RemoveAt(Locations.Count - 1);
-        }
-        else
-        {
-            NavigationManager.NavigateTo("/", false);
-        }
-
-        Locations.RemoveAt(Locations.Count - 1);
-    }
-
-    void LocationChanged(object? sender, LocationChangedEventArgs args) => Locations.Add(args.Location);
 
     public void Dispose()
     {
-        NavigationManager.LocationChanged -= LocationChanged;
+        NotifierSvc.ThemeChanged -= ThemeChanged;
         GC.SuppressFinalize(this);
     }
 }

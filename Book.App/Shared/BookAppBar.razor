@@ -1,0 +1,80 @@
+﻿@implements IDisposable
+
+<MudAppBar Elevation="0" Dense="true" Class="pa-0">
+    <MudIconButton Class="pa-0" Edge="Edge.Start" OnClick="Back" Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" title="@Localizer["GoBack"]" />
+    <MudSpacer />
+    <TransactionBtn IsIcon="false" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
+    <MudSpacer />
+    <MudMenu Class="pa-0 ma-0" Dense="true" Icon="@Icons.Material.Filled.Settings" Color="Color.Info" AnchorOrigin="Origin.BottomRight" title="@Localizer["Settings"]" AriaLabel="@Localizer["Settings"]">
+        <MudMenuItem Href="Database">@Localizer["Database"]</MudMenuItem>
+        <MudMenuItem Href="SummaryTypeList">@Localizer["Types"]</MudMenuItem>
+        <MudMenuItem Href="BookSettings">@Localizer["Settings"]</MudMenuItem>
+        <MudDivider DividerType="DividerType.Middle" />
+        <MudMenuItem Href="Info">@Localizer["About"]</MudMenuItem>
+    </MudMenu>
+    <MudIconButton Class="pa-0" Edge="Edge.End" OnClick="ToggleThemeMode" Icon="@themeIcon" Color="@themeColor" title="@themeText" />
+</MudAppBar>
+
+@code
+{
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+
+    [Inject] public INotifierSvc NotifierSvc { get; set; } = default!;
+
+    [Inject] internal IBookSettingSvc BookSettingSvc { get; set; } = default!;
+
+    List<string> locations { get; set; } = new List<string> { "/" };
+
+    bool isDarkMode = true;
+    string themeIcon = Icons.Material.Filled.LightMode;
+    string themeText = string.Empty;
+    Color themeColor = Color.Warning;
+
+    protected async override Task OnInitializedAsync()
+    {
+        themeText = Localizer["LightMode"];
+        isDarkMode = await BookSettingSvc.GetDarkMode();
+        SetTheme();
+
+        NavigationManager.LocationChanged += LocationChanged;
+    }
+
+    async void ToggleThemeMode()
+    {
+        isDarkMode = !isDarkMode;
+        SetTheme();
+
+        await BookSettingSvc.SetDarkMode(isDarkMode);
+        NotifierSvc.OnThemeChanged(this, isDarkMode);
+    }
+
+    void SetTheme()
+    {
+        themeIcon = isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode;
+        themeText = isDarkMode ? Localizer["LightMode"] : Localizer["DarkMode"];
+        themeColor = isDarkMode ? Color.Warning : Color.Dark;
+    }
+
+    void Back()
+    {
+        if (locations.Count > 1)
+        {
+            NavigationManager.NavigateTo(locations[^2], false);
+            locations.RemoveAt(locations.Count - 1);
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/", false);
+        }
+
+        locations.RemoveAt(locations.Count - 1);
+    }
+
+    void LocationChanged(object? sender, LocationChangedEventArgs args) => locations.Add(args.Location);
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= LocationChanged;
+        GC.SuppressFinalize(this);
+    }
+}

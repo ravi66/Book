@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="About" xml:space="preserve">
+    <value>About</value>
+  </data>
   <data name="Alcohol" xml:space="preserve">
     <value>Alcohol</value>
   </data>
@@ -459,7 +462,7 @@ It is an open-source project licensed under MIT and is free to use in commercial
     <value>More Information</value>
   </data>
   <data name="MoreInfoText" xml:space="preserve">
-    <value>Book enables the recording of Entries via the New Entry button while the Summary (Home) page shows monthly balances. An Entry has a Type, these Types are collated into Summaries that are used as columns on the Summary page. You can add Summaries by pressing the menu button and then the Types option. This page also lets you create and edit Entry Types.</value>
+    <value>Book enables the recording of Entries via the New Entry button while the Summary (Home) page shows monthly balances. An Entry has a Type, these Types are collated into Summaries that are used as columns on the Summary page. You can add Summaries by pressing the Settings button and then the Types option. This page also lets you create and edit Entry Types.</value>
   </data>
   <data name="Mortgage" xml:space="preserve">
     <value>Mortgage</value>
