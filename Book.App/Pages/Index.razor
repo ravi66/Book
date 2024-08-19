@@ -1,7 +1,7 @@
 ﻿@page "/"
 @implements IDisposable
 
-<PageTitle>@BookName - Summary @Year</PageTitle>
+<PageTitle>@BookName - @Localizer["Summary"] @Year</PageTitle>
 
 <MudHidden Breakpoint="Breakpoint.Xs" Invert="true" >
     <MudGrid Class="pa-2" Justify="Justify.Center" Spacing="1" >
@@ -38,36 +38,28 @@
         </ColGroup>
         <HeaderContent>
             <MudTh Class="pt-0 pb-1">
-                <MudTooltip Text="@Localizer["ViewAnotherYear"]" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
-                    <MudMenu Dense="true" AnchorOrigin="Origin.BottomLeft" Label="@Year.ToString()" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small" Class="pt-0 pb-0">
-                        @foreach (int year in Years)
-                        {
-                            <MudMenuItem OnClick="() => YearChanged(year)">@year</MudMenuItem>
-                        }
-                    </MudMenu>
-                </MudTooltip>
+                <MudMenu Dense="true" AnchorOrigin="Origin.BottomLeft" Label="@Year.ToString()" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small" Class="pt-0 pb-0" title="@Localizer["ViewAnotherYear"]">
+                    @foreach (int year in Years)
+                    {
+                        <MudMenuItem OnClick="() => YearChanged(year)">@year</MudMenuItem>
+                    }
+                </MudMenu>
             </MudTh>
             @foreach (var summary in MonthlySummaries[12].SummaryDetails)
             {
                 <MudTh Style="text-align:center" >
-                    <MudTooltip Text="@(Localizer["YearChart", summary.SummaryName])" Delay="500" Duration="0" ShowOnFocus="false">
-                        <MudButton Style="@summary.ChartColour" Variant="Variant.Outlined" OnClick="@(e => YearChart(summary))" Size="Size.Small" Class="py-0 px-2">@summary.SummaryName</MudButton>
-                    </MudTooltip>
+                    <MudButton Style="@summary.ChartColour" Variant="Variant.Outlined" OnClick="@(e => YearChart(summary))" Size="Size.Small" Class="py-0 px-2" title="@(Localizer["YearChart", summary.SummaryName])">@summary.SummaryName</MudButton>
                 </MudTh>
             }
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Month" Class="py-1" >
-                <MudTooltip Text="@(Localizer["ExpenditureChart", context.MonthNameFull])" Delay="500" Duration="0" ShowOnFocus="false" Placement="Placement.End" Arrow="true">
-                    <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="py-0 px-2"><MudText>@context.MonthName</MudText></MudButton>
-                </MudTooltip>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(e => MonthChart(context.MonthNo - 1))" Class="py-0 px-2" title="@(Localizer["ExpenditureChart", context.MonthNameFull])"><MudText>@context.MonthName</MudText></MudButton>
             </MudTd>
             @foreach (var summary in context.SummaryDetails)
             {
                 <MudTd Style="text-align:center" DataLabel="@summary.SummaryName" Class="py-0" >
-                    <MudTooltip Text="@(Localizer["TransList"])" Delay="500" Duration="0" ShowOnFocus="false" >
-                        <MudLink Color="Color.Inherit" OnClick="(e => TransList(summary.SummaryName, summary.Types, context.MonthNo))" ><MudText Style="@Utils.BalanceColour(summary.Total, DarkMode)">@summary.Total.ToString("N2")</MudText></MudLink>
-                    </MudTooltip>
+                    <MudLink Color="Color.Inherit" OnClick="(e => TransList(summary.SummaryName, summary.Types, context.MonthNo))" title="@(Localizer["TransList"])"><MudText Style="@Utils.BalanceColour(summary.Total, DarkMode)">@summary.Total.ToString("N2")</MudText></MudLink>
                 </MudTd>
             }
         </RowTemplate>

@@ -3,7 +3,7 @@
 @rendermode RenderMode.InteractiveWebAssembly
 @using ApexCharts
 
-<PageTitle>@BookName - @ChartTitle</PageTitle>
+<PageTitle>@BookName - @PageParamsSvc.PageTitle</PageTitle>
 
 <MudContainer Class="d-flex flex-grow-1" Gutters="false" MaxWidth="MaxWidth.ExtraExtraLarge">
     <MudPaper Elevation="0" Class="ma-0 pa-0" MinWidth="100%">
@@ -11,7 +11,7 @@
         {
             <MudText Typo="Typo.h5" Align="MudBlazor.Align.Center">@Localizer["PlottingChart"]</MudText>
         }
-        <ApexChart TItem="ChartTransaction" Title="@ChartTitle" XAxisType="XAxisType.Datetime"
+        <ApexChart TItem="ChartTransaction" Title="@PageParamsSvc.PageTitle" XAxisType="XAxisType.Datetime"
                 Options="ChartOptions" @ref="ApexChart" FormatYAxisLabel="GetYAxisLabel"
                 OnBeforeMount="OnBeforeMount" Height="@ChartHeight" >
             @foreach (var series in Series)
@@ -53,8 +53,6 @@
     List<YearSeries> Series = new List<YearSeries>() { new YearSeries() };
 
     string BookName = string.Empty;
-
-    string ChartTitle = string.Empty;
 
     int ChartHeight = 500;
 
@@ -103,7 +101,7 @@
 
     async void LoadYearChart()
     {
-        ChartTitle = Localizer["YearChartTitle", PageParamsSvc.Year, PageParamsSvc.Name];
+        PageParamsSvc.PageTitle = Localizer["YearChartTitle", PageParamsSvc.Year, PageParamsSvc.Name];
 
         if (!PageParamsSvc.Transactions.Any()) return;
 
@@ -171,7 +169,7 @@
 
     async void LoadSummaryChart()
     {
-        ChartTitle = Localizer["SummaryChartTitle", PageParamsSvc.Name];
+        PageParamsSvc.PageTitle = Localizer["SummaryChartTitle", PageParamsSvc.Name];
 
         IEnumerable<Transaction> transactions = await TransactionRepo.GetTransactionsBySummary(PageParamsSvc.Types);
 
@@ -188,7 +186,7 @@
 
     async void LoadTransactionTypeChart()
     {
-        ChartTitle = Localizer["TransactionTypeChartTitle", PageParamsSvc.Name];
+        PageParamsSvc.PageTitle = Localizer["TransactionTypeChartTitle", PageParamsSvc.Name];
 
         IEnumerable<Transaction> transactions = await TransactionRepo.GetTransactionsByType(PageParamsSvc.TransactionTypeId);
 

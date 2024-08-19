@@ -462,7 +462,7 @@ It is an open-source project licensed under MIT and is free to use in commercial
     <value>More Information</value>
   </data>
   <data name="MoreInfoText" xml:space="preserve">
-    <value>Book enables the recording of Entries via the New Entry button while the Summary (Home) page shows monthly balances. An Entry has a Type, these Types are collated into Summaries that are used as columns on the Summary page. You can add Summaries by pressing the Settings button and then the Types option. This page also lets you create and edit Entry Types.</value>
+    <value>Book enables the recording of Entries via the New Entry button while the Summary (Home) page shows monthly balances. An Entry has a Type, these Types are collated into Summaries that are used as columns on the Summary page. Maintain Summaries by pressing the Types option on the menu on the left. This page also enables the maintenance of Entry Types.</value>
   </data>
   <data name="Mortgage" xml:space="preserve">
     <value>Mortgage</value>
@@ -703,6 +703,9 @@ It is an open-source project licensed under MIT and is free to use in commercial
   </data>
   <data name="YearChartSTitle1" xml:space="preserve">
     <value>Year: {0} / Month: {1}</value>
+  </data>
+  <data name="YearChartText" xml:space="preserve">
+    <value>Year Chart</value>
   </data>
   <data name="YearChartTitle" xml:space="preserve">
     <value>{0} {1} Year Chart</value>

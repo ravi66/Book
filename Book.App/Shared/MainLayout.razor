@@ -8,6 +8,14 @@
 
 <MudLayout>
     <BookAppBar />
+    <MudDrawer @bind-Open="@drawerOpen" Anchor="Anchor.Start" Elevation="1" Variant="@DrawerVariant.Mini" ClipMode="DrawerClipMode.Always" OpenMiniOnHover="true" >
+        <MudNavMenu>
+            <MudNavLink Href="SummaryTypeList" Icon="@Icons.Material.Filled.Summarize" IconColor="Color.Info"><MudText Color="Color.Info">@Localizer["Types"]</MudText></MudNavLink>
+            <MudNavLink Href="Database" Icon="@SvgIcons.Database" IconColor="Color.Info"><MudText Color="Color.Info">@Localizer["Database"]</MudText></MudNavLink>
+            <MudNavLink Href="BookSettings" Icon="@Icons.Material.Filled.Settings" IconColor="Color.Info"><MudText Color="Color.Info">@Localizer["Settings"]</MudText></MudNavLink>
+            <MudNavLink Href="Info" Icon="@Icons.Material.Filled.Info" IconColor="Color.Info"><MudText Color="Color.Info">@Localizer["About"]</MudText></MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="pa-1" >
             <MudScrollToTop>
@@ -33,6 +41,8 @@
                 AppbarHeight = "48px"
             }
         };
+
+    bool drawerOpen = false;
 
     bool isDarkMode = true;
 

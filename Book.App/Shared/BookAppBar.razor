@@ -1,17 +1,10 @@
 ﻿@implements IDisposable
 
-<MudAppBar Elevation="0" Dense="true" Class="pa-0">
-    <MudIconButton Class="pa-0" Edge="Edge.Start" OnClick="Back" Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" title="@Localizer["GoBack"]" />
+<MudAppBar Elevation="1" Dense="true" Class="pa-0">
+    <MudIconButton Class="pa-0" Edge="Edge.Start" OnClick="Back" Icon="@Icons.Material.Filled.ArrowBack" Color="Color.Info" title="@backText" />
     <MudSpacer />
     <TransactionBtn IsIcon="false" TransactionId="0" Icon="@Icons.Material.Filled.AddCircleOutline" />
     <MudSpacer />
-    <MudMenu Class="pa-0 ma-0" Dense="true" Icon="@Icons.Material.Filled.Settings" Color="Color.Info" AnchorOrigin="Origin.BottomRight" title="@Localizer["Settings"]" AriaLabel="@Localizer["Settings"]">
-        <MudMenuItem Href="Database">@Localizer["Database"]</MudMenuItem>
-        <MudMenuItem Href="SummaryTypeList">@Localizer["Types"]</MudMenuItem>
-        <MudMenuItem Href="BookSettings">@Localizer["Settings"]</MudMenuItem>
-        <MudDivider DividerType="DividerType.Middle" />
-        <MudMenuItem Href="Info">@Localizer["About"]</MudMenuItem>
-    </MudMenu>
     <MudIconButton Class="pa-0" Edge="Edge.End" OnClick="ToggleThemeMode" Icon="@themeIcon" Color="@themeColor" title="@themeText" />
 </MudAppBar>
 
@@ -23,7 +16,11 @@
 
     [Inject] internal IBookSettingSvc BookSettingSvc { get; set; } = default!;
 
+    [Inject] public PageParamsSvc PageParamsSvc { get; set; } = default!;
+
     List<string> locations { get; set; } = new List<string> { "/" };
+
+    string backText = string.Empty;
 
     bool isDarkMode = true;
     string themeIcon = Icons.Material.Filled.LightMode;
@@ -34,7 +31,9 @@
     {
         themeText = Localizer["LightMode"];
         isDarkMode = await BookSettingSvc.GetDarkMode();
+
         SetTheme();
+        SetBackText();
 
         NavigationManager.LocationChanged += LocationChanged;
     }
@@ -70,7 +69,54 @@
         locations.RemoveAt(locations.Count - 1);
     }
 
-    void LocationChanged(object? sender, LocationChangedEventArgs args) => locations.Add(args.Location);
+    void LocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        locations.Add(args.Location);
+        SetBackText();
+    }
+
+    void SetBackText()
+    {
+        if (locations.Count > 2)
+        {
+            switch (locations[^2].Split("/").Last().ToLower())
+            {
+                case "linechart":
+                    backText = PageParamsSvc.PageTitle;
+                    break;
+
+                case "translist":
+                    backText = Localizer["Entries"];
+                    break;
+
+                case "summarytypelist":
+                    backText = Localizer["Types"];
+                    break;
+
+                case "database":
+                    backText = Localizer["Database"];
+                    break;
+
+                case "booksettings":
+                    backText = Localizer["Settings"];
+                    break;
+
+                case "info":
+                    backText = Localizer["About"];
+                    break;
+
+                default:
+                    backText = Localizer["Summary"];
+                    break;
+            }
+        }
+        else
+        {
+            backText = Localizer["Summary"];
+        }
+
+        StateHasChanged();
+    }
 
     public void Dispose()
     {

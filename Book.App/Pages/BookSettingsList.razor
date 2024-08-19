@@ -4,14 +4,14 @@
 
 <PageTitle>@BookName - @Localizer["Settings"]</PageTitle>
 
-<MudTable T="BookSetting" Items="BookSettings" @ref="Table" Elevation="5" Dense="true" Hover="true" 
+<MudTable T="BookSetting" Items="BookSettings" @ref="settingsTable" Elevation="5" Dense="true" Hover="true"
         IsEditRowSwitchingBlocked="true" CanCancelEdit="true" RowEditCancel="EditCancelled" 
         RowEditPreview="EditPreview" RowEditCommit="Save" CancelEditIcon="@Icons.Material.Filled.Cancel"
         CommitEditIcon="@Icons.Material.Filled.Save" OnRowClick="OnRowClick" RowEditableFunc="CanEditRow" >
     <ToolBarContent>
         <MudGrid Class="align-center">
             <MudItem Class="py-0 px-2">
-                <MudIconButton Icon="@Icons.Material.Filled.Settings" Variant="Variant.Text" Color="Color.Success" Size="Size.Large"/>
+                <MudIconButton Icon="@Icons.Material.Filled.Settings" Variant="Variant.Text" Color="Color.Info" Size="Size.Large" />
             </MudItem>
             <MudItem Class="pa-0">
                 <MudText Typo="Typo.h5">@Localizer["Settings"]</MudText>
@@ -68,7 +68,7 @@
 
     List<BookSetting> BookSettings { get; set; } = default!;
 
-    MudTable<BookSetting> Table = default!;
+    MudTable<BookSetting> settingsTable = default!;
 
     readonly BookSettingValidator validator = new();
 
@@ -110,7 +110,7 @@
 
     async void Save(object setting)
     {
-        if (!Table.Validator.IsValid) return;
+        if (!settingsTable.Validator.IsValid) return;
 
         BookSetting bookSetting = (BookSetting)setting;
 
