@@ -713,4 +713,7 @@ It is an open-source project licensed under MIT and is free to use in commercial
   <data name="Yearly" xml:space="preserve">
     <value>Yearly</value>
   </data>
+  <data name="ValueNotZero" xml:space="preserve">
+    <value>An Entry must have a value</value>
+  </data>
 </root>

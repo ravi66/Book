@@ -46,9 +46,9 @@
 
     public class TransactionValidator : AbstractValidator<Transaction>
     {
-        public TransactionValidator()
+        public TransactionValidator(IStringLocalizer<Resources.BookResources> localizer)
         {
-            RuleFor(x => x.Value).NotNull().NotEqual(0);
+            RuleFor(x => x.Value).NotNull().NotEqual(0).WithMessage(x => localizer["ValueNotZero"]);
             RuleFor(x => x.TransactionDate).NotEmpty();
             RuleFor(x => x.TransactionTypeId).NotNull().NotEqual(0);
         }

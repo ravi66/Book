@@ -77,7 +77,7 @@
             CreateDate = DateTime.Now,
         };
 
-    readonly TransactionValidator validator = new();
+    TransactionValidator validator = default!;
 
     MudForm form = default!;
 
@@ -124,6 +124,8 @@
         MudDialog.SetOptions(MudDialog.Options);
 
         TransactionTypes = (await TTypeRepo.GetAllTransactionTypes()).ToList();
+
+        validator = new(Localizer);
 
         if (SavedTransactionId == 0)
         {
