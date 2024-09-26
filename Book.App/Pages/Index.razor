@@ -5,7 +5,7 @@
 
 <MudHidden Breakpoint="Breakpoint.Xs" Invert="true" >
     <MudGrid Class="pa-2" Justify="Justify.Center" Spacing="1" >
-        @if (MonthlySummaries != null)
+        @if (MonthlySummaries != null && MonthlySummaries.Count > 1)
         {
             <MudMenu Dense="true" AnchorOrigin="Origin.BottomLeft" Label="@Year.ToString()" Variant="Variant.Outlined" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Size="Size.Small ">
                 @foreach (int year in Years)
@@ -123,19 +123,7 @@ else
         NotifierSvc.ThemeChanged += ThemeChanged;
 
         Years = Enumerable.Range(await BookSettingSvc.GetStartYear(), await BookSettingSvc.GetEndYear() - await BookSettingSvc.GetStartYear() + 1).ToArray();
-
-        if (PageParamsSvc.Year != 0)
-        {
-            Year = PageParamsSvc.Year;
-        }
-        else if (DateTime.Today.Year <= Years.Max() && DateTime.Today.Year >= Years.Min())
-        {
-            Year = DateTime.Today.Year;
-        }
-        else
-        {
-            Year = DateTime.Today.Year > Years.Max() ? Years.Max() : Years.Min();
-        }
+        SetYear();
 
         await LoadSummary();
     }
@@ -149,6 +137,24 @@ else
             if (!await SummaryRepo.IsEmptyDb()) return;
 
             await LoadDemoData.ConfirmLoad();
+        }
+    }
+
+    void SetYear()
+    {
+        if (Year != 0) return;
+
+        if (PageParamsSvc.Year != 0)
+        {
+            Year = PageParamsSvc.Year;
+        }
+        else if (DateTime.Today.Year <= Years.Max() && DateTime.Today.Year >= Years.Min())
+        {
+            Year = DateTime.Today.Year;
+        }
+        else
+        {
+            Year = DateTime.Today.Year > Years.Max() ? Years.Max() : Years.Min();
         }
     }
 
