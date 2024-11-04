@@ -140,14 +140,14 @@
         if (DebitTransactions.Count > CreditTransactions.Count)
         {
             DisplayTransactions = DebitTransactions;
-            ChartTitle = Localizer["Expenditure", DisplayMonth, Year];
+            ChartTitle = Localizer["Expenditure", DisplayMonth, Year, DisplayTransactions.Sum(t => t.Value).ToString("C2")];
             CreditsBtnText = Localizer["ShowCredits"];
         }
         else
         {
             DisplayTransactions = CreditTransactions;
-            ChartTitle = Localizer["Income", DisplayMonth, Year];
-            CreditsBtnText = Localizer["ShowDebits"];
+            ChartTitle = Localizer["Income", DisplayMonth, Year, DisplayTransactions.Sum(t => t.Value).ToString("C2")];
+            CreditsBtnText = Localizer["ShowDebits"]; 
         }
 
         if (DisplayTransactions.Count < 1) Loading = false;
@@ -193,13 +193,13 @@
         if (Credits)
         {
             DisplayTransactions = CreditTransactions ?? [];
-            ChartTitle = Localizer["Income", DisplayMonth, Year];
+            ChartTitle = Localizer["Income", DisplayMonth, Year, DisplayTransactions.Sum(t => t.Value).ToString("C2")];
             CreditsBtnText = Localizer["ShowDebits"];
         }
         else
         {
             DisplayTransactions = DebitTransactions ?? [];
-            ChartTitle = Localizer["Expenditure", DisplayMonth, Year];
+            ChartTitle = Localizer["Expenditure", DisplayMonth, Year, DisplayTransactions.Sum(t => t.Value).ToString("C2")];
             CreditsBtnText = Localizer["ShowCredits"];
         }
 

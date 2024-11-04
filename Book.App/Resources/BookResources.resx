@@ -375,7 +375,7 @@ It is an open-source project licensed under MIT and is free to use in commercial
     <value>Entry Types</value>
   </data>
   <data name="Expenditure" xml:space="preserve">
-    <value>{0} {1} Spend</value>
+    <value>{0} {1} Spend [{2}]</value>
   </data>
   <data name="ExpenditureChart" xml:space="preserve">
     <value>{0} Expenditure Chart</value>
@@ -426,7 +426,7 @@ It is an open-source project licensed under MIT and is free to use in commercial
     <value>in</value>
   </data>
   <data name="Income" xml:space="preserve">
-    <value>{0} {1} Income</value>
+    <value>{0} {1} Income [{2}]</value>
   </data>
   <data name="Info" xml:space="preserve">
     <value>More Information</value>
