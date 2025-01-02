@@ -122,7 +122,7 @@
 
             ChartOptions.Subtitle = new Subtitle
             {
-                Text = Localizer[forecastSet ? "YearChartSTitle" : "YearChartSTitle1", Series.First().Transactions.Sum(t => t.Value).ToString("C2"), (Series.First().Transactions.Sum(t => t.Value) / 12).ToString("C2")],
+                Text = Localizer[forecastSet ? "YearChartSTitle" : "YearChartSTitle1", (Series.First().Transactions.Sum(t => t.Value)).ToString("C2"), ((Series.First().Transactions.Sum(t => t.Value) / 12)).ToString("C2")],
                 OffsetX = 10,
                 Style = new SubtitleStyle { FontSize = "14px" },
             };
@@ -156,7 +156,7 @@
 
             ChartOptions.Subtitle = new Subtitle
             {
-                Text = Localizer[forecastSet ? "YearChartSTitle" : "YearChartSTitle1", forecastTotal.ToString("C2"), (forecastTotal / 12).ToString("C2")],
+                Text = Localizer[forecastSet ? "YearChartSTitle" : "YearChartSTitle1", (forecastTotal).ToString("C2"), ((forecastTotal / 12)).ToString("C2")],
                 OffsetX = 10,
                 Style = new SubtitleStyle { FontSize = "16px" },
             };
@@ -220,7 +220,7 @@
         ChartOptions.NoData = new NoData { Text = @Localizer["NoPieData"], Style = new NoDataStyle { FontSize = "24px" } };
     }
 
-    List<ChartTransaction> GetSeriesTransactions(List<Transaction> transactions) => transactions.Select(t => new ChartTransaction { Dated = t.TransactionDate, Value = t.Value }).ToList();
+    List<ChartTransaction> GetSeriesTransactions(List<Transaction> transactions) => transactions.Select(t => new ChartTransaction { Dated = t.TransactionDate, Value = t.Value * -1}).ToList();
 
     List<ChartTransaction> GetTotalSeriesTransactions()
     {
@@ -270,7 +270,7 @@
 
         DateTime forecastDate = new DateTime(PageParamsSvc.Year, DateTime.Today.Month, 1);
 
-        decimal average = (chartTransactions.Where(t => t.Dated < forecastDate).Sum(t => t.Value) / (forecastDate.Month - 1));
+        decimal average = forecastDate.Month > 1 ? (chartTransactions.Where(t => t.Dated < forecastDate).Sum(t => t.Value) / (forecastDate.Month - 1)) : 0;
         decimal current = 0;
         decimal adjustment = 0;
 
